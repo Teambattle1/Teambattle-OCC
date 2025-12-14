@@ -1,3 +1,4 @@
+import React from 'react';
 import { 
   LayoutDashboard, 
   Gamepad2,
@@ -5,25 +6,14 @@ import {
   QrCode, 
   Cloud, 
   Mail, 
-  Calendar, 
-  Settings, 
   Target,
   Swords,
   Zap,
-  Brain,
   Trophy,
-  Crosshair,
-  Flag,
   Navigation,
-  Key,
   Users,
-  Glasses,
   CircleDot,
-  Dumbbell,
-  Cpu,
-  PieChart,
   Package,
-  LifeBuoy,
   Utensils,
   Hammer,
   Banknote,
@@ -34,9 +24,31 @@ import {
   Code,
   Bot,
   ClipboardList,
-  Wrench
+  Wrench,
+  Map,
+  ListChecks,
+  LucideProps
 } from 'lucide-react';
 import { HubLink } from './types';
+
+// Custom E-conomics Logo Component
+const EconomicLogo = (props: LucideProps) => {
+  return React.createElement('svg', {
+    ...props,
+    xmlns: "http://www.w3.org/2000/svg",
+    width: props.size || 24,
+    height: props.size || 24,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: props.strokeWidth || 2,
+    strokeLinecap: "round",
+    strokeLinejoin: "round"
+  }, 
+    React.createElement('path', { d: "M16 11H7a4 4 0 0 0 0 8h5a4 4 0 0 0 4-4v-1a4 4 0 0 0-4-4h-1" }),
+    React.createElement('path', { d: "M12 2a10 10 0 1 0 10 10A10 10 0 0 0 12 2zm0 18a8 8 0 1 1 8-8 8 8 0 0 1-8 8z", strokeOpacity: "0.3" })
+  );
+};
 
 // Task Control Submenu Links
 export const TASK_CONTROL_LINKS: HubLink[] = [
@@ -49,10 +61,17 @@ export const TASK_CONTROL_LINKS: HubLink[] = [
   },
   {
     id: '12',
-    title: 'EXCEL',
+    title: 'EXCEL 2025',
     url: 'https://segway.sharepoint.com/:x:/r/_layouts/15/doc2.aspx?sourcedoc=%7B1AC01354-27AF-4226-9201-9AD803A8BE30%7D&file=TeamBattle%202025%20(OK%201.0).xlsx&action=default&mobileredirect=true&DefaultItemOpen=1',
     icon: FileSpreadsheet,
     description: 'Planning'
+  },
+  {
+    id: '14',
+    title: 'EXCEL 2026',
+    url: '#',
+    icon: FileSpreadsheet,
+    description: 'Future Planning'
   },
   {
     id: '8',
@@ -78,6 +97,38 @@ export const TOOLS_LINKS: HubLink[] = [
     url: 'https://login.qr-code-generator.com/',
     icon: QrCode,
     description: 'Code Generator'
+  },
+  {
+    id: '13',
+    title: 'MY MAPS',
+    url: 'https://www.google.com/maps/d/edit?mid=1kk3NNhrq_jToiol2_X6-_ExAh88Z55I&ll=55.642030146113406%2C12.52053131216431&z=16',
+    icon: Map,
+    description: 'Location Planning'
+  },
+  {
+    id: '15',
+    title: 'DISTANCE',
+    url: '#distance_tool',
+    icon: Navigation,
+    description: 'Calculator'
+  }
+];
+
+// TeamChallenge Submenu Links
+export const TEAM_CHALLENGE_LINKS: HubLink[] = [
+  {
+    id: 'tc1',
+    title: 'RESULTPAGE',
+    url: 'https://service-2026-loquiz-results-viewer-476701928390.us-west1.run.app/',
+    icon: ListChecks,
+    description: 'Game Standings'
+  },
+  {
+    id: 'tc2',
+    title: 'SETUP GAME',
+    url: 'https://beta.loquiz.com/dashboard',
+    icon: Wrench,
+    description: 'Game Configuration'
   }
 ];
 
@@ -149,7 +200,7 @@ export const HUB_LINKS: HubLink[] = [
 export const ACTIVITY_LINKS: HubLink[] = [
   // Group 1
   { id: 'a1', title: 'TEAMPLAY', url: 'https://play.eventday.dk', icon: Users, description: 'Cooperation', badge: 'ACTIVE' },
-  { id: 'a2', title: 'TEAMCHALLENGE', url: '#', icon: Trophy, description: 'Competition' },
+  { id: 'a2', title: 'TEAMCHALLENGE', url: '#team_challenge', icon: Trophy, description: 'Competition', badge: 'ACTIVE' },
   { id: 'a3', title: 'TEAMTASTE', url: 'https://taste.eventday.dk', icon: Utensils, description: 'Culinary', badge: 'ACTIVE' },
   
   // Group 2
@@ -173,7 +224,7 @@ export const ECONOMY_LINKS: HubLink[] = [
     id: 'e1',
     title: 'E-conomics',
     url: 'https://connect.visma.com/password?clientId=economic&returnUrl=%2Fconnect%2Fauthorize%2Fcallback%3Fclient_id%3Deconomic%26redirect_uri%3Dhttps%253A%252F%252Fid.e-conomic.com%252Fsignin-visma-connect%26response_type%3Dcode%26scope%3Dopenid%2520profile%2520email%2520idp_claims%26code_challenge%3DlZoA4c0ZvvK2tE5pTe3MpbQh1tvMnHnxIRpvY-WrnmU%26code_challenge_method%3DS256%26response_mode%3Dform_post%26nonce%3D639013079883742153.NmNlMTYwYjQtNzEwMi00MTBlLTk3ZDgtNThjYTZmOTE2MThmZDAzMTQwZWQtZjQyNS00NmY2LThmNWEtNDliMjAyNWJiNmFl%26state%3DCfDJ8D2TA8BDXn1HkmTBRGIPpGxnewcMYQTBlyGha62Ha0MP87kgIcOJAaW6ITPhxAkEV2i6fm_5M3FrIWuIUlcvsLGsVF709Fjmons1WK6Diq4UKqcj0w6nGN37U7_S-7OFsevIf_SdXar8Tg1c7s8AqCDqKEv65qih8eLF77kO1T22cLjepzSTBB0WOKcTVs-I741xmIV1y4w3JMz4jIcxe2DGSeFcjy2AFZEDJ58cRQ6wqqLYsthtZdaTPm61NL_gNQq7MmyEqSeM8mUHs6H27OTIWxtbQYB7bxjdA_VKFAbs71TvpWqxJaZhXLbX-7icpnTosabK9h6OeNbYsJodxgwwEHvtEk-i8ncGaalFGz7iHi8WEHLKIgJejJ2IecqkHFNrdmYIAEavXGDJib77SctiJ65628qWwM08eUs9FnuJ1gESmZwjbcu9h2tbKaRY6Lt3oN6v471UnXeKIos4wSsizWjxFLeiU3vvFa5tsykBi_gR_nK6W9c2xE6a3fqhzrZxoR2IQg6MFxWov0Ztds9PJmmcpix1bGTz9RnQymQdq9h5W40liyyNP8KrOrfW3rpP0VlWTAaehREgnv7Gle-LGDf4FcJAWOu7d24o0ykR_lq3naX1243weTlRdiZ3G59dafX43QIOzXs_g8HiLvqH2w7miHC26BAeB4H_039kumOrB7B-IKt-jkb7jYZbIC_zLPR1bKWdCM3TXuoiNF80R21nNkt2dNrhkRtP9R29igufU-PbYi9cKFeBhKWZjxHq2Mzph3RiZmk--QMoSqTWqLp0oRC5zI2R6PuqBcSM-fCShCk5Sz4r9_2mk3uc6ffS00yt3iJwi-YcWw-N6QPnwUkqoCZmLOkWn8m2XPlY2lRh4JNIbp3WKEWsUI55LtExBwmqX-P3AdmGmDPuqgFgWBywDwtDJ5HxBtlxu7oshYSmhaq7s_fn6zcmmORS4h4emsgYdHNt93Zj5irfGAOycD2h1FapFwOaUxv425UQ75nFlqmrMxiKtCUp-sue_S3W8acLiYHdVhrW3xmTM29aBMvZZWbgsy4mGp122YT0sLUzBZ1RJD-OluV39OP6UQ%26x-client-SKU%3DID_NET9_0%26x-client-ver%3D8.0.1.0',
-    icon: Banknote,
+    icon: EconomicLogo,
     description: 'Accounting'
   },
   {

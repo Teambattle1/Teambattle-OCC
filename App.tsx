@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   HUB_LINKS, 
   ACTIVITY_LINKS, 
@@ -6,11 +6,13 @@ import {
   CODING_LINKS, 
   TASK_CONTROL_LINKS,
   TOOLS_LINKS,
-  OFFICE_LINKS
+  OFFICE_LINKS,
+  TEAM_CHALLENGE_LINKS
 } from './constants';
 import HubButton from './components/HubButton';
 import Clock from './components/Clock';
 import CalendarModal from './components/CalendarModal';
+import DistanceTool from './components/DistanceTool';
 import { 
   ShieldCheck, 
   House, 
@@ -19,16 +21,73 @@ import {
   Code,
   ClipboardList,
   Wrench,
-  Briefcase
+  Briefcase,
+  Trophy,
+  Navigation
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'coding' | 'task_control' | 'tools' | 'office';
+type ViewState = 'main' | 'activities' | 'economy' | 'coding' | 'task_control' | 'tools' | 'office' | 'team_challenge' | 'distance_tool';
 
 const App: React.FC = () => {
   const [currentView, setCurrentView] = useState<ViewState>('main');
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+  
+  // Drag and Drop State
+  const [hubLinks, setHubLinks] = useState<HubLink[]>(() => {
+    try {
+      const saved = localStorage.getItem('hubLinksOrder');
+      if (saved) {
+        const savedIds = JSON.parse(saved);
+        if (Array.isArray(savedIds)) {
+          // Reconstruct order based on saved IDs
+          const orderedLinks = savedIds
+            .map((id: string) => HUB_LINKS.find(l => l.id === id))
+            .filter((l): l is HubLink => !!l);
+            
+          // Add any new links that aren't in local storage yet
+          const missingLinks = HUB_LINKS.filter(l => !savedIds.includes(l.id));
+          return [...orderedLinks, ...missingLinks];
+        }
+      }
+    } catch (error) {
+      console.error("Failed to load hub links order", error);
+    }
+    return HUB_LINKS;
+  });
+
+  const [draggedItemIndex, setDraggedItemIndex] = useState<number | null>(null);
+
+  const handleDragStart = (e: React.DragEvent, index: number) => {
+    setDraggedItemIndex(index);
+    e.dataTransfer.effectAllowed = "move";
+    // Optional: Set a custom drag image if needed, or stick to default
+  };
+
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault(); // Essential to allow dropping
+    e.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (e: React.DragEvent, targetIndex: number) => {
+    e.preventDefault();
+    if (draggedItemIndex === null || draggedItemIndex === targetIndex) return;
+
+    const newLinks = [...hubLinks];
+    const draggedItem = newLinks[draggedItemIndex];
+    
+    // Remove dragged item
+    newLinks.splice(draggedItemIndex, 1);
+    // Insert at new position
+    newLinks.splice(targetIndex, 0, draggedItem);
+    
+    setHubLinks(newLinks);
+    setDraggedItemIndex(null);
+    
+    // Save to localStorage
+    localStorage.setItem('hubLinksOrder', JSON.stringify(newLinks.map(l => l.id)));
+  };
 
   const changeView = (view: ViewState) => {
     setIsTransitioning(true);
@@ -45,22 +104,29 @@ const App: React.FC = () => {
     else if (link.title === 'TASKS') changeView('task_control');
     else if (link.title === 'TOOLS') changeView('tools');
     else if (link.title === 'OFFICE') changeView('office');
+    else if (link.title === 'TEAMCHALLENGE') changeView('team_challenge');
+    else if (link.title === 'DISTANCE') changeView('distance_tool');
   };
 
   const handleBackClick = () => {
     // Nested navigation logic
     if (currentView === 'economy') {
       changeView('office');
+    } else if (currentView === 'team_challenge') {
+      changeView('activities');
+    } else if (currentView === 'distance_tool') {
+      changeView('tools');
     } else {
       changeView('main');
     }
   };
 
-  let currentLinks: HubLink[] = HUB_LINKS;
-  let viewTitle = 'TEAMBATTLE';
-  let viewSubtitle = 'Operational Command Center';
+  let currentLinks: HubLink[] = [];
+  let viewTitle = '';
+  let viewSubtitle = '';
   let ViewIcon = ShieldCheck;
 
+  // Determine content based on view
   switch (currentView) {
     case 'activities':
       currentLinks = ACTIVITY_LINKS;
@@ -98,9 +164,22 @@ const App: React.FC = () => {
       viewSubtitle = 'Corporate Suite';
       ViewIcon = Briefcase;
       break;
+    case 'team_challenge':
+      currentLinks = TEAM_CHALLENGE_LINKS;
+      viewTitle = 'CHALLENGE';
+      viewSubtitle = 'Competition Control';
+      ViewIcon = Trophy;
+      break;
+    case 'distance_tool':
+      currentLinks = []; // No links grid for this view
+      viewTitle = 'DISTANCE';
+      viewSubtitle = 'Travel Calculator';
+      ViewIcon = Navigation;
+      break;
     case 'main':
     default:
-      currentLinks = HUB_LINKS;
+      // Use the state for main view to reflect drag and drop order
+      currentLinks = hubLinks; 
       viewTitle = 'TEAMBATTLE';
       viewSubtitle = 'Operational Command Center';
       ViewIcon = ShieldCheck;
@@ -112,7 +191,7 @@ const App: React.FC = () => {
   
   if (currentView === 'activities') {
     gridClass = "grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 md:gap-x-10 md:gap-y-12 justify-items-center max-w-4xl mx-auto";
-  } else if (currentView === 'economy' || currentView === 'coding' || currentView === 'tools') {
+  } else if (currentView === 'economy' || currentView === 'coding' || currentView === 'tools' || currentView === 'team_challenge') {
     gridClass = "grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-8 md:gap-x-10 md:gap-y-12 justify-items-center max-w-2xl mx-auto";
   } else if (currentView === 'task_control' || currentView === 'office') {
     gridClass = "grid grid-cols-1 md:grid-cols-3 gap-x-6 gap-y-8 md:gap-x-10 md:gap-y-12 justify-items-center max-w-4xl mx-auto";
@@ -171,11 +250,11 @@ const App: React.FC = () => {
 
       <CalendarModal isOpen={isCalendarOpen} onClose={() => setIsCalendarOpen(false)} />
 
-      {/* Main Content Container */}
-      <main className="relative z-10 flex-grow flex flex-col items-center justify-start pt-24 md:pt-32 px-4">
+      {/* Main Content Container - Reduced padding top to move things up */}
+      <main className="relative z-10 flex-grow flex flex-col items-center justify-start pt-20 px-4">
         
         {/* Header Section */}
-        <header className="w-full max-w-6xl mx-auto mb-10 md:mb-16 relative flex flex-col items-center justify-center">
+        <header className="w-full max-w-6xl mx-auto mb-10 relative flex flex-col items-center justify-center">
           
           {/* Centered Title Content - Text centered, Icon absolute left */}
           <div className="text-center flex flex-col items-center">
@@ -198,18 +277,26 @@ const App: React.FC = () => {
           </div>
         </header>
 
-        {/* The Grid */}
+        {/* content */}
         <div className={`w-full max-w-6xl mx-auto transition-opacity duration-300 ${isTransitioning ? 'opacity-0' : 'opacity-100'}`}>
-          <div className={gridClass}>
-            {currentLinks.map((link, index) => (
-              <HubButton 
-                key={link.id} 
-                link={link} 
-                index={index}
-                onClick={handleLinkClick}
-              />
-            ))}
-          </div>
+          {currentView === 'distance_tool' ? (
+            <DistanceTool />
+          ) : (
+            <div className={gridClass}>
+              {currentLinks.map((link, index) => (
+                <HubButton 
+                  key={link.id} 
+                  link={link} 
+                  index={index}
+                  onClick={handleLinkClick}
+                  draggable={currentView === 'main'}
+                  onDragStart={handleDragStart}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
       </main>

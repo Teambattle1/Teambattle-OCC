@@ -5,9 +5,21 @@ interface HubButtonProps {
   link: HubLink;
   index: number;
   onClick?: (link: HubLink) => void;
+  draggable?: boolean;
+  onDragStart?: (e: React.DragEvent, index: number) => void;
+  onDragOver?: (e: React.DragEvent, index: number) => void;
+  onDrop?: (e: React.DragEvent, index: number) => void;
 }
 
-const HubButton: React.FC<HubButtonProps> = ({ link, index, onClick }) => {
+const HubButton: React.FC<HubButtonProps> = ({ 
+  link, 
+  index, 
+  onClick,
+  draggable = false,
+  onDragStart,
+  onDragOver,
+  onDrop
+}) => {
   const [isHovered, setIsHovered] = useState(false);
 
   const handleClick = (e: React.MouseEvent) => {
@@ -30,7 +42,11 @@ const HubButton: React.FC<HubButtonProps> = ({ link, index, onClick }) => {
       target={link.url.startsWith('#') ? undefined : "_blank"}
       rel="noopener noreferrer"
       onClick={handleClick}
-      className="group relative flex flex-col items-center justify-center p-4 outline-none focus:outline-none"
+      draggable={draggable}
+      onDragStart={(e) => draggable && onDragStart && onDragStart(e, index)}
+      onDragOver={(e) => draggable && onDragOver && onDragOver(e, index)}
+      onDrop={(e) => draggable && onDrop && onDrop(e, index)}
+      className={`group relative flex flex-col items-center justify-center p-4 outline-none focus:outline-none ${draggable ? 'cursor-grab active:cursor-grabbing' : ''}`}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       style={{
@@ -45,7 +61,6 @@ const HubButton: React.FC<HubButtonProps> = ({ link, index, onClick }) => {
           rounded-full border-2 
           bg-battle-grey bg-opacity-40 backdrop-blur-sm
           transition-all duration-300 ease-out
-          cursor-pointer
           active:scale-95 active:shadow-inner
           ${isHovered 
             ? 'border-battle-orange shadow-neon-hover scale-110 -translate-y-2' 
