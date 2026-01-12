@@ -45,18 +45,19 @@ const PackingList: React.FC<PackingListProps> = ({ title, storageKey, items }) =
   const progress = Math.round((totalChecked / totalItems) * 100);
 
   return (
-    <div className="w-full max-w-3xl mx-auto">
-      <div className="bg-battle-grey/20 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <div className="flex items-center gap-3">
-            <Package className="w-8 h-8 text-battle-orange" />
-            <h2 className="text-xl font-bold text-white uppercase tracking-wider">{title}</h2>
+    <div className="w-full max-w-4xl mx-auto px-2 tablet:px-4">
+      <div className="bg-battle-grey/20 border border-white/10 rounded-xl tablet:rounded-2xl p-3 tablet:p-4 lg:p-6 backdrop-blur-sm">
+        {/* Header - Touch optimized */}
+        <div className="flex items-center justify-between mb-4 tablet:mb-6">
+          <div className="flex items-center gap-2 tablet:gap-3">
+            <Package className="w-6 h-6 tablet:w-7 tablet:h-7 lg:w-8 lg:h-8 text-battle-orange" />
+            <h2 className="text-base tablet:text-lg lg:text-xl font-bold text-white uppercase tracking-wider">{title}</h2>
           </div>
           <button
             onClick={resetAll}
-            className="flex items-center gap-2 px-3 py-2 text-sm text-gray-400 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+            className="flex items-center gap-1.5 tablet:gap-2 px-3 tablet:px-4 py-2 tablet:py-2.5 text-xs tablet:text-sm text-gray-400 hover:text-white hover:bg-white/10 active:bg-white/20 rounded-lg transition-colors touch-manipulation"
             title="Nulstil alle"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             <RotateCcw className="w-4 h-4" />
             Nulstil
@@ -64,12 +65,12 @@ const PackingList: React.FC<PackingListProps> = ({ title, storageKey, items }) =
         </div>
 
         {/* Progress Bar */}
-        <div className="mb-6">
-          <div className="flex justify-between text-sm text-gray-400 mb-2">
+        <div className="mb-4 tablet:mb-6">
+          <div className="flex justify-between text-xs tablet:text-sm text-gray-400 mb-1.5 tablet:mb-2">
             <span>{totalChecked} af {totalItems} pakket</span>
             <span>{progress}%</span>
           </div>
-          <div className="h-3 bg-battle-black rounded-full overflow-hidden">
+          <div className="h-2.5 tablet:h-3 bg-battle-black rounded-full overflow-hidden">
             <div
               className="h-full bg-gradient-to-r from-battle-orange to-green-500 transition-all duration-300"
               style={{ width: `${progress}%` }}
@@ -77,51 +78,54 @@ const PackingList: React.FC<PackingListProps> = ({ title, storageKey, items }) =
           </div>
         </div>
 
-        {/* Categories */}
-        {categories.map(category => (
-          <div key={category} className="mb-6 last:mb-0">
-            <h3 className="text-sm font-bold text-battle-orange uppercase tracking-wider mb-3 border-b border-white/10 pb-2">
-              {category}
-            </h3>
-            <div className="space-y-2">
-              {items
-                .filter(item => item.category === category)
-                .map(item => (
-                  <button
-                    key={item.id}
-                    onClick={() => toggleItem(item.id)}
-                    className={`w-full flex items-center gap-3 p-3 rounded-lg transition-all text-left ${
-                      checkedItems.has(item.id)
-                        ? 'bg-green-900/30 border border-green-500/30'
-                        : 'bg-battle-black/30 border border-white/10 hover:border-battle-orange/50'
-                    }`}
-                  >
-                    <div
-                      className={`w-6 h-6 rounded-md flex items-center justify-center flex-shrink-0 transition-colors ${
+        {/* Categories - Optimized for tablet with 2-column layout */}
+        <div className="tablet:grid tablet:grid-cols-2 tablet:gap-4">
+          {categories.map(category => (
+            <div key={category} className="mb-4 tablet:mb-0 last:mb-0">
+              <h3 className="text-xs tablet:text-sm font-bold text-battle-orange uppercase tracking-wider mb-2 tablet:mb-3 border-b border-white/10 pb-1.5 tablet:pb-2">
+                {category}
+              </h3>
+              <div className="space-y-1.5 tablet:space-y-2">
+                {items
+                  .filter(item => item.category === category)
+                  .map(item => (
+                    <button
+                      key={item.id}
+                      onClick={() => toggleItem(item.id)}
+                      className={`w-full flex items-center gap-2 tablet:gap-3 p-2.5 tablet:p-3 rounded-lg transition-all text-left touch-manipulation active:scale-[0.98] ${
                         checkedItems.has(item.id)
-                          ? 'bg-green-500 text-white'
-                          : 'bg-battle-grey border border-white/20'
+                          ? 'bg-green-900/30 border border-green-500/30'
+                          : 'bg-battle-black/30 border border-white/10 hover:border-battle-orange/50 active:border-battle-orange/70'
                       }`}
+                      style={{ WebkitTapHighlightColor: 'transparent' }}
                     >
-                      {checkedItems.has(item.id) && <Check className="w-4 h-4" />}
-                    </div>
-                    <span
-                      className={`text-sm ${
-                        checkedItems.has(item.id) ? 'text-gray-400 line-through' : 'text-white'
-                      }`}
-                    >
-                      {item.text}
-                    </span>
-                  </button>
-                ))}
+                      <div
+                        className={`w-6 h-6 tablet:w-7 tablet:h-7 rounded-md flex items-center justify-center flex-shrink-0 transition-colors ${
+                          checkedItems.has(item.id)
+                            ? 'bg-green-500 text-white'
+                            : 'bg-battle-grey border border-white/20'
+                        }`}
+                      >
+                        {checkedItems.has(item.id) && <Check className="w-4 h-4 tablet:w-5 tablet:h-5" />}
+                      </div>
+                      <span
+                        className={`text-xs tablet:text-sm ${
+                          checkedItems.has(item.id) ? 'text-gray-400 line-through' : 'text-white'
+                        }`}
+                      >
+                        {item.text}
+                      </span>
+                    </button>
+                  ))}
+              </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
 
         {/* Completion Message */}
         {progress === 100 && (
-          <div className="mt-6 p-4 bg-green-900/30 border border-green-500/30 rounded-xl text-center">
-            <p className="text-green-400 font-bold">✅ Alt er pakket!</p>
+          <div className="mt-4 tablet:mt-6 p-3 tablet:p-4 bg-green-900/30 border border-green-500/30 rounded-lg tablet:rounded-xl text-center">
+            <p className="text-green-400 font-bold text-sm tablet:text-base">Alt er pakket!</p>
           </div>
         )}
       </div>

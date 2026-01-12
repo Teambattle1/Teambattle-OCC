@@ -470,12 +470,16 @@ const App: React.FC = () => {
       break;
   }
 
-  // Grid layout logic - 4x2 grid on desktop for all subpages
-  let gridClass = "grid grid-cols-2 md:grid-cols-4 gap-x-6 gap-y-8 md:gap-x-8 md:gap-y-12 justify-items-center max-w-5xl mx-auto";
+  // Grid layout logic - optimized for tablet landscape (1280x800)
+  // Activities grid: 4 columns on tablet+ for better landscape layout
+  let gridClass = "grid grid-cols-2 tablet:grid-cols-4 lg:grid-cols-4 gap-x-4 gap-y-4 tablet:gap-x-6 tablet:gap-y-6 md:gap-x-8 md:gap-y-8 justify-items-center max-w-5xl mx-auto tablet-landscape-grid";
 
   if (currentView === 'main') {
     // Main view: centered flex layout
-    gridClass = "flex flex-wrap justify-center gap-8 md:gap-12 max-w-6xl mx-auto";
+    gridClass = "flex flex-wrap justify-center gap-4 tablet:gap-6 md:gap-8 lg:gap-12 max-w-6xl mx-auto";
+  } else if (currentView === 'activities') {
+    // Activities: 4 columns grid for 11 items, optimized for tablet landscape
+    gridClass = "grid grid-cols-2 sm:grid-cols-3 tablet:grid-cols-4 gap-x-3 gap-y-3 tablet:gap-x-4 tablet:gap-y-4 justify-items-center max-w-5xl mx-auto tablet-landscape-grid";
   }
 
   return (
@@ -498,15 +502,15 @@ const App: React.FC = () => {
         ></div>
       </div>
 
-      {/* Top Left Back Button (Same height/styling as calendar) */}
+      {/* Top Left Back Button - Touch optimized */}
       {currentView !== 'main' && (
-        <div className="absolute top-4 left-4 md:top-8 md:left-8 z-50">
-          <button 
+        <div className="absolute top-3 left-3 tablet:top-4 tablet:left-4 md:top-8 md:left-8 z-50">
+          <button
             onClick={handleBackClick}
-            className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-300"
+            className="group flex items-center justify-center w-11 h-11 tablet:w-12 tablet:h-12 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 active:bg-battle-orange/30 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-200 touch-manipulation"
             title="Return"
           >
-            <House className="w-6 h-6 md:w-7 md:h-7 group-hover:text-battle-orange transition-colors" />
+            <House className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-battle-orange group-active:text-battle-orange transition-colors" />
           </button>
         </div>
       )}
@@ -516,21 +520,21 @@ const App: React.FC = () => {
         <Clock />
       </div>
 
-      {/* Top Right User Info and Calendar */}
-      <div className="absolute top-4 right-4 md:top-8 md:right-8 z-50 flex items-center gap-3">
+      {/* Top Right User Info and Calendar - Touch optimized */}
+      <div className="absolute top-3 right-3 tablet:top-4 tablet:right-4 md:top-8 md:right-8 z-50 flex items-center gap-2 tablet:gap-3">
         {/* Claude AI Button - Admin Only */}
         {profile?.role === 'ADMIN' && (
           <button
             onClick={() => setIsClaudeAssistantOpen(true)}
-            className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-orange-500/20 to-amber-600/20 hover:from-orange-500/40 hover:to-amber-600/40 border border-orange-500/30 hover:border-orange-500 text-white rounded-full transition-all duration-300 shadow-[0_0_15px_rgba(255,140,0,0.2)] hover:shadow-[0_0_25px_rgba(255,140,0,0.4)]"
+            className="group flex items-center justify-center w-10 h-10 tablet:w-11 tablet:h-11 md:w-14 md:h-14 bg-gradient-to-br from-orange-500/20 to-amber-600/20 hover:from-orange-500/40 hover:to-amber-600/40 active:from-orange-500/50 active:to-amber-600/50 border border-orange-500/30 hover:border-orange-500 text-white rounded-full transition-all duration-200 shadow-[0_0_15px_rgba(255,140,0,0.2)] hover:shadow-[0_0_25px_rgba(255,140,0,0.4)] touch-manipulation"
             title="Claude AI Assistant"
           >
-            <Bot className="w-6 h-6 md:w-7 md:h-7 text-orange-400 group-hover:text-orange-300 transition-colors" />
+            <Bot className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 text-orange-400 group-hover:text-orange-300 group-active:text-orange-200 transition-colors" />
           </button>
         )}
 
-        {/* User Info */}
-        <div className="hidden md:flex items-center gap-2 bg-battle-grey/50 border border-white/10 rounded-full px-4 py-2">
+        {/* User Info - Hidden on small tablets */}
+        <div className="hidden lg:flex items-center gap-2 bg-battle-grey/50 border border-white/10 rounded-full px-4 py-2">
           <User className="w-4 h-4 text-gray-400" />
           <span className="text-sm text-gray-300">{profile?.name || profile?.email}</span>
           <span className={`text-xs px-2 py-0.5 rounded-full ${
@@ -545,27 +549,27 @@ const App: React.FC = () => {
         {/* Logout Button */}
         <button
           onClick={signOut}
-          className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-red-500/20 border border-white/10 hover:border-red-500 text-white rounded-full transition-all duration-300"
+          className="group flex items-center justify-center w-10 h-10 tablet:w-11 tablet:h-11 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-red-500/20 active:bg-red-500/30 border border-white/10 hover:border-red-500 text-white rounded-full transition-all duration-200 touch-manipulation"
           title="Log ud"
         >
-          <LogOut className="w-6 h-6 md:w-7 md:h-7 group-hover:text-red-500 transition-colors" />
+          <LogOut className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-red-500 group-active:text-red-400 transition-colors" />
         </button>
 
         {/* Distance Button */}
         <button
           onClick={() => changeView('distance_tool')}
-          className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-blue-500/20 border border-white/10 hover:border-blue-500 text-white rounded-full transition-all duration-300"
+          className="group flex items-center justify-center w-10 h-10 tablet:w-11 tablet:h-11 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-blue-500/20 active:bg-blue-500/30 border border-white/10 hover:border-blue-500 text-white rounded-full transition-all duration-200 touch-manipulation"
           title="Afstandsberegner"
         >
-          <Ruler className="w-6 h-6 md:w-7 md:h-7 group-hover:text-blue-400 transition-colors" />
+          <Ruler className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-blue-400 group-active:text-blue-300 transition-colors" />
         </button>
 
         {/* Calendar Button */}
         <button
           onClick={() => setIsCalendarOpen(true)}
-          className="group flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-300"
+          className="group flex items-center justify-center w-10 h-10 tablet:w-11 tablet:h-11 md:w-14 md:h-14 bg-battle-grey/50 hover:bg-battle-orange/20 active:bg-battle-orange/30 border border-white/10 hover:border-battle-orange text-white rounded-full transition-all duration-200 touch-manipulation"
         >
-          <Calendar className="w-6 h-6 md:w-7 md:h-7 group-hover:text-battle-orange transition-colors" />
+          <Calendar className="w-5 h-5 tablet:w-6 tablet:h-6 md:w-7 md:h-7 group-hover:text-battle-orange group-active:text-battle-orangeLight transition-colors" />
         </button>
       </div>
 
@@ -574,22 +578,22 @@ const App: React.FC = () => {
       <UsersManagement isOpen={isUsersOpen} onClose={() => setIsUsersOpen(false)} />
       <ClaudeAssistant isOpen={isClaudeAssistantOpen} onClose={() => setIsClaudeAssistantOpen(false)} />
 
-      {/* Main Content Container - Reduced padding top to move things up */}
-      <main className="relative z-10 flex-grow flex flex-col items-center justify-start pt-20 px-4">
-        
-        {/* Header Section */}
-        <header className="w-full max-w-6xl mx-auto mb-10 relative flex flex-col items-center justify-center">
-          
+      {/* Main Content Container - Optimized for tablet landscape */}
+      <main className="relative z-10 flex-grow flex flex-col items-center justify-start pt-16 tablet:pt-14 lg:pt-20 px-3 tablet:px-4 tablet-landscape-compact">
+
+        {/* Header Section - Compact on tablet landscape */}
+        <header className="w-full max-w-6xl mx-auto mb-4 tablet:mb-6 lg:mb-10 relative flex flex-col items-center justify-center tablet-landscape-header">
+
           {/* Centered Title Content - Text centered, Icon absolute left */}
           <div className="text-center flex flex-col items-center">
-            
-            <div className="relative flex items-center justify-center mb-2">
+
+            <div className="relative flex items-center justify-center mb-1 tablet:mb-2">
                {/* Icon Positioned Absolute Left of the Title */}
-               <div className="absolute right-full mr-4 md:mr-6 text-battle-orange drop-shadow-[0_0_10px_rgba(255,102,0,0.5)] flex items-center">
-                 <ViewIcon className="w-10 h-10 md:w-14 md:h-14" />
+               <div className="absolute right-full mr-3 tablet:mr-4 md:mr-6 text-battle-orange drop-shadow-[0_0_10px_rgba(255,102,0,0.5)] flex items-center">
+                 <ViewIcon className="w-8 h-8 tablet:w-10 tablet:h-10 md:w-14 md:h-14" />
                </div>
 
-               <h1 className="text-4xl md:text-6xl font-black tracking-tighter uppercase">
+               <h1 className="text-3xl tablet:text-4xl md:text-6xl font-black tracking-tighter uppercase">
                 {viewTitle.startsWith('TEAM') ? (
                   <>
                     <span className="text-white">TEAM</span>
@@ -602,11 +606,11 @@ const App: React.FC = () => {
                 )}
               </h1>
             </div>
-            
-            <p className="text-battle-white/50 text-sm md:text-lg tracking-[0.2em] uppercase">
+
+            <p className="text-battle-white/50 text-xs tablet:text-sm md:text-lg tracking-[0.2em] uppercase">
               {viewSubtitle}
             </p>
-            <div className="h-1 w-24 bg-battle-orange mx-auto mt-6 rounded-full shadow-[0_0_15px_rgba(255,102,0,1)]"></div>
+            <div className="h-0.5 tablet:h-1 w-16 tablet:w-24 bg-battle-orange mx-auto mt-3 tablet:mt-4 lg:mt-6 rounded-full shadow-[0_0_15px_rgba(255,102,0,1)]"></div>
           </div>
         </header>
 

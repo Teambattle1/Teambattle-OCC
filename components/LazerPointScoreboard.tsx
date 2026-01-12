@@ -339,21 +339,21 @@ const LazerPointScoreboard: React.FC = () => {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto">
-      <div className="bg-battle-grey/20 border border-white/10 rounded-2xl p-4 md:p-6 backdrop-blur-sm">
+    <div className="w-full max-w-7xl mx-auto px-2 tablet:px-3">
+      <div className="bg-battle-grey/20 border border-white/10 rounded-xl tablet:rounded-2xl p-3 tablet:p-4 md:p-6 backdrop-blur-sm">
 
-        {/* Cloud Sync Controls */}
-        <div className="bg-battle-black/30 rounded-xl p-4 mb-6 border border-white/5">
-          <div className="flex flex-wrap items-center gap-3">
+        {/* Cloud Sync Controls - Touch optimized */}
+        <div className="bg-battle-black/30 rounded-lg tablet:rounded-xl p-3 tablet:p-4 mb-4 tablet:mb-6 border border-white/5">
+          <div className="flex flex-wrap items-center gap-2 tablet:gap-3">
             <div className="flex items-center gap-2">
               {syncStatus === 'saved' ? (
-                <Cloud className="w-5 h-5 text-green-400" />
+                <Cloud className="w-4 h-4 tablet:w-5 tablet:h-5 text-green-400" />
               ) : syncStatus === 'error' ? (
-                <CloudOff className="w-5 h-5 text-red-400" />
+                <CloudOff className="w-4 h-4 tablet:w-5 tablet:h-5 text-red-400" />
               ) : (
-                <CloudOff className="w-5 h-5 text-gray-400" />
+                <CloudOff className="w-4 h-4 tablet:w-5 tablet:h-5 text-gray-400" />
               )}
-              <span className="text-sm text-gray-400">
+              <span className="text-xs tablet:text-sm text-gray-400">
                 {syncStatus === 'saved' ? 'Gemt' : syncStatus === 'error' ? 'Fejl' : 'Ikke gemt'}
               </span>
             </div>
@@ -363,13 +363,14 @@ const LazerPointScoreboard: React.FC = () => {
               value={sessionName}
               onChange={(e) => setSessionName(e.target.value)}
               placeholder="Session navn..."
-              className="flex-1 min-w-[200px] bg-battle-grey/50 border border-battle-grey rounded px-3 py-2 text-white text-sm"
+              className="flex-1 min-w-[140px] tablet:min-w-[200px] bg-battle-grey/50 border border-battle-grey rounded px-2 tablet:px-3 py-2 tablet:py-2.5 text-white text-sm touch-manipulation"
             />
 
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 text-white rounded-lg font-semibold transition-colors text-sm"
+              className="flex items-center gap-1.5 tablet:gap-2 px-3 tablet:px-4 py-2 tablet:py-2.5 bg-green-600 hover:bg-green-500 active:bg-green-400 disabled:bg-gray-600 text-white rounded-lg font-semibold transition-colors text-xs tablet:text-sm touch-manipulation"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <Save className="w-4 h-4" />
               {isSaving ? 'Gemmer...' : 'Gem'}
@@ -377,7 +378,8 @@ const LazerPointScoreboard: React.FC = () => {
 
             <button
               onClick={() => setShowSessionList(!showSessionList)}
-              className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg font-semibold transition-colors text-sm"
+              className="flex items-center gap-1.5 tablet:gap-2 px-3 tablet:px-4 py-2 tablet:py-2.5 bg-blue-600 hover:bg-blue-500 active:bg-blue-400 text-white rounded-lg font-semibold transition-colors text-xs tablet:text-sm touch-manipulation"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
               <FolderOpen className="w-4 h-4" />
               Indlæs
@@ -385,9 +387,10 @@ const LazerPointScoreboard: React.FC = () => {
 
             <button
               onClick={handleNewSession}
-              className="px-4 py-2 bg-battle-grey/50 hover:bg-battle-grey text-white rounded-lg font-semibold transition-colors text-sm"
+              className="px-3 tablet:px-4 py-2 tablet:py-2.5 bg-battle-grey/50 hover:bg-battle-grey active:bg-battle-grey/70 text-white rounded-lg font-semibold transition-colors text-xs tablet:text-sm touch-manipulation"
+              style={{ WebkitTapHighlightColor: 'transparent' }}
             >
-              Ny Session
+              Ny
             </button>
           </div>
 
@@ -429,42 +432,45 @@ const LazerPointScoreboard: React.FC = () => {
           )}
         </div>
 
-        {/* Controls */}
-        <div className="flex gap-3 mb-6 justify-center flex-wrap">
+        {/* Controls - Touch optimized */}
+        <div className="flex gap-2 tablet:gap-3 mb-4 tablet:mb-6 justify-center flex-wrap">
           <button
             onClick={addTeam}
             disabled={teams.length >= 8}
-            className="px-4 py-2 bg-green-600 hover:bg-green-500 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-colors"
+            className="px-3 tablet:px-4 py-2 tablet:py-2.5 bg-green-600 hover:bg-green-500 active:bg-green-400 disabled:bg-gray-600 disabled:cursor-not-allowed text-white rounded-lg font-semibold transition-colors text-sm touch-manipulation"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             + Tilføj Hold
           </button>
           <button
             onClick={resetAll}
-            className="px-4 py-2 bg-red-600 hover:bg-red-500 text-white rounded-lg font-semibold transition-colors"
+            className="px-3 tablet:px-4 py-2 tablet:py-2.5 bg-red-600 hover:bg-red-500 active:bg-red-400 text-white rounded-lg font-semibold transition-colors text-sm touch-manipulation"
+            style={{ WebkitTapHighlightColor: 'transparent' }}
           >
-            Nulstil Scores
+            Nulstil
           </button>
         </div>
 
-        {/* Scoreboard Table */}
-        <div className="overflow-x-auto rounded-xl shadow-2xl">
-          <table className="w-full border-collapse bg-battle-black/50 backdrop-blur">
+        {/* Scoreboard Table - Touch optimized */}
+        <div className="overflow-x-auto rounded-lg tablet:rounded-xl shadow-2xl -mx-2 tablet:mx-0">
+          <table className="w-full border-collapse bg-battle-black/50 backdrop-blur text-xs tablet:text-sm">
             <thead>
               <tr className="bg-gradient-to-r from-purple-700 to-pink-600">
-                <th className="p-3 text-left text-white font-bold border-r border-purple-500 min-w-[200px]">RUNDE</th>
+                <th className="p-2 tablet:p-3 text-left text-white font-bold border-r border-purple-500 min-w-[120px] tablet:min-w-[160px]">RUNDE</th>
                 {teams.map((team, i) => (
-                  <th key={i} className="p-2 text-white border-r border-purple-500 min-w-[180px]">
+                  <th key={i} className="p-1.5 tablet:p-2 text-white border-r border-purple-500 min-w-[130px] tablet:min-w-[160px]">
                     <div className="flex flex-col gap-1">
                       <input
                         type="text"
                         value={team.name}
                         onChange={(e) => updateTeamName(i, e.target.value)}
-                        className="bg-white/20 rounded px-2 py-1 text-center text-white placeholder-white/50 w-full font-bold"
+                        className="bg-white/20 rounded px-2 py-1.5 tablet:py-2 text-center text-white placeholder-white/50 w-full font-bold text-xs tablet:text-sm touch-manipulation"
                       />
                       {teams.length > 2 && (
                         <button
                           onClick={() => removeTeam(i)}
-                          className="text-xs text-red-300 hover:text-red-100"
+                          className="text-[10px] tablet:text-xs text-red-300 hover:text-red-100 active:text-red-50 py-1 touch-manipulation"
+                          style={{ WebkitTapHighlightColor: 'transparent' }}
                         >
                           Fjern
                         </button>
@@ -477,33 +483,35 @@ const LazerPointScoreboard: React.FC = () => {
             <tbody>
               {/* Round 1: LAZER POINT */}
               <tr className="bg-red-900/40">
-                <td className="p-3 border-r border-battle-grey/50">
-                  <div className="font-bold text-red-400">Runde 1: LAZER POINT</div>
-                  <div className="text-xs text-gray-400">2p = første skud | 1p = andet skud</div>
+                <td className="p-2 tablet:p-3 border-r border-battle-grey/50">
+                  <div className="font-bold text-red-400 text-xs tablet:text-sm">Runde 1: LAZER POINT</div>
+                  <div className="text-[10px] tablet:text-xs text-gray-400">2p = første | 1p = andet</div>
                 </td>
                 {teams.map((_, teamIdx) => (
-                  <td key={teamIdx} className="p-2 border-r border-battle-grey/50">
-                    <div className="space-y-1">
+                  <td key={teamIdx} className="p-1.5 tablet:p-2 border-r border-battle-grey/50">
+                    <div className="space-y-0.5 tablet:space-y-1">
                       {[0, 1, 2, 3, 4].map((shooterIdx) => (
-                        <div key={shooterIdx} className="flex items-center gap-1 text-xs">
-                          <span className="text-gray-400 w-14">Skytte {shooterIdx + 1}:</span>
+                        <div key={shooterIdx} className="flex items-center gap-0.5 tablet:gap-1 text-[10px] tablet:text-xs">
+                          <span className="text-gray-400 w-8 tablet:w-12">S{shooterIdx + 1}:</span>
                           <button
                             onClick={() => updateRound1Score(teamIdx, shooterIdx, 'first')}
-                            className={`px-2 py-0.5 rounded text-xs font-semibold transition-colors ${
+                            className={`px-2 tablet:px-3 py-1 tablet:py-1.5 rounded text-[10px] tablet:text-xs font-semibold transition-colors touch-manipulation ${
                               scores[teamIdx]?.round1[shooterIdx]?.first
                                 ? 'bg-green-500 text-white'
-                                : 'bg-battle-grey/50 text-gray-300 hover:bg-battle-grey'
+                                : 'bg-battle-grey/50 text-gray-300 hover:bg-battle-grey active:bg-battle-grey/70'
                             }`}
+                            style={{ WebkitTapHighlightColor: 'transparent' }}
                           >
                             2p
                           </button>
                           <button
                             onClick={() => updateRound1Score(teamIdx, shooterIdx, 'second')}
-                            className={`px-2 py-0.5 rounded text-xs font-semibold transition-colors ${
+                            className={`px-2 tablet:px-3 py-1 tablet:py-1.5 rounded text-[10px] tablet:text-xs font-semibold transition-colors touch-manipulation ${
                               scores[teamIdx]?.round1[shooterIdx]?.second
                                 ? 'bg-yellow-500 text-black'
-                                : 'bg-battle-grey/50 text-gray-300 hover:bg-battle-grey'
+                                : 'bg-battle-grey/50 text-gray-300 hover:bg-battle-grey active:bg-battle-grey/70'
                             }`}
+                            style={{ WebkitTapHighlightColor: 'transparent' }}
                           >
                             1p
                           </button>
@@ -514,37 +522,38 @@ const LazerPointScoreboard: React.FC = () => {
                 ))}
               </tr>
               <tr className="bg-red-900/20">
-                <td className="p-2 border-r border-battle-grey/50 text-right text-sm text-gray-400">
-                  Runde 1 Total / Placeringspoint:
+                <td className="p-1.5 tablet:p-2 border-r border-battle-grey/50 text-right text-[10px] tablet:text-sm text-gray-400">
+                  Total / Point:
                 </td>
                 {teams.map((_, teamIdx) => (
-                  <td key={teamIdx} className="p-2 border-r border-battle-grey/50 text-center">
-                    <span className="text-white font-bold">{calculateRound1Total(teamIdx)}</span>
-                    <span className="text-gray-400 mx-2">/</span>
-                    <span className="text-yellow-400 font-bold">{placements[teamIdx]?.round1}p</span>
+                  <td key={teamIdx} className="p-1.5 tablet:p-2 border-r border-battle-grey/50 text-center">
+                    <span className="text-white font-bold text-xs tablet:text-base">{calculateRound1Total(teamIdx)}</span>
+                    <span className="text-gray-400 mx-1 tablet:mx-2">/</span>
+                    <span className="text-yellow-400 font-bold text-xs tablet:text-base">{placements[teamIdx]?.round1}p</span>
                   </td>
                 ))}
               </tr>
 
               {/* Round 2: SPEED */}
               <tr className="bg-blue-900/40">
-                <td className="p-3 border-r border-battle-grey/50">
-                  <div className="font-bold text-blue-400">Runde 2: SPEED</div>
-                  <div className="text-xs text-gray-400">2p til første skytte der rammer</div>
+                <td className="p-2 tablet:p-3 border-r border-battle-grey/50">
+                  <div className="font-bold text-blue-400 text-xs tablet:text-sm">Runde 2: SPEED</div>
+                  <div className="text-[10px] tablet:text-xs text-gray-400">2p til første der rammer</div>
                 </td>
                 {teams.map((_, teamIdx) => (
-                  <td key={teamIdx} className="p-2 border-r border-battle-grey/50">
-                    <div className="space-y-1">
+                  <td key={teamIdx} className="p-1.5 tablet:p-2 border-r border-battle-grey/50">
+                    <div className="space-y-0.5 tablet:space-y-1">
                       {[0, 1, 2, 3, 4].map((shooterIdx) => (
-                        <div key={shooterIdx} className="flex items-center gap-1 text-xs">
-                          <span className="text-gray-400 w-14">Skytte {shooterIdx + 1}:</span>
+                        <div key={shooterIdx} className="flex items-center gap-0.5 tablet:gap-1 text-[10px] tablet:text-xs">
+                          <span className="text-gray-400 w-8 tablet:w-12">S{shooterIdx + 1}:</span>
                           <button
                             onClick={() => updateRound2Score(teamIdx, shooterIdx)}
-                            className={`px-3 py-0.5 rounded text-xs font-semibold transition-colors ${
+                            className={`px-3 tablet:px-4 py-1 tablet:py-1.5 rounded text-[10px] tablet:text-xs font-semibold transition-colors touch-manipulation ${
                               scores[teamIdx]?.round2[shooterIdx]
                                 ? 'bg-blue-500 text-white'
-                                : 'bg-battle-grey/50 text-gray-300 hover:bg-battle-grey'
+                                : 'bg-battle-grey/50 text-gray-300 hover:bg-battle-grey active:bg-battle-grey/70'
                             }`}
+                            style={{ WebkitTapHighlightColor: 'transparent' }}
                           >
                             {scores[teamIdx]?.round2[shooterIdx] ? '2p' : '-'}
                           </button>
@@ -555,67 +564,67 @@ const LazerPointScoreboard: React.FC = () => {
                 ))}
               </tr>
               <tr className="bg-blue-900/20">
-                <td className="p-2 border-r border-battle-grey/50 text-right text-sm text-gray-400">
-                  Runde 2 Total / Placeringspoint:
+                <td className="p-1.5 tablet:p-2 border-r border-battle-grey/50 text-right text-[10px] tablet:text-sm text-gray-400">
+                  Total / Point:
                 </td>
                 {teams.map((_, teamIdx) => (
-                  <td key={teamIdx} className="p-2 border-r border-battle-grey/50 text-center">
-                    <span className="text-white font-bold">{calculateRound2Total(teamIdx)}</span>
-                    <span className="text-gray-400 mx-2">/</span>
-                    <span className="text-yellow-400 font-bold">{placements[teamIdx]?.round2}p</span>
+                  <td key={teamIdx} className="p-1.5 tablet:p-2 border-r border-battle-grey/50 text-center">
+                    <span className="text-white font-bold text-xs tablet:text-base">{calculateRound2Total(teamIdx)}</span>
+                    <span className="text-gray-400 mx-1 tablet:mx-2">/</span>
+                    <span className="text-yellow-400 font-bold text-xs tablet:text-base">{placements[teamIdx]?.round2}p</span>
                   </td>
                 ))}
               </tr>
 
               {/* Round 3: SKILL */}
               <tr className="bg-green-900/40">
-                <td className="p-3 border-r border-battle-grey/50">
-                  <div className="font-bold text-green-400">Runde 3: SKILL</div>
-                  <div className="text-xs text-gray-400">"Running score" - indtast total</div>
+                <td className="p-2 tablet:p-3 border-r border-battle-grey/50">
+                  <div className="font-bold text-green-400 text-xs tablet:text-sm">Runde 3: SKILL</div>
+                  <div className="text-[10px] tablet:text-xs text-gray-400">Running score total</div>
                 </td>
                 {teams.map((_, teamIdx) => (
-                  <td key={teamIdx} className="p-2 border-r border-battle-grey/50">
+                  <td key={teamIdx} className="p-1.5 tablet:p-2 border-r border-battle-grey/50">
                     <div className="flex items-center justify-center">
                       <input
                         type="number"
                         min="0"
                         value={scores[teamIdx]?.round3 || 0}
                         onChange={(e) => updateRound3Score(teamIdx, e.target.value)}
-                        className="w-20 bg-battle-grey/50 border border-battle-grey rounded px-2 py-1 text-center text-white text-lg font-bold"
+                        className="w-16 tablet:w-20 bg-battle-grey/50 border border-battle-grey rounded px-2 py-2 tablet:py-2.5 text-center text-white text-base tablet:text-lg font-bold touch-manipulation"
                       />
                     </div>
                   </td>
                 ))}
               </tr>
               <tr className="bg-green-900/20">
-                <td className="p-2 border-r border-battle-grey/50 text-right text-sm text-gray-400">
-                  Runde 3 Total / Placeringspoint:
+                <td className="p-1.5 tablet:p-2 border-r border-battle-grey/50 text-right text-[10px] tablet:text-sm text-gray-400">
+                  Total / Point:
                 </td>
                 {teams.map((_, teamIdx) => (
-                  <td key={teamIdx} className="p-2 border-r border-battle-grey/50 text-center">
-                    <span className="text-white font-bold">{calculateRound3Total(teamIdx)}</span>
-                    <span className="text-gray-400 mx-2">/</span>
-                    <span className="text-yellow-400 font-bold">{placements[teamIdx]?.round3}p</span>
+                  <td key={teamIdx} className="p-1.5 tablet:p-2 border-r border-battle-grey/50 text-center">
+                    <span className="text-white font-bold text-xs tablet:text-base">{calculateRound3Total(teamIdx)}</span>
+                    <span className="text-gray-400 mx-1 tablet:mx-2">/</span>
+                    <span className="text-yellow-400 font-bold text-xs tablet:text-base">{placements[teamIdx]?.round3}p</span>
                   </td>
                 ))}
               </tr>
 
               {/* Round 4: RAPID */}
               <tr className="bg-orange-900/40">
-                <td className="p-3 border-r border-battle-grey/50">
-                  <div className="font-bold text-orange-400">Runde 4: RAPID</div>
-                  <div className="text-xs text-gray-400">Point til de 5 første skud (5,4,3,2,1)</div>
+                <td className="p-2 tablet:p-3 border-r border-battle-grey/50">
+                  <div className="font-bold text-orange-400 text-xs tablet:text-sm">Runde 4: RAPID</div>
+                  <div className="text-[10px] tablet:text-xs text-gray-400">5-4-3-2-1 point</div>
                 </td>
                 {teams.map((_, teamIdx) => (
-                  <td key={teamIdx} className="p-2 border-r border-battle-grey/50">
-                    <div className="space-y-1">
+                  <td key={teamIdx} className="p-1.5 tablet:p-2 border-r border-battle-grey/50">
+                    <div className="space-y-0.5 tablet:space-y-1">
                       {[0, 1, 2, 3, 4].map((shooterIdx) => (
-                        <div key={shooterIdx} className="flex items-center gap-1 text-xs">
-                          <span className="text-gray-400 w-14">Skytte {shooterIdx + 1}:</span>
+                        <div key={shooterIdx} className="flex items-center gap-0.5 tablet:gap-1 text-[10px] tablet:text-xs">
+                          <span className="text-gray-400 w-8 tablet:w-12">S{shooterIdx + 1}:</span>
                           <select
                             value={scores[teamIdx]?.round4[shooterIdx] || 0}
                             onChange={(e) => updateRound4Score(teamIdx, shooterIdx, e.target.value)}
-                            className="bg-battle-grey/50 border border-battle-grey rounded px-1 py-0.5 text-white text-xs"
+                            className="bg-battle-grey/50 border border-battle-grey rounded px-1.5 tablet:px-2 py-1 tablet:py-1.5 text-white text-[10px] tablet:text-xs touch-manipulation"
                           >
                             <option value={0}>0p</option>
                             <option value={1}>1p</option>
@@ -631,32 +640,32 @@ const LazerPointScoreboard: React.FC = () => {
                 ))}
               </tr>
               <tr className="bg-orange-900/20">
-                <td className="p-2 border-r border-battle-grey/50 text-right text-sm text-gray-400">
-                  Runde 4 Total / Placeringspoint:
+                <td className="p-1.5 tablet:p-2 border-r border-battle-grey/50 text-right text-[10px] tablet:text-sm text-gray-400">
+                  Total / Point:
                 </td>
                 {teams.map((_, teamIdx) => (
-                  <td key={teamIdx} className="p-2 border-r border-battle-grey/50 text-center">
-                    <span className="text-white font-bold">{calculateRound4Total(teamIdx)}</span>
-                    <span className="text-gray-400 mx-2">/</span>
-                    <span className="text-yellow-400 font-bold">{placements[teamIdx]?.round4}p</span>
+                  <td key={teamIdx} className="p-1.5 tablet:p-2 border-r border-battle-grey/50 text-center">
+                    <span className="text-white font-bold text-xs tablet:text-base">{calculateRound4Total(teamIdx)}</span>
+                    <span className="text-gray-400 mx-1 tablet:mx-2">/</span>
+                    <span className="text-yellow-400 font-bold text-xs tablet:text-base">{placements[teamIdx]?.round4}p</span>
                   </td>
                 ))}
               </tr>
 
               {/* Final Results */}
               <tr className="bg-gradient-to-r from-yellow-900/60 to-amber-900/60">
-                <td className="p-4 border-r border-battle-grey/50">
-                  <div className="font-bold text-yellow-400 text-lg">TOTAL PLACERING</div>
+                <td className="p-2 tablet:p-3 border-r border-battle-grey/50">
+                  <div className="font-bold text-yellow-400 text-sm tablet:text-lg">TOTAL</div>
                 </td>
                 {teams.map((_, teamIdx) => (
-                  <td key={teamIdx} className="p-3 border-r border-battle-grey/50 text-center">
-                    <div className="flex flex-col items-center gap-2">
-                      <div className={`w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold ${getRankColor(finalRankings[teamIdx])}`}>
+                  <td key={teamIdx} className="p-2 tablet:p-3 border-r border-battle-grey/50 text-center">
+                    <div className="flex flex-col items-center gap-1 tablet:gap-2">
+                      <div className={`w-8 h-8 tablet:w-10 tablet:h-10 rounded-full flex items-center justify-center text-lg tablet:text-xl font-bold ${getRankColor(finalRankings[teamIdx])}`}>
                         {finalRankings[teamIdx]}
                       </div>
                       <div className="text-white">
-                        <span className="text-2xl font-bold">{placements[teamIdx]?.total}</span>
-                        <span className="text-sm text-gray-400 ml-1">point</span>
+                        <span className="text-lg tablet:text-xl font-bold">{placements[teamIdx]?.total}</span>
+                        <span className="text-[10px] tablet:text-xs text-gray-400 ml-0.5">p</span>
                       </div>
                     </div>
                   </td>
@@ -666,25 +675,25 @@ const LazerPointScoreboard: React.FC = () => {
           </table>
         </div>
 
-        {/* Legend */}
-        <div className="mt-6 p-4 bg-battle-black/30 rounded-lg border border-white/5">
-          <h3 className="text-white font-bold mb-2">Pointsystem:</h3>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        {/* Legend - Compact on tablet */}
+        <div className="mt-4 tablet:mt-6 p-3 tablet:p-4 bg-battle-black/30 rounded-lg border border-white/5">
+          <h3 className="text-white font-bold mb-2 text-xs tablet:text-sm">Pointsystem:</h3>
+          <div className="grid grid-cols-2 tablet:grid-cols-4 gap-2 tablet:gap-4 text-[10px] tablet:text-sm">
             <div className="text-gray-300">
-              <span className="text-red-400 font-bold">Runde 1:</span> 2p/1p per skytte
+              <span className="text-red-400 font-bold">R1:</span> 2p/1p
             </div>
             <div className="text-gray-300">
-              <span className="text-blue-400 font-bold">Runde 2:</span> 2p per første skud
+              <span className="text-blue-400 font-bold">R2:</span> 2p første
             </div>
             <div className="text-gray-300">
-              <span className="text-green-400 font-bold">Runde 3:</span> Running score total
+              <span className="text-green-400 font-bold">R3:</span> Running
             </div>
             <div className="text-gray-300">
-              <span className="text-orange-400 font-bold">Runde 4:</span> 5-4-3-2-1 point
+              <span className="text-orange-400 font-bold">R4:</span> 5-4-3-2-1
             </div>
           </div>
-          <div className="mt-3 text-gray-400 text-xs">
-            <strong>Placeringspoint:</strong> 1. plads = 5p, 2. plads = 4p, 3. plads = 3p, 4. plads = 2p, 5. plads = 1p
+          <div className="mt-2 tablet:mt-3 text-gray-400 text-[10px] tablet:text-xs">
+            <strong>Placering:</strong> 1.=5p, 2.=4p, 3.=3p, 4.=2p, 5.=1p
           </div>
         </div>
       </div>
