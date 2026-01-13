@@ -32,6 +32,7 @@ import {
   Database,
   Camera,
   Play,
+  Download,
   LucideProps
 } from 'lucide-react';
 import { HubLink } from './types';
@@ -74,6 +75,15 @@ export const TASK_CONTROL_LINKS: HubLink[] = [
     icon: Users,
     description: 'User Management',
     color: 'red'
+  },
+  {
+    id: 'ar1',
+    title: 'FEJLRAPPORTER',
+    url: '#admin_reports',
+    icon: Wrench,
+    description: 'Alle Fejlrapporter',
+    color: 'yellow',
+    badge: 'new'
   }
 ];
 
@@ -145,9 +155,9 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
   {
     id: 'tc4',
     title: 'FEJLSØGNING',
-    url: '#',
+    url: '#fejlsogning_teamchallenge',
     icon: Wrench,
-    description: 'Troubleshooting',
+    description: 'Rapporter fejl',
     color: 'yellow'
   },
   {
@@ -180,9 +190,9 @@ export const LOQUIZ_LINKS: HubLink[] = [
   {
     id: 'lq3',
     title: 'FEJLSØGNING',
-    url: '#',
+    url: '#fejlsogning_loquiz',
     icon: Wrench,
-    description: 'Troubleshooting',
+    description: 'Rapporter fejl',
     color: 'yellow'
   }
 ];
@@ -218,11 +228,10 @@ export const TEAMLAZER_LINKS: HubLink[] = [
   {
     id: 'tl3',
     title: 'FEJLSØGNING',
-    url: '#teamlazer_fejlsogning',
+    url: '#fejlsogning_teamlazer',
     icon: Wrench,
-    description: 'Troubleshooting',
-    color: 'yellow',
-    badge: 'new'
+    description: 'Rapporter fejl',
+    color: 'yellow'
   },
   {
     id: 'tl4',
@@ -277,9 +286,9 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
   {
     id: 'ts4',
     title: 'FEJLSØGNING',
-    url: '#',
+    url: '#fejlsogning_teamsegway',
     icon: Wrench,
-    description: 'Troubleshooting',
+    description: 'Rapporter fejl',
     color: 'yellow'
   },
   {
@@ -314,16 +323,18 @@ export const TEAMBOX_LINKS: HubLink[] = [
   {
     id: 'tb3',
     title: 'NULSTIL BOX',
-    url: '#',
+    url: '#teambox_checklist',
     icon: Wrench,
-    description: 'Reset Box'
+    description: 'Reset Box',
+    color: 'orange',
+    badge: 'new'
   },
   {
     id: 'tb4',
     title: 'FEJLSØGNING',
-    url: '#',
+    url: '#fejlsogning_teambox',
     icon: Wrench,
-    description: 'Troubleshooting',
+    description: 'Rapporter fejl',
     color: 'yellow'
   },
   {
@@ -334,6 +345,14 @@ export const TEAMBOX_LINKS: HubLink[] = [
     description: 'Video Guides',
     color: 'red',
     badge: 'new'
+  },
+  {
+    id: 'tb6',
+    title: 'DOWNLOAD',
+    url: 'https://segway.sharepoint.com/:f:/g/IgCLZGdtJLIjTJX_Hcskh9YMAXuCh6SXHl0JKWebxPF4baA?e=OfgetW',
+    icon: Download,
+    description: 'EscapeBOX Print',
+    color: 'purple'
   }
 ];
 
@@ -342,7 +361,7 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
   {
     id: 'tcons1',
     title: 'SCORECARD',
-    url: '#',
+    url: '#teamconstruct_scorecard',
     icon: ListChecks,
     description: 'Point Tracking',
     color: 'red'
@@ -350,7 +369,7 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
   {
     id: 'tcons2',
     title: 'GUIDE',
-    url: '#',
+    url: '#teamconstruct_guide',
     icon: Map,
     description: 'Instructions',
     color: 'blue'
@@ -358,7 +377,7 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
   {
     id: 'tcons3',
     title: 'PAKKELISTE',
-    url: '#',
+    url: '#teamconstruct_packing',
     icon: Package,
     description: 'Packing List',
     color: 'green'
@@ -366,9 +385,9 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
   {
     id: 'tcons4',
     title: 'FEJLSØGNING',
-    url: '#',
+    url: '#fejlsogning_teamconstruct',
     icon: Wrench,
-    description: 'Troubleshooting',
+    description: 'Rapporter fejl',
     color: 'yellow'
   },
   {
@@ -387,32 +406,42 @@ export const TEAMCONTROL_LINKS: HubLink[] = [
   {
     id: 'tctrl1',
     title: 'GUIDE',
-    url: '#',
+    url: '#teamcontrol_guide',
     icon: Map,
     description: 'Instructions',
     color: 'blue'
   },
   {
+    id: 'tctrl6',
+    title: 'MUSIK',
+    url: '#teamcontrol_musik',
+    icon: Play,
+    description: 'Top Gun Anthem',
+    color: 'green'
+  },
+  {
     id: 'tctrl2',
     title: 'FLYBRIX',
-    url: 'intent://flybrix/#Intent;scheme=app;package=com.flybrix.app;end',
+    url: '#teamcontrol_flybrix',
     icon: Gamepad2,
-    description: 'Tablet App'
+    description: 'Drone Building',
+    color: 'purple'
   },
   {
     id: 'tctrl3',
     title: 'PAKKELISTE',
-    url: '#',
+    url: '#teamcontrol_packing',
     icon: Package,
     description: 'Packing List',
-    color: 'green'
+    color: 'green',
+    badge: 'new'
   },
   {
     id: 'tctrl4',
     title: 'FEJLSØGNING',
-    url: '#',
+    url: '#fejlsogning_teamcontrol',
     icon: Wrench,
-    description: 'Troubleshooting',
+    description: 'Rapporter fejl',
     color: 'yellow'
   },
   {
@@ -423,6 +452,46 @@ export const TEAMCONTROL_LINKS: HubLink[] = [
     description: 'Video Guides',
     color: 'red',
     badge: 'new'
+  }
+];
+
+// Flybrix Submenu Links
+export const FLYBRIX_LINKS: HubLink[] = [
+  {
+    id: 'fb1',
+    title: 'ÅBN APP',
+    url: 'intent://flybrix/#Intent;scheme=app;package=com.flybrix.app;end',
+    icon: Gamepad2,
+    description: 'Flybrix App',
+    color: 'green'
+  },
+  {
+    id: 'fb2',
+    title: 'SAMLEVEJLEDNING',
+    url: '#teamcontrol_flybrix_manual',
+    icon: Map,
+    description: 'Build Manual',
+    color: 'blue'
+  }
+];
+
+// TeamControl Packing Submenu Links
+export const TEAMCONTROL_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'tcpk1',
+    title: 'FØR OPGAVEN',
+    url: '#teamcontrol_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'tcpk2',
+    title: 'EFTER OPGAVEN',
+    url: '#teamcontrol_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
   }
 ];
 
@@ -447,9 +516,9 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
   {
     id: 'tc3',
     title: 'FEJLSØGNING',
-    url: '#',
+    url: '#fejlsogning_teamconnect',
     icon: Wrench,
-    description: 'Troubleshooting',
+    description: 'Rapporter fejl',
     color: 'yellow'
   }
 ];
@@ -484,9 +553,9 @@ export const TEAMROBIN_LINKS: HubLink[] = [
   {
     id: 'tr4',
     title: 'FEJLSØGNING',
-    url: '#',
+    url: '#fejlsogning_teamrobin',
     icon: Wrench,
-    description: 'Troubleshooting',
+    description: 'Rapporter fejl',
     color: 'yellow'
   },
   {
@@ -520,6 +589,25 @@ export const TEAMROBIN_PACKING_LINKS: HubLink[] = [
   }
 ];
 
+export const TEAMCONSTRUCT_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'tcp1',
+    title: 'FØR OPGAVEN',
+    url: '#teamconstruct_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'tcp2',
+    title: 'EFTER OPGAVEN',
+    url: '#teamconstruct_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
+  }
+];
+
 // TeamAction Submenu Links
 export const TEAMACTION_LINKS: HubLink[] = [
   {
@@ -541,9 +629,9 @@ export const TEAMACTION_LINKS: HubLink[] = [
   {
     id: 'ta3',
     title: 'FEJLSØGNING',
-    url: '#',
+    url: '#fejlsogning_teamaction',
     icon: Wrench,
-    description: 'Troubleshooting',
+    description: 'Rapporter fejl',
     color: 'yellow'
   },
   {
@@ -582,7 +670,7 @@ export const OFFICE_LINKS: HubLink[] = [
   {
     id: '5',
     title: 'OneDrive',
-    url: 'https://segway-my.sharepoint.com/',
+    url: 'https://segway-my.sharepoint.com/my?remoteItem=%7B%22mp%22%3A%7B%22webAbsoluteUrl%22%3A%22https%3A%2F%2Fsegway%2Dmy%2Esharepoint%2Ecom%2Fpersonal%2Fthomas%5Fteambattle%5Fdk%22%2C%22listFullUrl%22%3A%22https%3A%2F%2Fsegway%2Dmy%2Esharepoint%2Ecom%2Fpersonal%2Fthomas%5Fteambattle%5Fdk%2FDocuments%22%2C%22rootFolder%22%3A%22%2Fpersonal%2Fthomas%5Fteambattle%5Fdk%2FDocuments%2FTeamBattle%20Dokumenter%22%7D%2C%22rsi%22%3A%7B%22webAbsoluteUrl%22%3A%22https%3A%2F%2Fsegway%2Esharepoint%2Ecom%22%2C%22listFullUrl%22%3A%22https%3A%2F%2Fsegway%2Esharepoint%2Ecom%2FDelte%20dokumenter%22%2C%22rootFolder%22%3A%22%2FDelte%20dokumenter%2FTeamBattle%2FAktiviteter%2FTeamConstruct%2FCrewGuide%22%7D%7D&id=%2FDelte%20dokumenter%2FTeamBattle%2FAktiviteter%2FTeamConstruct%2FCrewGuide&listurl=https%3A%2F%2Fsegway%2Esharepoint%2Ecom%2FDelte%20dokumenter&viewid=49e61d81%2Dbe49%2D43bb%2D91fc%2Df672e3ac50f2',
     icon: Cloud,
     description: 'File storage',
     color: 'blue',
@@ -797,4 +885,18 @@ export const TEAMLAZER_VIDEO_INDEX = [
   { title: 'Sammenkobling 2+ displays', index: 25 },
   { title: 'Sammenkobling 2 kastere', index: 26 },
   { title: 'Pointgivning flere displays', index: 27 },
+];
+
+export const TEAMCONSTRUCT_VIDEO_INDEX = [
+  { title: 'Opsætning og indhold', index: 0, videoId: 'SkSJEtK3Xzw' },
+  { title: 'Sikkerhed', index: 1, videoId: 'ky0qV2n04uo' },
+  { title: 'Sæt i gang', index: 2, videoId: '3v2fb-ITyrE' },
+  { title: 'Pointgivning', index: 3, videoId: 'mJFBIUM_Mhc' },
+];
+
+export const TEAMCONTROL_VIDEO_INDEX = [
+  { title: 'Parring/nedskalering af RC biler til 50%', index: 0, videoId: 'Vl8ikU5LcxQ' },
+  { title: 'Placering af RC biler i rigtige boxe', index: 1, videoId: 'pFInMgP4oRo' },
+  { title: 'Parring af Droner (Hvide)', index: 2, videoId: 'pVoigvLu08I' },
+  { title: 'Flybrix - parring af drone', index: 3, videoId: 'oWYOgD2MN7g' },
 ];

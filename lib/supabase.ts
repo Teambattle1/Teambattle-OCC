@@ -5,7 +5,7 @@ const supabaseAnonKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYm
 // Service role key for admin operations (password reset)
 // Find this in Supabase Dashboard > Settings > API > service_role key
 // IMPORTANT: Replace this with your actual service role key
-const supabaseServiceKey = 'SERVICE_ROLE_KEY_HERE';
+const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImlsYmp5dHl1a2ljYnNzcWZ0bW1hIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc1NDgzMDQ2MSwiZXhwIjoyMDcwNDA2NDYxfQ.eCy-vQByybGSFx5QdWQHMGo0LkGQk2LD5fU3oHXpSro';
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
@@ -415,5 +415,118 @@ export const deleteTeamLazerScore = async (
   } catch (err) {
     console.error('Failed to delete TeamLazer score:', err);
     return { success: false, error: 'Failed to delete score' };
+  }
+};
+
+// Guide Section Types
+export interface GuideSection {
+  id?: string;
+  activity: string;
+  section_key: string;
+  title: string;
+  content: string;
+  image_url?: string;
+  order_index: number;
+  created_at?: string;
+  updated_at?: string;
+}
+
+// Get all guide sections for an activity
+export const getGuideSections = async (
+  activity: string
+): Promise<{ success: boolean; data?: GuideSection[]; error?: string }> => {
+  try {
+    const { data, error } = await supabase
+      .from('guide_sections')
+      .select('*')
+      .eq('activity', activity)
+      .order('order_index', { ascending: true });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true, data: data as GuideSection[] };
+  } catch (err) {
+    console.error('Failed to get guide sections:', err);
+    return { success: false, error: 'Failed to get guide sections' };
+  }
+};
+
+// Save or update a guide section
+export const saveGuideSection = async (
+  section: GuideSection
+): Promise<{ success: boolean; id?: string; error?: string }> => {
+  try {
+    if (section.id) {
+      // Update existing section
+      const { error } = await supabase
+        .from('guide_sections')
+        .update({
+          title: section.title,
+          content: section.content,
+          image_url: section.image_url,
+          order_index: section.order_index,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', section.id);
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+      return { success: true, id: section.id };
+    } else {
+      // Create new section
+      const { data, error } = await supabase
+        .from('guide_sections')
+        .insert({
+          activity: section.activity,
+          section_key: section.section_key,
+          title: section.title,
+          content: section.content,
+          image_url: section.image_url,
+          order_index: section.order_index,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+      return { success: true, id: data?.id };
+    }
+  } catch (err) {
+    console.error('Failed to save guide section:', err);
+    return { success: false, error: 'Failed to save section' };
+  }
+};
+
+// Upload image for guide section
+export const uploadGuideImage = async (
+  file: File,
+  activity: string,
+  sectionKey: string
+): Promise<{ success: boolean; url?: string; error?: string }> => {
+  try {
+    const fileExt = file.name.split('.').pop();
+    const fileName = `${activity}/${sectionKey}-${Date.now()}.${fileExt}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from('guide-images')
+      .upload(fileName, file, { upsert: true });
+
+    if (uploadError) {
+      return { success: false, error: uploadError.message };
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('guide-images')
+      .getPublicUrl(fileName);
+
+    return { success: true, url: publicUrl };
+  } catch (err) {
+    console.error('Failed to upload guide image:', err);
+    return { success: false, error: 'Failed to upload image' };
   }
 };

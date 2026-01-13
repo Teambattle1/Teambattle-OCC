@@ -4,6 +4,7 @@ import { Play, ChevronRight } from 'lucide-react';
 interface VideoIndexItem {
   title: string;
   index: number;
+  videoId?: string;
 }
 
 interface VideoPlayerProps {
@@ -15,18 +16,27 @@ interface VideoPlayerProps {
 
 const VideoPlayer: React.FC<VideoPlayerProps> = ({ title, videoId, playlistId, videoIndex }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [currentVideoId, setCurrentVideoId] = useState<string | undefined>(
+    videoIndex?.[0]?.videoId
+  );
 
   // Build the embed URL based on whether it's a video or playlist
-  // YouTube uses 1-based indexing for playlists
-  const getEmbedUrl = (index: number = 0) => {
+  // If we have a specific videoId from the index, use that with the playlist
+  const getEmbedUrl = (index: number = 0, specificVideoId?: string) => {
+    if (specificVideoId && playlistId) {
+      // Use specific video ID with playlist context
+      return `https://www.youtube.com/embed/${specificVideoId}?list=${playlistId}&rel=0&modestbranding=1`;
+    }
     if (playlistId) {
+      // YouTube uses 1-based indexing for playlists
       return `https://www.youtube.com/embed/videoseries?list=${playlistId}&index=${index + 1}&rel=0&modestbranding=1`;
     }
     return `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
   };
 
-  const handleVideoSelect = (index: number) => {
+  const handleVideoSelect = (index: number, specificVideoId?: string) => {
     setCurrentIndex(index);
+    setCurrentVideoId(specificVideoId);
   };
 
   return (
@@ -43,9 +53,9 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ title, videoId, playlistId, v
           {/* Video Container */}
           <div className={`relative w-full ${videoIndex && videoIndex.length > 0 ? 'tablet:w-3/5' : ''} aspect-video rounded-lg tablet:rounded-xl overflow-hidden bg-battle-black border border-white/10`}>
             <iframe
-              key={currentIndex}
+              key={`${currentIndex}-${currentVideoId}`}
               className="absolute inset-0 w-full h-full"
-              src={getEmbedUrl(currentIndex)}
+              src={getEmbedUrl(currentIndex, currentVideoId)}
               title={title}
               frameBorder="0"
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -63,7 +73,7 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ title, videoId, playlistId, v
                 {videoIndex.map((video) => (
                   <button
                     key={video.index}
-                    onClick={() => handleVideoSelect(video.index)}
+                    onClick={() => handleVideoSelect(video.index, video.videoId)}
                     className={`flex items-center gap-2 px-2.5 tablet:px-3 py-2.5 tablet:py-3 rounded-lg text-left transition-all duration-200 touch-manipulation active:scale-98 ${
                       currentIndex === video.index
                         ? 'bg-battle-orange/20 border border-battle-orange/50 text-battle-orange'
