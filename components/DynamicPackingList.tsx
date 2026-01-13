@@ -8,6 +8,7 @@ interface PackingItem {
   subtext?: string;
   imageUrl?: string;
   indent?: boolean;
+  isDivider?: boolean;
 }
 
 // Default packing lists - fallback if no custom data in Supabase
@@ -222,10 +223,12 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({ activity, listT
   };
 
   const checkAll = () => {
-    setCheckedItems(new Set(items.map(i => i.id)));
+    setCheckedItems(new Set(items.filter(i => !i.isDivider).map(i => i.id)));
   };
 
-  const progress = items.length > 0 ? (checkedItems.size / items.length) * 100 : 0;
+  // Exclude dividers from progress calculation
+  const checkableItems = items.filter(item => !item.isDivider);
+  const progress = checkableItems.length > 0 ? (checkedItems.size / checkableItems.length) * 100 : 0;
 
   if (isLoading) {
     return (
@@ -271,7 +274,7 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({ activity, listT
         {/* Progress bar */}
         <div className="mb-4 tablet:mb-6">
           <div className="flex justify-between text-xs text-gray-400 mb-1">
-            <span>{checkedItems.size} / {items.length}</span>
+            <span>{checkedItems.size} / {checkableItems.length}</span>
             <span>{Math.round(progress)}%</span>
           </div>
           <div className="h-2 bg-battle-black/50 rounded-full overflow-hidden">
@@ -288,6 +291,23 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({ activity, listT
         <div className="space-y-2">
           {items.map((item) => {
             const isChecked = checkedItems.has(item.id);
+
+            // Render dividers as section headers
+            if (item.isDivider) {
+              return (
+                <div
+                  key={item.id}
+                  className="flex items-center gap-3 py-3 px-2 mt-4 first:mt-0"
+                >
+                  <div className="h-px flex-1 bg-battle-orange/30" />
+                  <span className="text-battle-orange font-bold text-sm tablet:text-base uppercase tracking-wider">
+                    {item.text}
+                  </span>
+                  <div className="h-px flex-1 bg-battle-orange/30" />
+                </div>
+              );
+            }
+
             return (
               <button
                 key={item.id}
@@ -309,13 +329,13 @@ const DynamicPackingList: React.FC<DynamicPackingListProps> = ({ activity, listT
 
                 {/* Text content - left side */}
                 <div className="flex-1 min-w-0">
-                  <span className={`text-sm tablet:text-base block ${
+                  <span className={`text-sm tablet:text-base block uppercase ${
                     isChecked ? 'text-green-400 line-through' : 'text-white'
                   }`}>
                     {item.text}
                   </span>
                   {item.subtext && (
-                    <span className={`text-xs block mt-0.5 ${
+                    <span className={`text-xs block mt-0.5 uppercase ${
                       isChecked ? 'text-green-400/60' : 'text-gray-500'
                     }`}>
                       {item.subtext}

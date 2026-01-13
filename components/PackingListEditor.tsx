@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Package, Plus, Trash2, ChevronUp, ChevronDown, Save, Edit3, X, Camera, ImagePlus, GripVertical, Check, RotateCcw } from 'lucide-react';
+import { Package, Plus, Trash2, ChevronUp, ChevronDown, Save, Edit3, X, Camera, ImagePlus, GripVertical, Check, RotateCcw, Minus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -9,6 +9,7 @@ interface PackingItem {
   subtext?: string;
   imageUrl?: string;
   indent?: boolean;
+  isDivider?: boolean;
 }
 
 interface PackingListData {
@@ -286,6 +287,19 @@ const PackingListEditor: React.FC = () => {
     setHasChanges(true);
   };
 
+  const addDivider = () => {
+    const newDivider: PackingItem = {
+      id: `divider-${Date.now()}`,
+      text: 'NY SEKTION',
+      isDivider: true,
+    };
+    setItems([...items, newDivider]);
+    setEditingId(newDivider.id);
+    setEditText(newDivider.text);
+    setEditSubtext('');
+    setHasChanges(true);
+  };
+
   const deleteItem = (id: string) => {
     if (confirm('Slet denne item?')) {
       setItems(items.filter(item => item.id !== id));
@@ -330,6 +344,49 @@ const PackingListEditor: React.FC = () => {
     setHasChanges(true);
   };
 
+  // Resize image to standard size for packing lists
+  const resizeImage = (file: File, maxSize: number = 200): Promise<Blob> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let width = img.width;
+          let height = img.height;
+
+          // Make it square (crop to center)
+          const size = Math.min(width, height);
+          const offsetX = (width - size) / 2;
+          const offsetY = (height - size) / 2;
+
+          canvas.width = maxSize;
+          canvas.height = maxSize;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+
+          // Draw cropped and resized image
+          ctx.drawImage(img, offsetX, offsetY, size, size, 0, 0, maxSize, maxSize);
+
+          canvas.toBlob((blob) => {
+            if (blob) {
+              resolve(blob);
+            } else {
+              reject(new Error('Could not create blob'));
+            }
+          }, 'image/jpeg', 0.85);
+        };
+        img.onerror = reject;
+        img.src = e.target?.result as string;
+      };
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, itemId: string) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -337,12 +394,13 @@ const PackingListEditor: React.FC = () => {
     setUploadingItemId(itemId);
 
     try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `packing-lists/${selectedActivity}-${itemId}-${Date.now()}.${fileExt}`;
+      // Resize image to standard 200x200 square
+      const resizedBlob = await resizeImage(file, 200);
+      const fileName = `packing-lists/${selectedActivity}-${itemId}-${Date.now()}.jpg`;
 
       const { error: uploadError } = await supabase.storage
         .from('guide-images')
-        .upload(fileName, file, { upsert: true });
+        .upload(fileName, resizedBlob, { upsert: true, contentType: 'image/jpeg' });
 
       if (uploadError) {
         setMessage({ type: 'error', text: 'Kunne ikke uploade billede' });
@@ -482,10 +540,12 @@ const PackingListEditor: React.FC = () => {
               <div
                 key={item.id}
                 className={`border rounded-lg overflow-hidden transition-all ${
-                  editingId === item.id
-                    ? 'border-green-500 bg-green-500/10'
-                    : 'border-white/10 bg-battle-black/30'
-                } ${item.indent ? 'ml-6' : ''}`}
+                  item.isDivider
+                    ? 'border-battle-orange/50 bg-battle-orange/10'
+                    : editingId === item.id
+                      ? 'border-green-500 bg-green-500/10'
+                      : 'border-white/10 bg-battle-black/30'
+                } ${item.indent && !item.isDivider ? 'ml-6' : ''}`}
               >
                 {editingId === item.id ? (
                   // Edit mode
@@ -545,24 +605,34 @@ const PackingListEditor: React.FC = () => {
 
                       {/* Content */}
                       <div className="flex-1 min-w-0">
-                        <div className="text-white">{item.text}</div>
-                        {item.subtext && (
-                          <div className="text-xs text-gray-500">{item.subtext}</div>
-                        )}
-                        {item.imageUrl && (
-                          <div className="mt-2 relative">
-                            <img
-                              src={item.imageUrl}
-                              alt=""
-                              className="h-20 rounded border border-white/10 object-cover"
-                            />
-                            <button
-                              onClick={() => removeImage(item.id)}
-                              className="absolute top-1 right-1 p-1 bg-red-500/80 rounded-full text-white hover:bg-red-500"
-                            >
-                              <X className="w-3 h-3" />
-                            </button>
+                        {item.isDivider ? (
+                          <div className="flex items-center gap-2">
+                            <Minus className="w-4 h-4 text-battle-orange" />
+                            <div className="text-battle-orange font-bold uppercase tracking-wider">{item.text}</div>
+                            <div className="flex-1 h-px bg-battle-orange/30" />
                           </div>
+                        ) : (
+                          <>
+                            <div className="text-white">{item.text}</div>
+                            {item.subtext && (
+                              <div className="text-xs text-gray-500">{item.subtext}</div>
+                            )}
+                            {item.imageUrl && (
+                              <div className="mt-2 relative">
+                                <img
+                                  src={item.imageUrl}
+                                  alt=""
+                                  className="h-20 rounded border border-white/10 object-cover"
+                                />
+                                <button
+                                  onClick={() => removeImage(item.id)}
+                                  className="absolute top-1 right-1 p-1 bg-red-500/80 rounded-full text-white hover:bg-red-500"
+                                >
+                                  <X className="w-3 h-3" />
+                                </button>
+                              </div>
+                            )}
+                          </>
                         )}
                       </div>
 
@@ -629,13 +699,20 @@ const PackingListEditor: React.FC = () => {
         </div>
 
         {/* Actions */}
-        <div className="flex gap-3">
+        <div className="flex flex-wrap gap-3">
           <button
             onClick={addItem}
             className="flex-1 flex items-center justify-center gap-2 p-3 bg-white/10 border border-white/20 rounded-lg text-white hover:bg-white/20 transition-colors"
           >
             <Plus className="w-5 h-5" />
             Tilføj Item
+          </button>
+          <button
+            onClick={addDivider}
+            className="flex-1 flex items-center justify-center gap-2 p-3 bg-battle-orange/20 border border-battle-orange/30 rounded-lg text-battle-orange hover:bg-battle-orange/30 transition-colors"
+          >
+            <Minus className="w-5 h-5" />
+            Tilføj Divider
           </button>
           <button
             onClick={resetToDefault}
