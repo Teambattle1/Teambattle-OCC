@@ -630,7 +630,14 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
             <div className="space-y-4">
               {/* Add User Button */}
               <button
-                onClick={() => setShowAddUser(!showAddUser)}
+                onClick={() => {
+                  // Clear form when opening
+                  setNewUserEmail('');
+                  setNewUserPassword('');
+                  setNewUserName('');
+                  setNewUserRole('INSTRUCTOR');
+                  setShowAddUser(!showAddUser);
+                }}
                 className="flex items-center gap-2 px-4 py-2 bg-battle-orange/20 hover:bg-battle-orange/30 text-battle-orange rounded-lg transition-colors"
               >
                 <UserPlus className="w-4 h-4" />
@@ -639,7 +646,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
 
               {/* Add User Form */}
               {showAddUser && (
-                <form onSubmit={handleAddUser} className="bg-battle-black rounded-xl p-4 space-y-4">
+                <form onSubmit={handleAddUser} className="bg-battle-black rounded-xl p-4 space-y-4" autoComplete="off">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm text-gray-400 mb-1">Navn</label>
@@ -649,6 +656,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
                         onChange={(e) => setNewUserName(e.target.value)}
                         placeholder="Fulde navn"
                         className="w-full bg-battle-grey border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-battle-orange"
+                        autoComplete="off"
                       />
                     </div>
                     <div>
@@ -660,6 +668,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
                         placeholder="email@example.com"
                         className="w-full bg-battle-grey border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-battle-orange"
                         required
+                        autoComplete="new-email"
                       />
                     </div>
                     <div>
@@ -672,6 +681,7 @@ const UsersManagement: React.FC<UsersManagementProps> = ({ isOpen, onClose }) =>
                         className="w-full bg-battle-grey border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-battle-orange"
                         required
                         minLength={6}
+                        autoComplete="new-password"
                       />
                     </div>
                     <div>
