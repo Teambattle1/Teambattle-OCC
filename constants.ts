@@ -698,7 +698,7 @@ export const HUB_LINKS: HubLink[] = [
     title: 'ControlCenter',
     url: 'https://eventday.dk',
     icon: LayoutDashboard,
-    description: 'ADMIN',
+    description: 'Crew Control',
     color: 'orange'
   },
   {
