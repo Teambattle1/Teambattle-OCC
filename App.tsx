@@ -49,6 +49,7 @@ import TeamControlPackingList from './components/TeamControlPackingList';
 import FejlsogningReport from './components/FejlsogningReport';
 import TeamBoxChecklist from './components/TeamBoxChecklist';
 import AdminReports from './components/AdminReports';
+import PackingListEditor from './components/PackingListEditor';
 import { useAuth } from './contexts/AuthContext';
 import {
   ShieldCheck,
@@ -79,7 +80,7 @@ import {
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'admin_reports';
+type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'admin_reports' | 'admin_packing_editor';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -298,6 +299,7 @@ const App: React.FC = () => {
     else if (link.url === '#fejlsogning_loquiz') changeView('fejlsogning_loquiz');
     else if (link.url === '#code') changeView('code');
     else if (link.url === '#admin_reports') changeView('admin_reports');
+    else if (link.url === '#admin_packing_editor') changeView('admin_packing_editor');
     else if (link.title === 'CLAUDE') setIsClaudeDevOpen(true);
     else if (link.title === 'USERS') setIsUsersOpen(true);
   };
@@ -331,6 +333,8 @@ const App: React.FC = () => {
     } else if (currentView === 'code') {
       changeView('task_control');
     } else if (currentView === 'admin_reports') {
+      changeView('task_control');
+    } else if (currentView === 'admin_packing_editor') {
       changeView('task_control');
     } else if (currentView === 'teamrobin_packing') {
       changeView('teamrobin');
@@ -451,6 +455,12 @@ const App: React.FC = () => {
       viewTitle = 'FEJLRAPPORTER';
       viewSubtitle = 'Alle Aktiviteter';
       ViewIcon = Wrench;
+      break;
+    case 'admin_packing_editor':
+      currentLinks = [];
+      viewTitle = 'PAKKELISTER';
+      viewSubtitle = 'Editor';
+      ViewIcon = Package;
       break;
     case 'office':
       currentLinks = filterOfficeSectionsByRole(OFFICE_LINKS);
@@ -1061,6 +1071,8 @@ const App: React.FC = () => {
             <FejlsogningReport activity="loquiz" />
           ) : currentView === 'admin_reports' ? (
             <AdminReports />
+          ) : currentView === 'admin_packing_editor' ? (
+            <PackingListEditor />
           ) : currentView === 'office' ? (
             <div className="w-full max-w-4xl mx-auto">
               <div className="grid grid-cols-2 gap-3 tablet:gap-4">

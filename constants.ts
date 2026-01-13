@@ -84,6 +84,15 @@ export const TASK_CONTROL_LINKS: HubLink[] = [
     description: 'Alle Fejlrapporter',
     color: 'yellow',
     badge: 'new'
+  },
+  {
+    id: 'ar2',
+    title: 'PAKKELISTER',
+    url: '#admin_packing_editor',
+    icon: Package,
+    description: 'Rediger Pakkelister',
+    color: 'green',
+    badge: 'new'
   }
 ];
 

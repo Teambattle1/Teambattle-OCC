@@ -175,17 +175,17 @@ Sendt fra CrewCenter`
 
   return (
     <div className="w-full max-w-2xl mx-auto px-2 tablet:px-4">
-      <div className="bg-battle-grey/20 border border-white/10 rounded-xl tablet:rounded-2xl p-4 tablet:p-6 backdrop-blur-sm">
+      <div className="bg-battle-grey/20 border border-yellow-500/30 rounded-xl tablet:rounded-2xl p-4 tablet:p-6 backdrop-blur-sm">
         {/* Header */}
         <div className="flex items-center gap-3 mb-6">
           <div className="p-3 bg-yellow-500/20 rounded-xl border border-yellow-500/30">
             <AlertTriangle className="w-6 h-6 tablet:w-8 tablet:h-8 text-yellow-400" />
           </div>
           <div>
-            <h2 className="text-lg tablet:text-xl font-bold text-white uppercase tracking-wider">
+            <h2 className="text-lg tablet:text-xl font-bold text-yellow-400 uppercase tracking-wider">
               Fejlrapport
             </h2>
-            <p className="text-xs tablet:text-sm text-yellow-400 uppercase">{activityName}</p>
+            <p className="text-xs tablet:text-sm text-yellow-400/70 uppercase">{activityName}</p>
           </div>
         </div>
 
@@ -193,26 +193,26 @@ Sendt fra CrewCenter`
         <div className="space-y-4">
           {/* Date */}
           <div>
-            <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
+            <label className="block text-xs text-yellow-400/70 uppercase tracking-wider mb-2">
               Dato
             </label>
             <input
               type="date"
               value={date}
               onChange={(e) => setDate(e.target.value)}
-              className="w-full bg-battle-black/50 border border-white/20 rounded-lg p-3 text-white focus:outline-none focus:border-battle-orange transition-colors"
+              className="w-full bg-battle-black/50 border border-yellow-500/30 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 transition-colors"
             />
           </div>
 
           {/* Gear Selection */}
           <div>
-            <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
+            <label className="block text-xs text-yellow-400/70 uppercase tracking-wider mb-2">
               Hvilket gear drejer det sig om?
             </label>
             <select
               value={gear}
               onChange={(e) => setGear(e.target.value)}
-              className="w-full bg-battle-black/50 border border-white/20 rounded-lg p-3 text-white focus:outline-none focus:border-battle-orange transition-colors"
+              className="w-full bg-battle-black/50 border border-yellow-500/30 rounded-lg p-3 text-white focus:outline-none focus:border-yellow-500 transition-colors"
             >
               <option value="">Vælg gear...</option>
               {gearOptions.map((option) => (
@@ -223,7 +223,7 @@ Sendt fra CrewCenter`
 
           {/* Description */}
           <div>
-            <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
+            <label className="block text-xs text-yellow-400/70 uppercase tracking-wider mb-2">
               Beskriv fejlen
             </label>
             <textarea
@@ -231,13 +231,13 @@ Sendt fra CrewCenter`
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Hvad er problemet? Hvornår opstod det? Hvad har du prøvet?"
               rows={4}
-              className="w-full bg-battle-black/50 border border-white/20 rounded-lg p-3 text-white placeholder-gray-600 focus:outline-none focus:border-battle-orange transition-colors resize-none"
+              className="w-full bg-battle-black/50 border border-yellow-500/30 rounded-lg p-3 text-white placeholder-gray-600 focus:outline-none focus:border-yellow-500 transition-colors resize-none"
             />
           </div>
 
           {/* Image Upload */}
           <div>
-            <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
+            <label className="block text-xs text-yellow-400/70 uppercase tracking-wider mb-2">
               Billede (valgfrit)
             </label>
             {/* Hidden file inputs */}
@@ -261,7 +261,7 @@ Sendt fra CrewCenter`
                 <img
                   src={imageUrl}
                   alt="Uploaded"
-                  className="w-full h-48 object-cover rounded-lg border border-white/20"
+                  className="w-full h-48 object-cover rounded-lg border border-yellow-500/30"
                 />
                 <button
                   onClick={() => setImageUrl(null)}
@@ -276,14 +276,14 @@ Sendt fra CrewCenter`
                 <button
                   onClick={() => cameraInputRef.current?.click()}
                   disabled={isUploading}
-                  className="flex-1 p-4 border-2 border-dashed border-white/20 rounded-lg flex flex-col items-center gap-2 hover:border-battle-orange/50 hover:bg-white/5 transition-colors disabled:opacity-50"
+                  className="flex-1 p-4 border-2 border-dashed border-yellow-500/30 rounded-lg flex flex-col items-center gap-2 hover:border-yellow-500 hover:bg-yellow-500/5 transition-colors disabled:opacity-50"
                 >
                   {isUploading ? (
-                    <div className="w-8 h-8 border-2 border-battle-orange/30 border-t-battle-orange rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin" />
                   ) : (
                     <>
-                      <Camera className="w-8 h-8 text-battle-orange" />
-                      <span className="text-xs text-gray-500">Tag Billede</span>
+                      <Camera className="w-8 h-8 text-yellow-400" />
+                      <span className="text-xs text-yellow-400/70">Tag Billede</span>
                     </>
                   )}
                 </button>
@@ -291,14 +291,14 @@ Sendt fra CrewCenter`
                 <button
                   onClick={() => fileInputRef.current?.click()}
                   disabled={isUploading}
-                  className="flex-1 p-4 border-2 border-dashed border-white/20 rounded-lg flex flex-col items-center gap-2 hover:border-battle-orange/50 hover:bg-white/5 transition-colors disabled:opacity-50"
+                  className="flex-1 p-4 border-2 border-dashed border-yellow-500/30 rounded-lg flex flex-col items-center gap-2 hover:border-yellow-500 hover:bg-yellow-500/5 transition-colors disabled:opacity-50"
                 >
                   {isUploading ? (
-                    <div className="w-8 h-8 border-2 border-battle-orange/30 border-t-battle-orange rounded-full animate-spin" />
+                    <div className="w-8 h-8 border-2 border-yellow-400/30 border-t-yellow-400 rounded-full animate-spin" />
                   ) : (
                     <>
-                      <ImagePlus className="w-8 h-8 text-gray-500" />
-                      <span className="text-xs text-gray-500">Vælg Billede</span>
+                      <ImagePlus className="w-8 h-8 text-yellow-400/70" />
+                      <span className="text-xs text-yellow-400/70">Vælg Billede</span>
                     </>
                   )}
                 </button>
@@ -327,7 +327,7 @@ Sendt fra CrewCenter`
             Send Rapport
           </button>
 
-          <p className="text-xs text-gray-500 text-center">
+          <p className="text-xs text-yellow-400/50 text-center">
             Rapporten sendes til booking@teambattle.dk
           </p>
         </div>
