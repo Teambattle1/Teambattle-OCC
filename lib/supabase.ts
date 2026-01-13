@@ -151,13 +151,28 @@ export const createUser = async (
   name?: string
 ): Promise<{ success: boolean; error?: string }> => {
   try {
-    // First create auth user
+    // First check if user already exists in users table
+    const { data: existingUser } = await supabase
+      .from('users')
+      .select('id')
+      .eq('email', email)
+      .single();
+
+    if (existingUser) {
+      return { success: false, error: 'EMAIL_EXISTS' };
+    }
+
+    // Create auth user
     const { data: authData, error: authError } = await supabase.auth.signUp({
       email,
       password,
     });
 
     if (authError) {
+      // User might exist in auth but not in users table
+      if (authError.message.includes('User already registered')) {
+        return { success: false, error: 'EMAIL_EXISTS' };
+      }
       return { success: false, error: authError.message };
     }
 
@@ -165,22 +180,18 @@ export const createUser = async (
       return { success: false, error: 'Failed to create user' };
     }
 
-    // Then create user profile with role
+    // Create user profile with role (use upsert to handle edge cases)
     const { error: profileError } = await supabase
       .from('users')
-      .insert({
+      .upsert({
         id: authData.user.id,
         email,
         role,
         name,
         created_at: new Date().toISOString()
-      });
+      }, { onConflict: 'id' });
 
     if (profileError) {
-      // Check for duplicate key error
-      if (profileError.message.includes('duplicate key') || profileError.code === '23505') {
-        return { success: false, error: 'EMAIL_EXISTS' };
-      }
       return { success: false, error: profileError.message };
     }
 
