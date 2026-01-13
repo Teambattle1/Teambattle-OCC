@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Send, Upload, X, AlertTriangle, CheckCircle2, Camera } from 'lucide-react';
+import { Send, Upload, X, AlertTriangle, CheckCircle2, Camera, ImagePlus } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -48,6 +48,7 @@ const FejlsogningReport: React.FC<FejlsogningReportProps> = ({ activity }) => {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const cameraInputRef = useRef<HTMLInputElement>(null);
 
   const activityName = ACTIVITY_NAMES[activity] || activity;
   const gearOptions = GEAR_OPTIONS[activity] || ['Udstyr', 'Andet'];
@@ -239,11 +240,20 @@ Sendt fra CrewCenter`
             <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
               Billede (valgfrit)
             </label>
+            {/* Hidden file inputs */}
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleImageUpload}
               accept="image/*"
+              className="hidden"
+            />
+            <input
+              type="file"
+              ref={cameraInputRef}
+              onChange={handleImageUpload}
+              accept="image/*"
+              capture="environment"
               className="hidden"
             />
             {imageUrl ? (
@@ -261,20 +271,38 @@ Sendt fra CrewCenter`
                 </button>
               </div>
             ) : (
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                disabled={isUploading}
-                className="w-full p-4 border-2 border-dashed border-white/20 rounded-lg flex flex-col items-center gap-2 hover:border-battle-orange/50 hover:bg-white/5 transition-colors disabled:opacity-50"
-              >
-                {isUploading ? (
-                  <div className="w-8 h-8 border-2 border-battle-orange/30 border-t-battle-orange rounded-full animate-spin" />
-                ) : (
-                  <>
-                    <Camera className="w-8 h-8 text-gray-500" />
-                    <span className="text-sm text-gray-500">Tryk for at uploade billede</span>
-                  </>
-                )}
-              </button>
+              <div className="flex gap-3">
+                {/* Camera button */}
+                <button
+                  onClick={() => cameraInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="flex-1 p-4 border-2 border-dashed border-white/20 rounded-lg flex flex-col items-center gap-2 hover:border-battle-orange/50 hover:bg-white/5 transition-colors disabled:opacity-50"
+                >
+                  {isUploading ? (
+                    <div className="w-8 h-8 border-2 border-battle-orange/30 border-t-battle-orange rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <Camera className="w-8 h-8 text-battle-orange" />
+                      <span className="text-xs text-gray-500">Tag Billede</span>
+                    </>
+                  )}
+                </button>
+                {/* Gallery button */}
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={isUploading}
+                  className="flex-1 p-4 border-2 border-dashed border-white/20 rounded-lg flex flex-col items-center gap-2 hover:border-battle-orange/50 hover:bg-white/5 transition-colors disabled:opacity-50"
+                >
+                  {isUploading ? (
+                    <div className="w-8 h-8 border-2 border-battle-orange/30 border-t-battle-orange rounded-full animate-spin" />
+                  ) : (
+                    <>
+                      <ImagePlus className="w-8 h-8 text-gray-500" />
+                      <span className="text-xs text-gray-500">Vælg Billede</span>
+                    </>
+                  )}
+                </button>
+              </div>
             )}
           </div>
 
