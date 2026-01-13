@@ -50,6 +50,7 @@ import FejlsogningReport from './components/FejlsogningReport';
 import TeamBoxChecklist from './components/TeamBoxChecklist';
 import AdminReports from './components/AdminReports';
 import PackingListEditor from './components/PackingListEditor';
+import DynamicPackingList from './components/DynamicPackingList';
 import { useAuth } from './contexts/AuthContext';
 import {
   ShieldCheck,
@@ -943,17 +944,9 @@ const App: React.FC = () => {
           {currentView === 'distance_tool' ? (
             <DistanceTool />
           ) : currentView === 'teamrobin_packing_before' ? (
-            <PackingList
-              title="Før Opgaven - Afgang"
-              storageKey="teamrobin_packing_before"
-              items={TEAMROBIN_PACKING_BEFORE}
-            />
+            <DynamicPackingList activity="teamrobin" listType="before" title="FØR OPGAVEN" />
           ) : currentView === 'teamrobin_packing_after' ? (
-            <PackingList
-              title="Efter Opgaven - Hjemkomst"
-              storageKey="teamrobin_packing_after"
-              items={TEAMROBIN_PACKING_AFTER}
-            />
+            <DynamicPackingList activity="teamrobin" listType="after" title="EFTER OPGAVEN" />
           ) : currentView === 'teamlazer_justering' ? (
             <VideoPlayer
               title="TeamLazer Justering"
@@ -990,9 +983,9 @@ const App: React.FC = () => {
           ) : currentView === 'teamconstruct_scorecard' ? (
             <TeamConstructScorecard />
           ) : currentView === 'teamconstruct_packing_afgang' ? (
-            <TeamConstructPackingList mode="afgang" />
+            <DynamicPackingList activity="teamconstruct" listType="afgang" />
           ) : currentView === 'teamconstruct_packing_hjemkomst' ? (
-            <TeamConstructPackingList mode="hjemkomst" />
+            <DynamicPackingList activity="teamconstruct" listType="hjemkomst" />
           ) : currentView === 'teamcontrol_video' ? (
             <VideoPlayer
               title="TeamControl Video Guides"
@@ -1004,9 +997,9 @@ const App: React.FC = () => {
           ) : currentView === 'teamcontrol_flybrix_manual' ? (
             <FlybrixManual />
           ) : currentView === 'teamcontrol_packing_afgang' ? (
-            <TeamControlPackingList mode="afgang" />
+            <DynamicPackingList activity="teamcontrol" listType="afgang" />
           ) : currentView === 'teamcontrol_packing_hjemkomst' ? (
-            <TeamControlPackingList mode="hjemkomst" />
+            <DynamicPackingList activity="teamcontrol" listType="hjemkomst" />
           ) : currentView === 'teamcontrol_musik' ? (
             <div className="w-full max-w-2xl mx-auto px-2 tablet:px-4">
               <div className="bg-battle-grey/20 border border-green-500/30 rounded-xl tablet:rounded-2xl p-6 tablet:p-8 backdrop-blur-sm">
@@ -1044,9 +1037,9 @@ const App: React.FC = () => {
               videoIndex={TEAMLAZER_VIDEO_INDEX}
             />
           ) : currentView === 'teamlazer_packing' ? (
-            <TeamLazerPackingList />
+            <DynamicPackingList activity="teamlazer" listType="before" />
           ) : currentView === 'teamsegway_packing' ? (
-            <TeamSegwayPackingList />
+            <DynamicPackingList activity="teamsegway" listType="before" />
           ) : currentView === 'teamlazer_scorecard' ? (
             <LazerPointScoreboard />
           ) : currentView === 'fejlsogning_teamlazer' ? (
