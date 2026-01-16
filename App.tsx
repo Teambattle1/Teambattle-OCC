@@ -65,6 +65,8 @@ import PDFViewer from './components/PDFViewer';
 import TeamRaceGuide from './components/TeamRaceGuide';
 import TeamRaceInstructions from './components/TeamRaceInstructions';
 import TeamRaceScorecard from './components/TeamRaceScorecard';
+import TeamRobinVideoGrid from './components/TeamRobinVideoGrid';
+import TeamSegwayVideoGrid from './components/TeamSegwayVideoGrid';
 import ActivityGuide from './components/ActivityGuide';
 import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
 import { useAuth } from './contexts/AuthContext';
@@ -1217,10 +1219,7 @@ const App: React.FC = () => {
               videoId="ZkkqiV-uRRg"
             />
           ) : currentView === 'teamrobin_video' ? (
-            <VideoPlayer
-              title="TeamRobin Video Guides"
-              playlistId="PLq4wXYwkH9QaWwF-HmOgfUc_ubty9BOub"
-            />
+            <TeamRobinVideoGrid onBack={() => changeView('teamrobin')} />
           ) : currentView === 'teamchallenge_video' ? (
             <VideoPlayer
               title="TeamChallenge Video Guides"
@@ -1234,10 +1233,7 @@ const App: React.FC = () => {
               playlistId="PLq4wXYwkH9QY14CVT_nnytn_HMX_BTnyR"
             />
           ) : currentView === 'teamsegway_video' ? (
-            <VideoPlayer
-              title="TeamSegway Video Guides"
-              playlistId="PLq4wXYwkH9QZE47RWiYV6XAy48RSt83mR"
-            />
+            <TeamSegwayVideoGrid onBack={() => changeView('teamsegway')} />
           ) : currentView === 'teamconstruct_video' ? (
             <VideoPlayer
               title="TeamConstruct Video Guides"

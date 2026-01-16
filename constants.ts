@@ -983,7 +983,7 @@ export const HUB_LINKS: HubLink[] = [
     url: 'https://eventday.dk',
     icon: LayoutDashboard,
     description: 'Crew Control',
-    color: 'orange'
+    color: 'blue'
   },
   {
     id: 'cat3',
