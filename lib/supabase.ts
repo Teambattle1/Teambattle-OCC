@@ -426,6 +426,9 @@ export interface GuideSection {
   title: string;
   content: string;
   image_url?: string;
+  video_url?: string;
+  icon_key?: string;
+  linked_packing_list?: string; // Format: "activity:list_type" e.g. "teamconstruct:afgang"
   order_index: number;
   category?: string;
   created_at?: string;
@@ -466,6 +469,9 @@ export const saveGuideSection = async (
           title: section.title,
           content: section.content,
           image_url: section.image_url,
+          video_url: section.video_url,
+          icon_key: section.icon_key,
+          linked_packing_list: section.linked_packing_list,
           order_index: section.order_index,
           category: section.category,
           updated_at: new Date().toISOString()
@@ -486,6 +492,9 @@ export const saveGuideSection = async (
           title: section.title,
           content: section.content,
           image_url: section.image_url,
+          video_url: section.video_url,
+          icon_key: section.icon_key,
+          linked_packing_list: section.linked_packing_list,
           order_index: section.order_index,
           category: section.category,
           created_at: new Date().toISOString(),

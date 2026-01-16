@@ -32,7 +32,8 @@ import {
   Palette,
   Type,
   CheckSquare,
-  Square
+  Square,
+  RefreshCw
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -40,7 +41,8 @@ import {
   saveGuideSection,
   deleteGuideSection,
   uploadGuideImage,
-  GuideSection
+  GuideSection,
+  supabase
 } from '../lib/supabase';
 
 // Category definitions
@@ -338,6 +340,8 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
   const [editTitle, setEditTitle] = useState('');
+  const [editIcon, setEditIcon] = useState('file');
+  const [editCategory, setEditCategory] = useState<CategoryKey>('before');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -385,12 +389,14 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
       // Merge saved data with defaults and add custom sections
       allSections = DEFAULT_SECTIONS.map(defaultSection => {
         const savedSection = result.data?.find(s => s.section_key === defaultSection.section_key);
+        // Use icon_key from DB if available, otherwise use default
+        const iconKey = savedSection?.icon_key || defaultSection.iconKey;
         return {
           ...defaultSection,
           ...savedSection,
           activity: 'teamconstruct',
-          icon: defaultSection.icon,
-          iconKey: defaultSection.iconKey,
+          icon: getIconByKey(iconKey || 'file'),
+          iconKey: iconKey,
           color: defaultSection.color,
           link: defaultSection.link,
           linkText: defaultSection.linkText,
@@ -404,10 +410,11 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
         s => !DEFAULT_SECTIONS.find(d => d.section_key === s.section_key)
       );
       customSections.forEach(cs => {
+        const iconKey = cs.icon_key || cs.section_key.split('_')[0] || 'file';
         allSections.push({
           ...cs,
-          icon: getIconByKey(cs.section_key.split('_')[0] || 'file'),
-          iconKey: cs.section_key.split('_')[0] || 'file',
+          icon: getIconByKey(iconKey),
+          iconKey: iconKey,
           color: 'blue',
           category: (cs.category as CategoryKey) || 'before',
           isDefault: false
@@ -429,23 +436,49 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     setEditingSection(section.section_key);
     setEditContent(section.content);
     setEditTitle(section.title);
+    setEditIcon(section.iconKey || 'file');
+    setEditCategory(section.category);
   };
 
   const handleSaveEdit = async (section: SectionWithMeta) => {
     setIsSaving(true);
-    const updatedSection = {
-      ...section,
+
+    // Calculate new order_index if category changed
+    let newOrderIndex = section.order_index || 0;
+    if (editCategory !== section.category) {
+      const targetCategorySections = sections.filter(s => s.category === editCategory);
+      const maxOrder = Math.max(...targetCategorySections.map(s => s.order_index || 0), -1);
+      newOrderIndex = maxOrder + 1;
+    }
+
+    const updatedSection: GuideSection = {
+      id: section.id,
+      activity: 'teamconstruct',
+      section_key: section.section_key,
       title: editTitle,
-      content: editContent
+      content: editContent,
+      image_url: section.image_url,
+      icon_key: editIcon,
+      order_index: newOrderIndex,
+      category: editCategory
     };
 
     const result = await saveGuideSection(updatedSection);
     if (result.success) {
       setSections(prev => prev.map(s =>
         s.section_key === section.section_key
-          ? { ...s, title: editTitle, content: editContent, id: result.id || s.id }
+          ? {
+              ...s,
+              title: editTitle,
+              content: editContent,
+              icon: getIconByKey(editIcon),
+              iconKey: editIcon,
+              category: editCategory,
+              order_index: newOrderIndex,
+              id: result.id || s.id
+            }
           : s
-      ));
+      ).sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
       setEditingSection(null);
     }
     setIsSaving(false);
@@ -456,6 +489,68 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     setEditContent('');
     setEditTitle('');
   };
+
+  // Fetch packing list from Supabase and format as text
+  const syncPackingList = async (listType: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('packing_lists')
+        .select('items')
+        .eq('activity', 'teamconstruct')
+        .eq('list_type', listType)
+        .single();
+
+      if (error || !data?.items) {
+        alert(`Ingen pakkeliste fundet for teamconstruct - ${listType}`);
+        return;
+      }
+
+      const items = data.items as Array<{
+        id: string;
+        text: string;
+        subtext?: string;
+        indent?: boolean;
+        isDivider?: boolean;
+      }>;
+
+      let formattedContent = '';
+      items.forEach(item => {
+        if (item.isDivider) {
+          formattedContent += `\n${item.text}:\n`;
+        } else if (item.indent) {
+          formattedContent += `  • ${item.text}${item.subtext ? ` (${item.subtext})` : ''}\n`;
+        } else {
+          formattedContent += `• ${item.text}${item.subtext ? ` (${item.subtext})` : ''}\n`;
+        }
+      });
+
+      setEditContent(formattedContent.trim());
+    } catch (err) {
+      console.error('Error syncing packing list:', err);
+      alert('Fejl ved sync af pakkeliste');
+    }
+  };
+
+  // Check if packing lists exist for this activity
+  const [availablePackingLists, setAvailablePackingLists] = useState<string[]>([]);
+
+  useEffect(() => {
+    const checkPackingLists = async () => {
+      try {
+        const { data } = await supabase
+          .from('packing_lists')
+          .select('list_type')
+          .eq('activity', 'teamconstruct');
+
+        if (data) {
+          setAvailablePackingLists(data.map(d => d.list_type));
+        }
+      } catch (err) {
+        console.error('Error checking packing lists:', err);
+      }
+    };
+    checkPackingLists();
+  }, []);
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, sectionKey: string) => {
     const file = e.target.files?.[0];
@@ -788,11 +883,98 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                         className="w-full bg-battle-black/50 border border-white/20 rounded-lg px-4 py-2 text-white font-bold uppercase tracking-wider focus:outline-none focus:border-battle-orange"
                       />
                     </div>
+
+                    {/* Icon and Category Row */}
+                    <div className="grid grid-cols-2 gap-3">
+                      {/* Icon Selection */}
+                      <div>
+                        <label className="block text-xs text-gray-400 uppercase tracking-wider mb-1">
+                          Ikon
+                        </label>
+                        <div className="grid grid-cols-5 gap-1">
+                          {ICON_OPTIONS.map((opt) => {
+                            const IconOpt = opt.icon;
+                            return (
+                              <button
+                                key={opt.key}
+                                type="button"
+                                onClick={() => setEditIcon(opt.key)}
+                                className={`p-2 rounded-lg border transition-colors ${
+                                  editIcon === opt.key
+                                    ? 'border-battle-orange bg-battle-orange/20'
+                                    : 'border-white/10 hover:bg-white/5'
+                                }`}
+                                title={opt.label}
+                              >
+                                <IconOpt className={`w-4 h-4 mx-auto ${editIcon === opt.key ? 'text-battle-orange' : 'text-gray-400'}`} />
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Category Selection */}
+                      <div>
+                        <label className="block text-xs text-gray-400 uppercase tracking-wider mb-1">
+                          Sektion
+                        </label>
+                        <div className="flex flex-col gap-1">
+                          {(Object.keys(CATEGORIES) as CategoryKey[]).map((catKey) => {
+                            const cat = CATEGORIES[catKey];
+                            const catColors = COLORS[cat.color];
+                            return (
+                              <button
+                                key={catKey}
+                                type="button"
+                                onClick={() => setEditCategory(catKey)}
+                                className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border transition-colors text-left ${
+                                  editCategory === catKey
+                                    ? `${catColors.border} ${catColors.bg}`
+                                    : 'border-white/10 hover:bg-white/5'
+                                }`}
+                              >
+                                <cat.icon className={`w-4 h-4 ${editCategory === catKey ? catColors.icon : 'text-gray-500'}`} />
+                                <span className={`text-xs uppercase tracking-wider ${editCategory === catKey ? catColors.text : 'text-gray-400'}`}>
+                                  {cat.title}
+                                </span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    </div>
+
                     {/* Content Textarea */}
                     <div>
-                      <label className="block text-xs text-gray-400 uppercase tracking-wider mb-1">
-                        Indhold
-                      </label>
+                      <div className="flex items-center justify-between mb-1">
+                        <label className="block text-xs text-gray-400 uppercase tracking-wider">
+                          Indhold
+                        </label>
+                        {/* Sync Packing List Buttons */}
+                        {availablePackingLists.length > 0 && (
+                          <div className="flex items-center gap-1">
+                            <span className="text-[10px] text-gray-500 uppercase mr-1">Sync pakkeliste:</span>
+                            {availablePackingLists.map(listType => (
+                              <button
+                                key={listType}
+                                type="button"
+                                onClick={() => {
+                                  if (confirm(`Vil du erstatte indholdet med pakkeliste "${listType}"?`)) {
+                                    syncPackingList(listType);
+                                  }
+                                }}
+                                className="flex items-center gap-1 px-2 py-1 bg-purple-500/20 border border-purple-500/30 rounded text-purple-400 text-[10px] uppercase tracking-wider hover:bg-purple-500/30 transition-colors"
+                              >
+                                <RefreshCw className="w-3 h-3" />
+                                {listType === 'afgang' ? 'Afgang' :
+                                 listType === 'hjemkomst' ? 'Hjemkomst' :
+                                 listType === 'before' ? 'Før' :
+                                 listType === 'after' ? 'Efter' : listType}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                       <textarea
                         value={editContent}
                         onChange={(e) => setEditContent(e.target.value)}

@@ -64,6 +64,7 @@ import TeamRaceGuide from './components/TeamRaceGuide';
 import TeamRaceInstructions from './components/TeamRaceInstructions';
 import TeamRaceScorecard from './components/TeamRaceScorecard';
 import ActivityGuide from './components/ActivityGuide';
+import { DevicePreviewToolbar, DevicePreviewWrapper, DeviceType, Orientation, detectDevice } from './components/DevicePreview';
 import { useAuth } from './contexts/AuthContext';
 import {
   ShieldCheck,
@@ -106,6 +107,11 @@ const App: React.FC = () => {
   const [isUsersOpen, setIsUsersOpen] = useState(false);
   const [isClaudeAssistantOpen, setIsClaudeAssistantOpen] = useState(false);
   const [isIdeasOpen, setIsIdeasOpen] = useState(false);
+
+  // Device Preview State
+  const [previewDevice, setPreviewDevice] = useState<DeviceType | null>(null);
+  const [previewOrientation, setPreviewOrientation] = useState<Orientation>('portrait');
+  const [isPreviewActive, setIsPreviewActive] = useState(false);
 
   // Drag and Drop State - MUST be before any early returns to satisfy React hooks rules
   const [hubLinks, setHubLinks] = useState<HubLink[]>(() => {
@@ -1038,7 +1044,7 @@ const App: React.FC = () => {
 
       {/* Center Top Clock */}
       <div className="absolute top-4 left-1/2 transform -translate-x-1/2 z-50">
-        <Clock />
+        <Clock showVersion={profile?.role === 'ADMIN' || profile?.role === 'GAMEMASTER'} />
       </div>
 
       {/* Top Right User Info and Calendar - Responsive for all 5 modes */}
@@ -1188,7 +1194,7 @@ const App: React.FC = () => {
               videoIndex={TEAMCONSTRUCT_VIDEO_INDEX}
             />
           ) : currentView === 'teamconstruct_guide' ? (
-            <TeamConstructGuide onNavigate={(view) => changeView(view as ViewState)} />
+            <ActivityGuide activity="teamconstruct" onNavigate={(view) => changeView(view as ViewState)} />
           ) : currentView === 'teamconstruct_scorecard' ? (
             <TeamConstructScorecard />
           ) : currentView === 'teamconstruct_packing_afgang' ? (
@@ -1202,7 +1208,7 @@ const App: React.FC = () => {
               videoIndex={TEAMCONTROL_VIDEO_INDEX}
             />
           ) : currentView === 'teamcontrol_guide' ? (
-            <TeamControlGuide onNavigate={(view) => changeView(view as ViewState)} />
+            <ActivityGuide activity="teamcontrol" onNavigate={(view) => changeView(view as ViewState)} />
           ) : currentView === 'teamcontrol_flybrix_manual' ? (
             <FlybrixManual />
           ) : currentView === 'teamcontrol_packing_afgang' ? (
@@ -1240,7 +1246,7 @@ const App: React.FC = () => {
           ) : currentView === 'teambox_checklist' ? (
             <DynamicPackingList activity="teambox" listType="nulstil" title="NULSTIL BOX" enableTabs={true} trackCompletion={true} />
           ) : currentView === 'teambox_guide' ? (
-            <TeamBoxGuide onNavigate={(view) => changeView(view as ViewState)} />
+            <ActivityGuide activity="teambox" onNavigate={(view) => changeView(view as ViewState)} />
           ) : currentView === 'teambox_packing_afgang' ? (
             <DynamicPackingList activity="teambox" listType="afgang" />
           ) : currentView === 'teambox_packing_hjemkomst' ? (
@@ -1325,7 +1331,7 @@ const App: React.FC = () => {
               videoIndex={TEAMRACE_VIDEO_INDEX}
             />
           ) : currentView === 'teamrace_guide' ? (
-            <TeamRaceGuide onNavigate={(view) => changeView(view as ViewState)} />
+            <ActivityGuide activity="teamrace" onNavigate={(view) => changeView(view as ViewState)} />
           ) : currentView === 'teamrace_rccars' ? (
             <PDFViewer
               pdfUrl="https://shop.hoeco.at/explosionsdatein/pdf/76054-5_LaTraxTeton.pdf"

@@ -187,18 +187,23 @@ const PackingListEditor: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const cameraInputRef = useRef<HTMLInputElement>(null);
 
-  // Load list when activity or type changes
-  useEffect(() => {
-    loadList();
-  }, [selectedActivity, selectedListType]);
-
-  // Update list type options when activity changes
+  // Update list type options when activity changes, then load list
   useEffect(() => {
     const types = LIST_TYPE_OPTIONS[selectedActivity];
     if (types && types.length > 0) {
-      setSelectedListType(types[0].value);
+      const firstType = types[0].value;
+      setSelectedListType(firstType);
     }
   }, [selectedActivity]);
+
+  // Load list when listType changes (which happens after activity change sets the correct type)
+  useEffect(() => {
+    // Only load if the listType is valid for the current activity
+    const validTypes = LIST_TYPE_OPTIONS[selectedActivity]?.map(t => t.value) || [];
+    if (validTypes.includes(selectedListType)) {
+      loadList();
+    }
+  }, [selectedActivity, selectedListType]);
 
   const loadList = async () => {
     setIsLoading(true);

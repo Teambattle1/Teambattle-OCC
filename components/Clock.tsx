@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from 'react';
 
+// App version - update this when deploying new versions
+export const APP_VERSION = '2.4.1';
+
 interface ClockProps {
   showDate?: boolean;
+  showVersion?: boolean;
 }
 
-const Clock: React.FC<ClockProps> = ({ showDate = false }) => {
+const Clock: React.FC<ClockProps> = ({ showDate = false, showVersion = false }) => {
   const [time, setTime] = useState(new Date());
 
   useEffect(() => {
@@ -32,6 +36,11 @@ const Clock: React.FC<ClockProps> = ({ showDate = false }) => {
       <div className="text-sm mobile-landscape:text-sm tablet-portrait:text-lg tablet-landscape:text-base desktop:text-xl font-bold text-battle-orange tracking-widest drop-shadow-[0_0_8px_rgba(255,102,0,0.6)]">
         {timeString}
       </div>
+      {showVersion && (
+        <div className="text-[8px] mobile-landscape:text-[7px] tablet-portrait:text-[9px] tablet-landscape:text-[8px] desktop:text-[10px] text-gray-500 uppercase tracking-widest">
+          v{APP_VERSION}
+        </div>
+      )}
       {showDate && (
         <div className="text-[8px] mobile-landscape:text-[8px] tablet-portrait:text-[10px] tablet-landscape:text-[9px] desktop:text-xs text-battle-white/70 uppercase tracking-widest mt-0.5">
           {dateString}
