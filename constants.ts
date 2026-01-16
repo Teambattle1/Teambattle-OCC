@@ -164,7 +164,7 @@ export const TEAM_CHALLENGE_LINKS: HubLink[] = [
   },
   {
     id: 'tc4',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_teamchallenge',
     icon: Wrench,
     description: 'Rapporter fejl',
@@ -199,7 +199,7 @@ export const LOQUIZ_LINKS: HubLink[] = [
   },
   {
     id: 'lq3',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_loquiz',
     icon: Wrench,
     description: 'Rapporter fejl',
@@ -237,7 +237,7 @@ export const TEAMLAZER_LINKS: HubLink[] = [
   },
   {
     id: 'tl3',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_teamlazer',
     icon: Wrench,
     description: 'Rapporter fejl',
@@ -254,7 +254,7 @@ export const TEAMLAZER_LINKS: HubLink[] = [
   }
 ];
 
-// TeamLazer Fejlsøgning Submenu
+// TeamLazer Fejl & Mangler Submenu
 export const TEAMLAZER_FEJLSOGNING_LINKS: HubLink[] = [
   {
     id: 'tlf1',
@@ -295,7 +295,7 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
   },
   {
     id: 'ts4',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_teamsegway',
     icon: Wrench,
     description: 'Rapporter fejl',
@@ -341,7 +341,7 @@ export const TEAMBOX_LINKS: HubLink[] = [
   },
   {
     id: 'tb4',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_teambox',
     icon: Wrench,
     description: 'Rapporter fejl',
@@ -414,7 +414,7 @@ export const TEAMCONSTRUCT_LINKS: HubLink[] = [
   },
   {
     id: 'tcons4',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_teamconstruct',
     icon: Wrench,
     description: 'Rapporter fejl',
@@ -468,7 +468,7 @@ export const TEAMCONTROL_LINKS: HubLink[] = [
   },
   {
     id: 'tctrl4',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_teamcontrol',
     icon: Wrench,
     description: 'Rapporter fejl',
@@ -545,7 +545,7 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
   },
   {
     id: 'tc3',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_teamconnect',
     icon: Wrench,
     description: 'Rapporter fejl',
@@ -582,7 +582,7 @@ export const TEAMROBIN_LINKS: HubLink[] = [
   },
   {
     id: 'tr4',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_teamrobin',
     icon: Wrench,
     description: 'Rapporter fejl',
@@ -658,7 +658,7 @@ export const TEAMACTION_LINKS: HubLink[] = [
   },
   {
     id: 'ta3',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_teamaction',
     icon: Wrench,
     description: 'Rapporter fejl',
@@ -704,7 +704,7 @@ export const TEAMRACE_LINKS: HubLink[] = [
   },
   {
     id: 'trace4',
-    title: 'FEJLSØGNING',
+    title: 'FEJL & MANGLER',
     url: '#fejlsogning_teamrace',
     icon: Wrench,
     description: 'Rapporter fejl',

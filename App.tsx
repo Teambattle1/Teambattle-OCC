@@ -649,7 +649,7 @@ const App: React.FC = () => {
       break;
     case 'fejlsogning_teamrace':
       currentLinks = [];
-      viewTitle = 'FEJLSØGNING';
+      viewTitle = 'FEJL & MANGLER';
       viewSubtitle = 'TeamRace';
       ViewIcon = Wrench;
       break;
@@ -697,7 +697,7 @@ const App: React.FC = () => {
       break;
     case 'teamlazer_fejlsogning':
       currentLinks = TEAMLAZER_FEJLSOGNING_LINKS;
-      viewTitle = 'FEJLSØGNING';
+      viewTitle = 'FEJL & MANGLER';
       viewSubtitle = 'TeamLazer';
       ViewIcon = Wrench;
       break;

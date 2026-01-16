@@ -427,6 +427,7 @@ export interface GuideSection {
   content: string;
   image_url?: string;
   order_index: number;
+  category?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -466,6 +467,7 @@ export const saveGuideSection = async (
           content: section.content,
           image_url: section.image_url,
           order_index: section.order_index,
+          category: section.category,
           updated_at: new Date().toISOString()
         })
         .eq('id', section.id);
@@ -485,6 +487,7 @@ export const saveGuideSection = async (
           content: section.content,
           image_url: section.image_url,
           order_index: section.order_index,
+          category: section.category,
           created_at: new Date().toISOString(),
           updated_at: new Date().toISOString()
         })
@@ -499,6 +502,26 @@ export const saveGuideSection = async (
   } catch (err) {
     console.error('Failed to save guide section:', err);
     return { success: false, error: 'Failed to save section' };
+  }
+};
+
+// Delete a guide section
+export const deleteGuideSection = async (
+  sectionId: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const { error } = await supabase
+      .from('guide_sections')
+      .delete()
+      .eq('id', sectionId);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to delete guide section:', err);
+    return { success: false, error: 'Failed to delete section' };
   }
 };
 

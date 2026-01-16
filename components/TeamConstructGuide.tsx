@@ -18,12 +18,17 @@ import {
   ExternalLink,
   PackageCheck,
   Play,
-  CheckCircle2
+  CheckCircle2,
+  Plus,
+  Trash2,
+  GripVertical,
+  FileText
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import {
   getGuideSections,
   saveGuideSection,
+  deleteGuideSection,
   uploadGuideImage,
   GuideSection
 } from '../lib/supabase';
@@ -35,6 +40,24 @@ const CATEGORIES: Record<CategoryKey, { title: string; icon: React.ElementType; 
   before: { title: 'FØR OPGAVEN', icon: PackageCheck, color: 'green' },
   during: { title: 'UNDER OPGAVEN', icon: Play, color: 'yellow' },
   after: { title: 'EFTER OPGAVEN', icon: CheckCircle2, color: 'red' }
+};
+
+// Icon map for custom sections
+const ICON_OPTIONS = [
+  { key: 'target', icon: Target, label: 'Mål' },
+  { key: 'users', icon: Users, label: 'Brugere' },
+  { key: 'music', icon: Music, label: 'Musik' },
+  { key: 'clock', icon: Clock, label: 'Tid' },
+  { key: 'clipboard', icon: ClipboardList, label: 'Liste' },
+  { key: 'mappin', icon: MapPin, label: 'Lokation' },
+  { key: 'settings', icon: Settings, label: 'Indstillinger' },
+  { key: 'trophy', icon: Trophy, label: 'Trofæ' },
+  { key: 'home', icon: Home, label: 'Hjem' },
+  { key: 'file', icon: FileText, label: 'Dokument' }
+];
+
+const getIconByKey = (key: string): React.ElementType => {
+  return ICON_OPTIONS.find(i => i.key === key)?.icon || FileText;
 };
 
 // Default sections from the TeamConstruct instructor manual
@@ -49,8 +72,10 @@ TEAMOPDELING: 3-4 deltagere pr. team
 Resultatet bliver, trods samme udgangspunkt – meget forskelligt.`,
     order_index: 0,
     icon: Target,
+    iconKey: 'target',
     color: 'red',
-    category: 'before' as CategoryKey
+    category: 'before' as CategoryKey,
+    isDefault: true
   },
   {
     section_key: 'musik',
@@ -66,8 +91,10 @@ REGLER:
 • Tænd altid ved oprydning`,
     order_index: 1,
     icon: Music,
+    iconKey: 'music',
     color: 'green',
-    category: 'during' as CategoryKey
+    category: 'during' as CategoryKey,
+    isDefault: true
   },
   {
     section_key: 'tidsplan',
@@ -87,8 +114,10 @@ EFTER:
 • 10 min - Tjekliste HJEMKOMST`,
     order_index: 2,
     icon: Clock,
+    iconKey: 'clock',
     color: 'blue',
-    category: 'before' as CategoryKey
+    category: 'before' as CategoryKey,
+    isDefault: true
   },
   {
     section_key: 'foer_opgaven',
@@ -107,11 +136,13 @@ PAKKELISTE:
 • Sorte borde (et til hvert hold)`,
     order_index: 3,
     icon: ClipboardList,
+    iconKey: 'clipboard',
     color: 'yellow',
     link: '#teamconstruct_packing_afgang',
     linkText: 'PAKKELISTE AFGANG',
     isInternal: true,
-    category: 'before' as CategoryKey
+    category: 'before' as CategoryKey,
+    isDefault: true
   },
   {
     section_key: 'ankomst',
@@ -127,10 +158,12 @@ OPSÆTNING:
 • Tænd musik svagt som det første`,
     order_index: 4,
     icon: MapPin,
+    iconKey: 'mappin',
     color: 'purple',
     link: 'https://l.ead.me/TeamConstruct-Video',
     linkText: 'SE OPSÆTNING VIDEO',
-    category: 'before' as CategoryKey
+    category: 'before' as CategoryKey,
+    isDefault: true
   },
   {
     section_key: 'velkomst',
@@ -144,8 +177,10 @@ OPSÆTNING:
 Sørg for at ALLE kan høre dig tydeligt.`,
     order_index: 5,
     icon: Users,
+    iconKey: 'users',
     color: 'orange',
-    category: 'during' as CategoryKey
+    category: 'during' as CategoryKey,
+    isDefault: true
   },
   {
     section_key: 'afvikling',
@@ -162,10 +197,12 @@ SIKKERHED:
 • Grib ind ved farlig adfærd`,
     order_index: 6,
     icon: Settings,
+    iconKey: 'settings',
     color: 'red',
     link: 'https://l.ead.me/TeamConstruct-Video',
     linkText: 'SE AFVIKLING VIDEO',
-    category: 'during' as CategoryKey
+    category: 'during' as CategoryKey,
+    isDefault: true
   },
   {
     section_key: 'kaaring',
@@ -180,8 +217,10 @@ SIKKERHED:
 Sørg for god stemning og anerkendelse til ALLE hold.`,
     order_index: 7,
     icon: Trophy,
+    iconKey: 'trophy',
     color: 'yellow',
-    category: 'during' as CategoryKey
+    category: 'during' as CategoryKey,
+    isDefault: true
   },
   {
     section_key: 'oprydning',
@@ -197,11 +236,13 @@ EFTER HVER OPGAVE:
 Tænd musik under oprydning!`,
     order_index: 8,
     icon: Home,
+    iconKey: 'home',
     color: 'green',
     link: '#teamconstruct_packing_hjemkomst',
     linkText: 'TJEKLISTE HJEMKOMST',
     isInternal: true,
-    category: 'after' as CategoryKey
+    category: 'after' as CategoryKey,
+    isDefault: true
   }
 ];
 
@@ -216,11 +257,13 @@ const COLORS: Record<string, { bg: string; border: string; text: string; icon: s
 
 interface SectionWithMeta extends GuideSection {
   icon: React.ElementType;
+  iconKey?: string;
   color: string;
   link?: string;
   linkText?: string;
   isInternal?: boolean;
   category: CategoryKey;
+  isDefault?: boolean;
 }
 
 interface TeamConstructGuideProps {
@@ -236,7 +279,17 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const newSectionImageRef = useRef<HTMLInputElement>(null);
   const [uploadingSectionKey, setUploadingSectionKey] = useState<string | null>(null);
+
+  // New section modal state
+  const [showNewSectionModal, setShowNewSectionModal] = useState(false);
+  const [newSectionCategory, setNewSectionCategory] = useState<CategoryKey>('before');
+  const [newSectionTitle, setNewSectionTitle] = useState('');
+  const [newSectionContent, setNewSectionContent] = useState('');
+  const [newSectionIcon, setNewSectionIcon] = useState('file');
+  const [newSectionImage, setNewSectionImage] = useState<File | null>(null);
+  const [newSectionImagePreview, setNewSectionImagePreview] = useState<string | null>(null);
 
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'GAMEMASTER';
 
@@ -248,29 +301,49 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     setIsLoading(true);
     const result = await getGuideSections('teamconstruct');
 
+    // Start with defaults
+    let allSections: SectionWithMeta[] = DEFAULT_SECTIONS.map(s => ({
+      ...s,
+      activity: 'teamconstruct'
+    } as SectionWithMeta));
+
     if (result.success && result.data && result.data.length > 0) {
-      // Merge saved data with default metadata
-      const mergedSections = DEFAULT_SECTIONS.map(defaultSection => {
+      // Merge saved data with defaults and add custom sections
+      allSections = DEFAULT_SECTIONS.map(defaultSection => {
         const savedSection = result.data?.find(s => s.section_key === defaultSection.section_key);
         return {
           ...defaultSection,
           ...savedSection,
           activity: 'teamconstruct',
           icon: defaultSection.icon,
+          iconKey: defaultSection.iconKey,
           color: defaultSection.color,
           link: defaultSection.link,
           linkText: defaultSection.linkText,
-          category: defaultSection.category
+          category: (savedSection?.category as CategoryKey) || defaultSection.category,
+          isDefault: true
         } as SectionWithMeta;
       });
-      setSections(mergedSections);
-    } else {
-      // Use defaults with activity set
-      setSections(DEFAULT_SECTIONS.map(s => ({
-        ...s,
-        activity: 'teamconstruct'
-      } as SectionWithMeta)));
+
+      // Add custom sections (not in defaults)
+      const customSections = result.data.filter(
+        s => !DEFAULT_SECTIONS.find(d => d.section_key === s.section_key)
+      );
+      customSections.forEach(cs => {
+        allSections.push({
+          ...cs,
+          icon: getIconByKey(cs.section_key.split('_')[0] || 'file'),
+          iconKey: cs.section_key.split('_')[0] || 'file',
+          color: 'blue',
+          category: (cs.category as CategoryKey) || 'before',
+          isDefault: false
+        } as SectionWithMeta);
+      });
     }
+
+    // Sort by order_index within each category
+    allSections.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+    setSections(allSections);
     setIsLoading(false);
   };
 
@@ -339,6 +412,121 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     fileInputRef.current?.click();
   };
 
+  // Move section up/down within category
+  const moveSection = async (sectionKey: string, direction: 'up' | 'down') => {
+    const section = sections.find(s => s.section_key === sectionKey);
+    if (!section) return;
+
+    const categorySections = sections.filter(s => s.category === section.category);
+    const currentIndex = categorySections.findIndex(s => s.section_key === sectionKey);
+
+    if (direction === 'up' && currentIndex === 0) return;
+    if (direction === 'down' && currentIndex === categorySections.length - 1) return;
+
+    const swapIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1;
+    const swapSection = categorySections[swapIndex];
+
+    // Swap order indices
+    const tempOrder = section.order_index;
+    section.order_index = swapSection.order_index;
+    swapSection.order_index = tempOrder;
+
+    // Save both sections
+    await Promise.all([
+      saveGuideSection({ ...section, category: section.category }),
+      saveGuideSection({ ...swapSection, category: swapSection.category })
+    ]);
+
+    // Update local state
+    setSections(prev => {
+      const updated = prev.map(s => {
+        if (s.section_key === section.section_key) return { ...s, order_index: section.order_index };
+        if (s.section_key === swapSection.section_key) return { ...s, order_index: swapSection.order_index };
+        return s;
+      });
+      return updated.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+    });
+  };
+
+  // Delete custom section
+  const handleDeleteSection = async (section: SectionWithMeta) => {
+    if (section.isDefault) return;
+    if (!confirm(`Er du sikker på at du vil slette "${section.title}"?`)) return;
+
+    if (section.id) {
+      const result = await deleteGuideSection(section.id);
+      if (result.success) {
+        setSections(prev => prev.filter(s => s.section_key !== section.section_key));
+      }
+    }
+  };
+
+  // Add new section
+  const openNewSectionModal = (category: CategoryKey) => {
+    setNewSectionCategory(category);
+    setNewSectionTitle('');
+    setNewSectionContent('');
+    setNewSectionIcon('file');
+    setNewSectionImage(null);
+    setNewSectionImagePreview(null);
+    setShowNewSectionModal(true);
+  };
+
+  const handleNewSectionImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setNewSectionImage(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setNewSectionImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleCreateSection = async () => {
+    if (!newSectionTitle.trim()) return;
+
+    setIsSaving(true);
+    const sectionKey = `${newSectionIcon}_custom_${Date.now()}`;
+    const categorySections = sections.filter(s => s.category === newSectionCategory);
+    const maxOrder = Math.max(...categorySections.map(s => s.order_index || 0), -1);
+
+    let imageUrl: string | undefined;
+    if (newSectionImage) {
+      const uploadResult = await uploadGuideImage(newSectionImage, 'teamconstruct', sectionKey);
+      if (uploadResult.success) {
+        imageUrl = uploadResult.url;
+      }
+    }
+
+    const newSection: GuideSection = {
+      activity: 'teamconstruct',
+      section_key: sectionKey,
+      title: newSectionTitle.toUpperCase(),
+      content: newSectionContent,
+      image_url: imageUrl,
+      order_index: maxOrder + 1,
+      category: newSectionCategory
+    };
+
+    const result = await saveGuideSection(newSection);
+    if (result.success) {
+      const newSectionWithMeta: SectionWithMeta = {
+        ...newSection,
+        id: result.id,
+        icon: getIconByKey(newSectionIcon),
+        iconKey: newSectionIcon,
+        color: 'blue',
+        category: newSectionCategory,
+        isDefault: false
+      };
+      setSections(prev => [...prev, newSectionWithMeta].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
+      setShowNewSectionModal(false);
+    }
+    setIsSaving(false);
+  };
+
   if (isLoading) {
     return (
       <div className="w-full max-w-6xl mx-auto flex items-center justify-center py-20">
@@ -354,154 +542,222 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     after: sections.filter(s => s.category === 'after')
   };
 
-  const renderSection = (section: SectionWithMeta, categoryColor: string) => {
-          const Icon = section.icon;
-          const colorClasses = COLORS[categoryColor] || COLORS.blue;
-          const isExpanded = expandedSection === section.section_key;
-          const isEditing = editingSection === section.section_key;
+  const renderSection = (section: SectionWithMeta, categoryColor: string, index: number, totalInCategory: number) => {
+    const Icon = section.icon;
+    const colorClasses = COLORS[categoryColor] || COLORS.blue;
+    const isExpanded = expandedSection === section.section_key;
+    const isEditing = editingSection === section.section_key;
 
-          return (
-            <div
-              key={section.section_key}
-              className={`rounded-xl border ${colorClasses.border} ${colorClasses.bg} overflow-hidden transition-all duration-300 ${
-                isExpanded ? 'tablet:col-span-3 tablet:row-span-2' : ''
-              }`}
-            >
-              {/* Header - Always visible */}
+    return (
+      <div
+        key={section.section_key}
+        className={`rounded-xl border ${colorClasses.border} ${colorClasses.bg} overflow-hidden transition-all duration-300 ${
+          isExpanded ? 'tablet:col-span-3 tablet:row-span-2' : ''
+        }`}
+      >
+        {/* Header - Always visible */}
+        <div className="flex items-center">
+          {/* Reorder buttons for admin */}
+          {isAdmin && (
+            <div className="flex flex-col border-r border-white/10">
               <button
-                onClick={() => handleToggleSection(section.section_key)}
-                className="w-full p-3 tablet:p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+                onClick={(e) => { e.stopPropagation(); moveSection(section.section_key, 'up'); }}
+                disabled={index === 0}
+                className="p-1.5 hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed"
+                title="Flyt op"
               >
-                <div className="flex items-center gap-3">
-                  <div className={`p-2 rounded-lg ${colorClasses.bg} border ${colorClasses.border}`}>
-                    <Icon className={`w-5 h-5 tablet:w-6 tablet:h-6 ${colorClasses.icon}`} />
-                  </div>
-                  <h3 className={`text-sm tablet:text-base font-bold uppercase tracking-wider ${colorClasses.text}`}>
-                    {section.title}
-                  </h3>
-                </div>
-                {isExpanded ? (
-                  <ChevronUp className={`w-5 h-5 ${colorClasses.text}`} />
-                ) : (
-                  <ChevronDown className={`w-5 h-5 ${colorClasses.text}`} />
-                )}
+                <ChevronUp className="w-4 h-4 text-gray-400" />
               </button>
-
-              {/* Expanded Content */}
-              {isExpanded && (
-                <div className="p-4 tablet:p-6 border-t border-white/10">
-                  <div className="flex flex-col tablet:flex-row gap-4">
-                    {/* Image Section */}
-                    <div className="tablet:w-1/3">
-                      {section.image_url ? (
-                        <div className="relative group">
-                          <img
-                            src={section.image_url}
-                            alt={section.title}
-                            className="w-full h-48 tablet:h-64 object-cover rounded-lg"
-                          />
-                          {isAdmin && (
-                            <button
-                              onClick={() => triggerImageUpload(section.section_key)}
-                              className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg"
-                            >
-                              <Upload className="w-8 h-8 text-white" />
-                            </button>
-                          )}
-                        </div>
-                      ) : (
-                        <div
-                          className={`w-full h-48 tablet:h-64 rounded-lg border-2 border-dashed ${colorClasses.border} flex flex-col items-center justify-center gap-2 ${
-                            isAdmin ? 'cursor-pointer hover:bg-white/5' : ''
-                          }`}
-                          onClick={() => isAdmin && triggerImageUpload(section.section_key)}
-                        >
-                          <Icon className={`w-12 h-12 ${colorClasses.icon} opacity-30`} />
-                          {isAdmin && (
-                            <span className="text-xs text-gray-500 uppercase tracking-wider">
-                              UPLOAD BILLEDE
-                            </span>
-                          )}
-                        </div>
-                      )}
-                    </div>
-
-                    {/* Content Section */}
-                    <div className="tablet:w-2/3">
-                      {isEditing ? (
-                        <div className="space-y-3">
-                          <textarea
-                            value={editContent}
-                            onChange={(e) => setEditContent(e.target.value)}
-                            className="w-full h-64 bg-battle-black/50 border border-white/20 rounded-lg p-4 text-white text-sm leading-relaxed resize-none focus:outline-none focus:border-battle-orange"
-                          />
-                          <div className="flex gap-2">
-                            <button
-                              onClick={() => handleSaveEdit(section)}
-                              disabled={isSaving}
-                              className="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 text-sm uppercase tracking-wider hover:bg-green-500/30 transition-colors disabled:opacity-50"
-                            >
-                              <Save className="w-4 h-4" />
-                              {isSaving ? 'GEMMER...' : 'GEM'}
-                            </button>
-                            <button
-                              onClick={handleCancelEdit}
-                              className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm uppercase tracking-wider hover:bg-red-500/30 transition-colors"
-                            >
-                              <X className="w-4 h-4" />
-                              ANNULLER
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        <div className="relative">
-                          <div className="text-sm tablet:text-base text-gray-300 whitespace-pre-line leading-relaxed">
-                            {section.content}
-                          </div>
-
-                          {/* Action buttons */}
-                          <div className="mt-4 flex flex-wrap gap-2">
-                            {section.link && (
-                              section.isInternal && onNavigate ? (
-                                <button
-                                  onClick={() => {
-                                    const view = section.link?.replace('#', '') || '';
-                                    onNavigate(view);
-                                  }}
-                                  className={`inline-flex items-center gap-2 px-4 py-2 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
-                                >
-                                  <ExternalLink className="w-4 h-4" />
-                                  {section.linkText || 'ÅBEN'}
-                                </button>
-                              ) : (
-                                <a
-                                  href={section.link}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                  className={`inline-flex items-center gap-2 px-4 py-2 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
-                                >
-                                  <ExternalLink className="w-4 h-4" />
-                                  {section.linkText || 'ÅBEN LINK'}
-                                </a>
-                              )
-                            )}
-                            {isAdmin && (
-                              <button
-                                onClick={() => handleStartEdit(section)}
-                                className="inline-flex items-center gap-2 px-4 py-2 bg-battle-orange/20 border border-battle-orange/30 rounded-lg text-battle-orange text-xs uppercase tracking-wider hover:bg-battle-orange/30 transition-colors"
-                              >
-                                <Edit3 className="w-4 h-4" />
-                                REDIGER
-                              </button>
-                            )}
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
+              <button
+                onClick={(e) => { e.stopPropagation(); moveSection(section.section_key, 'down'); }}
+                disabled={index === totalInCategory - 1}
+                className="p-1.5 hover:bg-white/10 disabled:opacity-20 disabled:cursor-not-allowed"
+                title="Flyt ned"
+              >
+                <ChevronDown className="w-4 h-4 text-gray-400" />
+              </button>
+            </div>
+          )}
+          <button
+            onClick={() => handleToggleSection(section.section_key)}
+            className="flex-1 p-3 tablet:p-4 flex items-center justify-between hover:bg-white/5 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <div className={`p-2 rounded-lg ${colorClasses.bg} border ${colorClasses.border}`}>
+                <Icon className={`w-5 h-5 tablet:w-6 tablet:h-6 ${colorClasses.icon}`} />
+              </div>
+              <h3 className={`text-sm tablet:text-base font-bold uppercase tracking-wider ${colorClasses.text}`}>
+                {section.title}
+              </h3>
+            </div>
+            <div className="flex items-center gap-2">
+              {isAdmin && !section.isDefault && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); handleDeleteSection(section); }}
+                  className="p-1.5 hover:bg-red-500/20 rounded-lg transition-colors"
+                  title="Slet sektion"
+                >
+                  <Trash2 className="w-4 h-4 text-red-400" />
+                </button>
+              )}
+              {isExpanded ? (
+                <ChevronUp className={`w-5 h-5 ${colorClasses.text}`} />
+              ) : (
+                <ChevronDown className={`w-5 h-5 ${colorClasses.text}`} />
               )}
             </div>
+          </button>
+        </div>
+
+        {/* Expanded Content */}
+        {isExpanded && (
+          <div className="p-4 tablet:p-6 border-t border-white/10">
+            <div className="flex flex-col tablet:flex-row gap-4">
+              {/* Image Section */}
+              <div className="tablet:w-1/3">
+                {section.image_url ? (
+                  <div className="relative group">
+                    <img
+                      src={section.image_url}
+                      alt={section.title}
+                      className="w-full h-48 tablet:h-64 object-cover rounded-lg"
+                    />
+                    {isAdmin && (
+                      <button
+                        onClick={() => triggerImageUpload(section.section_key)}
+                        className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg"
+                      >
+                        <Upload className="w-8 h-8 text-white" />
+                      </button>
+                    )}
+                  </div>
+                ) : (
+                  <div
+                    className={`w-full h-48 tablet:h-64 rounded-lg border-2 border-dashed ${colorClasses.border} flex flex-col items-center justify-center gap-2 ${
+                      isAdmin ? 'cursor-pointer hover:bg-white/5' : ''
+                    }`}
+                    onClick={() => isAdmin && triggerImageUpload(section.section_key)}
+                  >
+                    <Icon className={`w-12 h-12 ${colorClasses.icon} opacity-30`} />
+                    {isAdmin && (
+                      <span className="text-xs text-gray-500 uppercase tracking-wider">
+                        UPLOAD BILLEDE
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Content Section */}
+              <div className="tablet:w-2/3">
+                {isEditing ? (
+                  <div className="space-y-3">
+                    <textarea
+                      value={editContent}
+                      onChange={(e) => setEditContent(e.target.value)}
+                      className="w-full h-64 bg-battle-black/50 border border-white/20 rounded-lg p-4 text-white text-sm leading-relaxed resize-none focus:outline-none focus:border-battle-orange"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => handleSaveEdit(section)}
+                        disabled={isSaving}
+                        className="flex items-center gap-2 px-4 py-2 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 text-sm uppercase tracking-wider hover:bg-green-500/30 transition-colors disabled:opacity-50"
+                      >
+                        <Save className="w-4 h-4" />
+                        {isSaving ? 'GEMMER...' : 'GEM'}
+                      </button>
+                      <button
+                        onClick={handleCancelEdit}
+                        className="flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-sm uppercase tracking-wider hover:bg-red-500/30 transition-colors"
+                      >
+                        <X className="w-4 h-4" />
+                        ANNULLER
+                      </button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="relative">
+                    <div className="text-sm tablet:text-base text-gray-300 whitespace-pre-line leading-relaxed">
+                      {section.content}
+                    </div>
+
+                    {/* Action buttons */}
+                    <div className="mt-4 flex flex-wrap gap-2">
+                      {section.link && (
+                        section.isInternal && onNavigate ? (
+                          <button
+                            onClick={() => {
+                              const view = section.link?.replace('#', '') || '';
+                              onNavigate(view);
+                            }}
+                            className={`inline-flex items-center gap-2 px-4 py-2 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            {section.linkText || 'ÅBEN'}
+                          </button>
+                        ) : (
+                          <a
+                            href={section.link}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`inline-flex items-center gap-2 px-4 py-2 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
+                          >
+                            <ExternalLink className="w-4 h-4" />
+                            {section.linkText || 'ÅBEN LINK'}
+                          </a>
+                        )
+                      )}
+                      {isAdmin && (
+                        <button
+                          onClick={() => handleStartEdit(section)}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-battle-orange/20 border border-battle-orange/30 rounded-lg text-battle-orange text-xs uppercase tracking-wider hover:bg-battle-orange/30 transition-colors"
+                        >
+                          <Edit3 className="w-4 h-4" />
+                          REDIGER
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const renderCategory = (categoryKey: CategoryKey, colorName: string, IconComponent: React.ElementType) => {
+    const categorySections = sectionsByCategory[categoryKey];
+    const colorClasses = COLORS[colorName];
+    const categoryInfo = CATEGORIES[categoryKey];
+
+    return (
+      <div className={`rounded-2xl border ${colorClasses.border} ${colorClasses.bg} p-3 tablet:p-4`}>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-3">
+            <div className={`p-2 rounded-lg ${colorClasses.bg} border ${colorClasses.border}`}>
+              <IconComponent className={`w-5 h-5 tablet:w-6 tablet:h-6 ${colorClasses.icon}`} />
+            </div>
+            <h2 className={`text-base tablet:text-lg font-bold uppercase tracking-wider ${colorClasses.text}`}>
+              {categoryInfo.title}
+            </h2>
+            <span className={`text-xs ${colorClasses.text}/50`}>({categorySections.length} sektioner)</span>
+          </div>
+          {isAdmin && (
+            <button
+              onClick={() => openNewSectionModal(categoryKey)}
+              className={`flex items-center gap-2 px-3 py-1.5 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
+            >
+              <Plus className="w-4 h-4" />
+              TILFØJ
+            </button>
+          )}
+        </div>
+        <div className={`grid grid-cols-1 ${categoryKey === 'after' ? '' : 'tablet:grid-cols-2 desktop:grid-cols-3'} gap-3`}>
+          {categorySections.map((s, idx) => renderSection(s, colorName, idx, categorySections.length))}
+        </div>
+      </div>
     );
   };
 
@@ -517,54 +773,142 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
 
       {/* Category-based layout */}
       <div className="space-y-6">
-        {/* FØR OPGAVEN - Green */}
-        <div className="rounded-2xl border border-green-500/30 bg-green-500/5 p-3 tablet:p-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-green-500/20 border border-green-500/30">
-              <PackageCheck className="w-5 h-5 tablet:w-6 tablet:h-6 text-green-500" />
-            </div>
-            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-green-400">
-              FØR OPGAVEN
-            </h2>
-            <span className="text-xs text-green-400/50">({sectionsByCategory.before.length} sektioner)</span>
-          </div>
-          <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-3 gap-3">
-            {sectionsByCategory.before.map(s => renderSection(s, 'green'))}
-          </div>
-        </div>
-
-        {/* UNDER OPGAVEN - Yellow */}
-        <div className="rounded-2xl border border-yellow-500/30 bg-yellow-500/5 p-3 tablet:p-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-yellow-500/20 border border-yellow-500/30">
-              <Play className="w-5 h-5 tablet:w-6 tablet:h-6 text-yellow-500" />
-            </div>
-            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-yellow-400">
-              UNDER OPGAVEN
-            </h2>
-            <span className="text-xs text-yellow-400/50">({sectionsByCategory.during.length} sektioner)</span>
-          </div>
-          <div className="grid grid-cols-1 tablet:grid-cols-2 desktop:grid-cols-4 gap-3">
-            {sectionsByCategory.during.map(s => renderSection(s, 'yellow'))}
-          </div>
-        </div>
-
-        {/* EFTER OPGAVEN - Red */}
-        <div className="rounded-2xl border border-red-500/30 bg-red-500/5 p-3 tablet:p-4">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="p-2 rounded-lg bg-red-500/20 border border-red-500/30">
-              <CheckCircle2 className="w-5 h-5 tablet:w-6 tablet:h-6 text-red-500" />
-            </div>
-            <h2 className="text-base tablet:text-lg font-bold uppercase tracking-wider text-red-400">
-              EFTER OPGAVEN
-            </h2>
-            <span className="text-xs text-red-400/50">({sectionsByCategory.after.length} sektioner)</span>
-          </div>
-          <div className="grid grid-cols-1 gap-3">
-            {sectionsByCategory.after.map(s => renderSection(s, 'red'))}
-          </div>
-        </div>
+        {renderCategory('before', 'green', PackageCheck)}
+        {renderCategory('during', 'yellow', Play)}
+        {renderCategory('after', 'red', CheckCircle2)}
       </div>
+
+      {/* New Section Modal */}
+      {showNewSectionModal && (
+        <div className="fixed inset-0 bg-black/80 flex items-center justify-center z-50 p-4">
+          <div className="bg-battle-grey rounded-2xl border border-white/20 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="p-4 border-b border-white/10 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-white uppercase tracking-wider">
+                Ny Sektion - {CATEGORIES[newSectionCategory].title}
+              </h3>
+              <button
+                onClick={() => setShowNewSectionModal(false)}
+                className="p-2 hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-400" />
+              </button>
+            </div>
+            <div className="p-4 space-y-4">
+              {/* Title */}
+              <div>
+                <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
+                  Titel
+                </label>
+                <input
+                  type="text"
+                  value={newSectionTitle}
+                  onChange={(e) => setNewSectionTitle(e.target.value)}
+                  placeholder="Sektion titel..."
+                  className="w-full bg-battle-black/50 border border-white/20 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-battle-orange"
+                />
+              </div>
+
+              {/* Icon Selection */}
+              <div>
+                <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
+                  Ikon
+                </label>
+                <div className="grid grid-cols-5 gap-2">
+                  {ICON_OPTIONS.map(opt => {
+                    const IconOpt = opt.icon;
+                    return (
+                      <button
+                        key={opt.key}
+                        onClick={() => setNewSectionIcon(opt.key)}
+                        className={`p-3 rounded-lg border transition-colors ${
+                          newSectionIcon === opt.key
+                            ? 'border-battle-orange bg-battle-orange/20'
+                            : 'border-white/10 hover:bg-white/5'
+                        }`}
+                        title={opt.label}
+                      >
+                        <IconOpt className={`w-5 h-5 mx-auto ${newSectionIcon === opt.key ? 'text-battle-orange' : 'text-gray-400'}`} />
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Content */}
+              <div>
+                <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
+                  Indhold
+                </label>
+                <textarea
+                  value={newSectionContent}
+                  onChange={(e) => setNewSectionContent(e.target.value)}
+                  placeholder="Skriv indholdet her..."
+                  rows={6}
+                  className="w-full bg-battle-black/50 border border-white/20 rounded-lg px-4 py-3 text-white resize-none focus:outline-none focus:border-battle-orange"
+                />
+              </div>
+
+              {/* Image Upload */}
+              <div>
+                <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
+                  Billede (valgfrit)
+                </label>
+                <input
+                  type="file"
+                  ref={newSectionImageRef}
+                  accept="image/*"
+                  onChange={handleNewSectionImageSelect}
+                  className="hidden"
+                />
+                {newSectionImagePreview ? (
+                  <div className="relative">
+                    <img
+                      src={newSectionImagePreview}
+                      alt="Preview"
+                      className="w-full h-40 object-cover rounded-lg"
+                    />
+                    <button
+                      onClick={() => {
+                        setNewSectionImage(null);
+                        setNewSectionImagePreview(null);
+                      }}
+                      className="absolute top-2 right-2 p-1.5 bg-red-500/80 rounded-full text-white hover:bg-red-500"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => newSectionImageRef.current?.click()}
+                    className="w-full h-32 border-2 border-dashed border-white/20 rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-white/5 transition-colors"
+                  >
+                    <Upload className="w-8 h-8 text-gray-500" />
+                    <span className="text-xs text-gray-500">Klik for at uploade</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Actions */}
+              <div className="flex gap-3 pt-2">
+                <button
+                  onClick={handleCreateSection}
+                  disabled={!newSectionTitle.trim() || isSaving}
+                  className="flex-1 flex items-center justify-center gap-2 px-4 py-3 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 font-medium uppercase tracking-wider hover:bg-green-500/30 transition-colors disabled:opacity-50"
+                >
+                  <Save className="w-5 h-5" />
+                  {isSaving ? 'OPRETTER...' : 'OPRET SEKTION'}
+                </button>
+                <button
+                  onClick={() => setShowNewSectionModal(false)}
+                  className="px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-gray-400 font-medium uppercase tracking-wider hover:bg-white/20 transition-colors"
+                >
+                  ANNULLER
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
