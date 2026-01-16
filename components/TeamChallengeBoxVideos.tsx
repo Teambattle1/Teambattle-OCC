@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Play, ArrowLeft, X, PlayCircle, PauseCircle, SkipForward, SkipBack } from 'lucide-react';
+import { Play, ArrowLeft, X, PlayCircle, PauseCircle, SkipForward, SkipBack, Star } from 'lucide-react';
 
 interface BoxVideo {
-  boxNumber: number;
+  boxNumber: number | string;
   title: string;
   id: string;
   length: string;
+  isBonus?: boolean;
 }
 
 // Parse and sort the box videos by box number
@@ -30,7 +31,7 @@ const BOX_VIDEOS: BoxVideo[] = [
   { boxNumber: 18, title: 'Præcis!', id: 'yFhhhUMHYaA', length: '0:36' },
   { boxNumber: 19, title: 'MÅL!', id: '-phNmL-52ho', length: '0:35' },
   { boxNumber: 20, title: 'Oppustet', id: 'l4NEZb6jAwQ', length: '0:23' },
-  { boxNumber: 21, title: 'Box 21', id: '', length: '' }, // No video in CSV
+  { boxNumber: 21, title: 'Box 21', id: 'IGrF6MuzLN4', length: '' },
   { boxNumber: 22, title: 'Box 22', id: 'IkR0cJ4N5Yw', length: '0:21' },
   { boxNumber: 23, title: 'Knuden', id: '0sppIvVui-w', length: '0:25' },
   { boxNumber: 24, title: 'Holey Moley!', id: '326MmwpH_N0', length: '0:32' },
@@ -38,10 +39,11 @@ const BOX_VIDEOS: BoxVideo[] = [
   { boxNumber: 26, title: 'Snake', id: 'd-YR5w4C-9A', length: '0:23' },
   { boxNumber: 27, title: 'Simon', id: 'LT0ExdbBnuE', length: '1:04' },
   { boxNumber: 28, title: 'Spice Girls', id: '30ISFLhciSQ', length: '0:32' },
-  { boxNumber: 29, title: 'Box 29', id: '', length: '' }, // No video in CSV
+  { boxNumber: 29, title: 'Box 29', id: '', length: '' },
   { boxNumber: 30, title: 'Var der andet?', id: 'HMfvBD06nt8', length: '0:19' },
   { boxNumber: 31, title: 'Top100', id: 'jkO60ivQsPs', length: '0:32' },
-].filter(v => v.id !== ''); // Remove boxes without videos
+  { boxNumber: 'BONUS', title: 'Bonuspanel', id: 'IGrF6MuzLN4', length: '', isBonus: true },
+];
 
 interface TeamChallengeBoxVideosProps {
   onBack?: () => void;
@@ -112,7 +114,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                 <ArrowLeft className="w-4 h-4" />
               </button>
             )}
-            <Play className="w-6 h-6 text-pink-500" />
+            <Play className="w-6 h-6 text-battle-orange" />
             <h1 className="text-lg tablet-landscape:text-xl font-bold text-white uppercase tracking-wider">
               TeamChallenge Bokse
             </h1>
@@ -121,7 +123,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
           {/* Play All Button */}
           <button
             onClick={handlePlayAll}
-            className="flex items-center gap-2 px-4 py-2 bg-pink-500 hover:bg-pink-600 text-white rounded-lg font-medium transition-colors"
+            className="flex items-center gap-2 px-4 py-2 bg-battle-orange hover:bg-battle-orangeLight text-white rounded-lg font-medium transition-colors"
           >
             <PlayCircle className="w-5 h-5" />
             <span className="hidden mobile-landscape:inline">Afspil Alle</span>
@@ -134,24 +136,30 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
         <div className="max-w-7xl mx-auto grid grid-cols-4 mobile-landscape:grid-cols-6 tablet-portrait:grid-cols-6 tablet-landscape:grid-cols-8 desktop:grid-cols-10 gap-2 tablet-landscape:gap-3">
           {BOX_VIDEOS.map((video) => (
             <button
-              key={video.boxNumber}
+              key={String(video.boxNumber)}
               onClick={() => video.id && handleVideoClick(video)}
               disabled={!video.id}
               className={`
                 aspect-square rounded-lg flex flex-col items-center justify-center gap-1 transition-all
                 ${video.id
-                  ? 'bg-pink-500/20 border border-pink-500/30 hover:bg-pink-500/30 hover:border-pink-500/50 hover:scale-105 cursor-pointer'
-                  : 'bg-gray-800/50 border border-gray-700/30 opacity-50 cursor-not-allowed'}
+                  ? video.isBonus
+                    ? 'bg-battle-orange/20 border-2 border-battle-orange hover:bg-battle-orange/30 hover:border-battle-orangeLight hover:scale-105 cursor-pointer'
+                    : 'bg-battle-black border-2 border-battle-orange/50 hover:bg-battle-orange/10 hover:border-battle-orange hover:scale-105 cursor-pointer'
+                  : 'bg-gray-900 border-2 border-gray-700/50 opacity-50 cursor-not-allowed'}
               `}
             >
-              <span className="text-2xl tablet-landscape:text-3xl font-bold text-white">
-                {video.boxNumber}
-              </span>
+              {video.isBonus ? (
+                <Star className="w-6 h-6 tablet-landscape:w-8 tablet-landscape:h-8 text-battle-orange" />
+              ) : (
+                <span className="text-2xl tablet-landscape:text-3xl font-bold text-white">
+                  {video.boxNumber}
+                </span>
+              )}
               <span className="text-[10px] tablet-landscape:text-xs text-gray-300 text-center px-1 line-clamp-2">
                 {video.title}
               </span>
               {video.length && (
-                <span className="text-[9px] tablet-landscape:text-[10px] text-pink-400">
+                <span className="text-[9px] tablet-landscape:text-[10px] text-battle-orange">
                   {video.length}
                 </span>
               )}
@@ -167,7 +175,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
             {/* Close Button */}
             <button
               onClick={handleCloseModal}
-              className="absolute -top-12 right-0 text-white hover:text-pink-400 transition-colors"
+              className="absolute -top-12 right-0 text-white hover:text-battle-orange transition-colors"
             >
               <X className="w-8 h-8" />
             </button>
@@ -175,17 +183,17 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
             {/* Video Title */}
             <div className="mb-4 text-center">
               <h2 className="text-xl tablet-landscape:text-2xl font-bold text-white">
-                Box {selectedVideo.boxNumber} - {selectedVideo.title}
+                {selectedVideo.isBonus ? selectedVideo.title : `Box ${selectedVideo.boxNumber} - ${selectedVideo.title}`}
               </h2>
               {playAllMode && (
-                <p className="text-pink-400 text-sm mt-1">
+                <p className="text-battle-orange text-sm mt-1">
                   Video {currentPlayIndex + 1} af {videosWithContent.length}
                 </p>
               )}
             </div>
 
             {/* Video Player */}
-            <div className="relative aspect-video bg-black rounded-lg overflow-hidden">
+            <div className="relative aspect-video bg-black rounded-lg overflow-hidden border-2 border-battle-orange/30">
               <iframe
                 key={selectedVideo.id} // Force re-render on video change
                 src={`https://www.youtube.com/embed/${selectedVideo.id}?autoplay=1&enablejsapi=1`}
@@ -207,7 +215,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                   className={`p-3 rounded-full transition-colors ${
                     currentPlayIndex === 0
                       ? 'text-gray-600 cursor-not-allowed'
-                      : 'text-white hover:bg-pink-500/20'
+                      : 'text-white hover:bg-battle-orange/20'
                   }`}
                 >
                   <SkipBack className="w-8 h-8" />
@@ -215,7 +223,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
 
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="p-4 bg-pink-500 hover:bg-pink-600 rounded-full text-white transition-colors"
+                  className="p-4 bg-battle-orange hover:bg-battle-orangeLight rounded-full text-white transition-colors"
                 >
                   {isPlaying ? (
                     <PauseCircle className="w-10 h-10" />
@@ -230,7 +238,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                   className={`p-3 rounded-full transition-colors ${
                     currentPlayIndex === videosWithContent.length - 1
                       ? 'text-gray-600 cursor-not-allowed'
-                      : 'text-white hover:bg-pink-500/20'
+                      : 'text-white hover:bg-battle-orange/20'
                   }`}
                 >
                   <SkipForward className="w-8 h-8" />
@@ -240,22 +248,22 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
 
             {/* Video List in Play All Mode */}
             {playAllMode && (
-              <div className="mt-4 max-h-32 overflow-y-auto bg-gray-900/50 rounded-lg p-2">
+              <div className="mt-4 max-h-32 overflow-y-auto bg-gray-900/50 rounded-lg p-2 border border-battle-orange/20">
                 <div className="flex flex-wrap gap-2">
                   {videosWithContent.map((video, index) => (
                     <button
-                      key={video.boxNumber}
+                      key={String(video.boxNumber)}
                       onClick={() => {
                         setCurrentPlayIndex(index);
                         setSelectedVideo(video);
                       }}
                       className={`px-3 py-1 rounded text-sm transition-colors ${
                         index === currentPlayIndex
-                          ? 'bg-pink-500 text-white'
+                          ? 'bg-battle-orange text-white'
                           : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
                       }`}
                     >
-                      {video.boxNumber}
+                      {video.isBonus ? 'BONUS' : video.boxNumber}
                     </button>
                   ))}
                 </div>
