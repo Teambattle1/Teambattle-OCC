@@ -146,6 +146,30 @@ export const CODE_LINKS: HubLink[] = [
   }
 ];
 
+// TeamPlay Submenu Links
+export const TEAMPLAY_LINKS: HubLink[] = [
+  {
+    id: 'tplay1',
+    title: 'GAME',
+    url: 'https://play.eventday.dk',
+    icon: Play,
+    description: 'Start spil',
+    color: 'green'
+  }
+];
+
+// TeamTaste Submenu Links
+export const TEAMTASTE_LINKS: HubLink[] = [
+  {
+    id: 'ttaste1',
+    title: 'GAME',
+    url: 'https://taste.eventday.dk',
+    icon: Play,
+    description: 'Start spil',
+    color: 'gold'
+  }
+];
+
 // TeamChallenge Submenu Links
 export const TEAM_CHALLENGE_LINKS: HubLink[] = [
   {
@@ -1022,9 +1046,9 @@ export const HUB_LINKS: HubLink[] = [
 // Activity Submenu Links
 export const ACTIVITY_LINKS: HubLink[] = [
   // Group 1
-  { id: 'a1', title: 'TEAMPLAY', url: 'https://play.eventday.dk', icon: Users, description: 'Cooperation', badge: 'ACTIVE' },
+  { id: 'a1', title: 'TEAMPLAY', url: '#teamplay', icon: Users, description: 'Cooperation', badge: 'ACTIVE' },
   { id: 'a2', title: 'TEAMCHALLENGE', url: '#team_challenge', icon: Trophy, description: 'Competition', badge: 'ACTIVE', color: 'hotpink' },
-  { id: 'a3', title: 'TEAMTASTE', url: 'https://taste.eventday.dk', icon: Utensils, description: 'Culinary', badge: 'ACTIVE', color: 'gold' },
+  { id: 'a3', title: 'TEAMTASTE', url: '#teamtaste', icon: Utensils, description: 'Culinary', badge: 'ACTIVE', color: 'gold' },
   
   // Group 2
   { id: 'a4', title: 'TEAMLAZER', url: '#teamlazer', icon: Zap, description: 'Laser Combat', color: 'blue' },

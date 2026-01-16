@@ -31,7 +31,9 @@ import {
   FLYBRIX_LINKS,
   TEAMCONTROL_PACKING_LINKS,
   TEAMRACE_LINKS,
-  TEAMRACE_PACKING_LINKS
+  TEAMRACE_PACKING_LINKS,
+  TEAMPLAY_LINKS,
+  TEAMTASTE_LINKS
 } from './constants';
 import HubButton from './components/HubButton';
 import Clock, { DateDisplay } from './components/Clock';
@@ -97,11 +99,13 @@ import {
   ListChecks,
   HelpCircle,
   Map,
-  Car
+  Car,
+  Users,
+  Utensils
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide';
+type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'teamplay' | 'teamtaste' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamchallenge_boxvideos' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -319,6 +323,8 @@ const App: React.FC = () => {
     else if (link.title === 'TEAMCONTROL') changeView('teamcontrol');
     else if (link.title === 'TEAMCONSTRUCT') changeView('teamconstruct');
     else if (link.title === 'TEAMRACE') changeView('teamrace');
+    else if (link.title === 'TEAMPLAY') changeView('teamplay');
+    else if (link.title === 'TEAMTASTE') changeView('teamtaste');
     else if (link.title === 'DISTANCE') changeView('distance_tool');
     else if (link.url === '#teamrobin_packing') changeView('teamrobin_packing');
     else if (link.url === '#teamrobin_packing_before') changeView('teamrobin_packing_before');
@@ -410,6 +416,10 @@ const App: React.FC = () => {
     } else if (currentView === 'teamconstruct') {
       changeView('activities');
     } else if (currentView === 'teamrace') {
+      changeView('activities');
+    } else if (currentView === 'teamplay') {
+      changeView('activities');
+    } else if (currentView === 'teamtaste') {
       changeView('activities');
     } else if (currentView === 'teamrace_scorecard' || currentView === 'teamrace_guide' || currentView === 'teamrace_packing' || currentView === 'teamrace_video' || currentView === 'fejlsogning_teamrace' || currentView === 'teamrace_rccars' || currentView === 'teamrace_instructions') {
       changeView('teamrace');
@@ -674,6 +684,18 @@ const App: React.FC = () => {
       viewTitle = 'TEAMRACE';
       viewSubtitle = '';
       ViewIcon = Car;
+      break;
+    case 'teamplay':
+      currentLinks = TEAMPLAY_LINKS;
+      viewTitle = 'TEAMPLAY';
+      viewSubtitle = '';
+      ViewIcon = Users;
+      break;
+    case 'teamtaste':
+      currentLinks = TEAMTASTE_LINKS;
+      viewTitle = 'TEAMTASTE';
+      viewSubtitle = '';
+      ViewIcon = Utensils;
       break;
     case 'teamrace_scorecard':
       currentLinks = [];
