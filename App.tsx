@@ -25,6 +25,9 @@ import {
   TEAMCONSTRUCT_VIDEO_INDEX,
   TEAMCONTROL_VIDEO_INDEX,
   TEAMRACE_VIDEO_INDEX,
+  TEAMLAZER_FEJLSOGNING_VIDEO_INDEX,
+  TEAMROBIN_FEJLSOGNING_VIDEO_INDEX,
+  TEAMSEGWAY_FEJLSOGNING_VIDEO_INDEX,
   FLYBRIX_LINKS,
   TEAMCONTROL_PACKING_LINKS,
   TEAMRACE_LINKS,
@@ -91,7 +94,7 @@ import {
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor';
+type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -696,9 +699,21 @@ const App: React.FC = () => {
       ViewIcon = Zap;
       break;
     case 'teamlazer_fejlsogning':
-      currentLinks = TEAMLAZER_FEJLSOGNING_LINKS;
-      viewTitle = 'FEJL & MANGLER';
-      viewSubtitle = 'TeamLazer';
+      currentLinks = [];
+      viewTitle = 'FEJLSØGNING';
+      viewSubtitle = 'TeamLazer Troubleshooting';
+      ViewIcon = Wrench;
+      break;
+    case 'teamrobin_fejlsogning':
+      currentLinks = [];
+      viewTitle = 'FEJLSØGNING';
+      viewSubtitle = 'TeamRobin Troubleshooting';
+      ViewIcon = Wrench;
+      break;
+    case 'teamsegway_fejlsogning':
+      currentLinks = [];
+      viewTitle = 'FEJLSØGNING';
+      viewSubtitle = 'TeamSegway Troubleshooting';
       ViewIcon = Wrench;
       break;
     case 'teamrobin_video':
@@ -1179,6 +1194,22 @@ const App: React.FC = () => {
               title="TeamLazer Video Guides"
               playlistId="PLq4wXYwkH9QbWM9SurCo-EWPJlCO03-vk"
               videoIndex={TEAMLAZER_VIDEO_INDEX}
+            />
+          ) : currentView === 'teamlazer_fejlsogning' ? (
+            <VideoPlayer
+              title="TeamLazer Fejlsøgning"
+              playlistId="PLq4wXYwkH9QbWM9SurCo-EWPJlCO03-vk"
+              videoIndex={TEAMLAZER_FEJLSOGNING_VIDEO_INDEX}
+            />
+          ) : currentView === 'teamrobin_fejlsogning' ? (
+            <VideoPlayer
+              title="TeamRobin Fejlsøgning"
+              videoIndex={TEAMROBIN_FEJLSOGNING_VIDEO_INDEX}
+            />
+          ) : currentView === 'teamsegway_fejlsogning' ? (
+            <VideoPlayer
+              title="TeamSegway Fejlsøgning"
+              videoIndex={TEAMSEGWAY_FEJLSOGNING_VIDEO_INDEX}
             />
           ) : currentView === 'teamlazer_packing' ? (
             <DynamicPackingList activity="teamlazer" listType="before" />

@@ -251,6 +251,15 @@ export const TEAMLAZER_LINKS: HubLink[] = [
     description: 'Packing Lists',
     color: 'green',
     badge: 'new'
+  },
+  {
+    id: 'tl7',
+    title: 'FEJLSØGNING',
+    url: '#teamlazer_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
+    badge: 'new'
   }
 ];
 
@@ -308,6 +317,15 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
     icon: Play,
     description: 'Video Guides',
     color: 'red',
+    badge: 'new'
+  },
+  {
+    id: 'ts6',
+    title: 'FEJLSØGNING',
+    url: '#teamsegway_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
     badge: 'new'
   }
 ];
@@ -595,6 +613,15 @@ export const TEAMROBIN_LINKS: HubLink[] = [
     icon: Play,
     description: 'Video Guides',
     color: 'red',
+    badge: 'new'
+  },
+  {
+    id: 'tr6',
+    title: 'FEJLSØGNING',
+    url: '#teamrobin_fejlsogning',
+    icon: Wrench,
+    description: 'Troubleshooting Guides',
+    color: 'orange',
     badge: 'new'
   }
 ];
@@ -1029,4 +1056,19 @@ export const TEAMRACE_VIDEO_INDEX = [
   { title: 'Video 2 - Kommer snart', index: 1 },
   { title: 'Video 3 - Kommer snart', index: 2 },
   { title: 'Video 4 - Kommer snart', index: 3 },
+];
+
+// Troubleshooting Video Indexes
+export const TEAMLAZER_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Justering af gevær', index: -1, videoId: 'RREzWzfckOc' },
+  { title: 'Kaster fejlsøgning', index: 17 },
+  { title: 'Range ajuster', index: 24 },
+];
+
+export const TEAMROBIN_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
+];
+
+export const TEAMSEGWAY_FEJLSOGNING_VIDEO_INDEX = [
+  { title: 'Fejlsøgning - Kommer snart', index: 0 },
 ];

@@ -22,7 +22,17 @@ import {
   Plus,
   Trash2,
   GripVertical,
-  FileText
+  FileText,
+  Bold,
+  Italic,
+  Underline,
+  AlignCenter,
+  AlignLeft,
+  List,
+  Palette,
+  Type,
+  CheckSquare,
+  Square
 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import {
@@ -276,6 +286,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
   const [expandedSection, setExpandedSection] = useState<string | null>(null);
   const [editingSection, setEditingSection] = useState<string | null>(null);
   const [editContent, setEditContent] = useState('');
+  const [editTitle, setEditTitle] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -290,8 +301,20 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
   const [newSectionIcon, setNewSectionIcon] = useState('file');
   const [newSectionImage, setNewSectionImage] = useState<File | null>(null);
   const [newSectionImagePreview, setNewSectionImagePreview] = useState<string | null>(null);
+  const editorRef = useRef<HTMLDivElement>(null);
+  const [showColorPicker, setShowColorPicker] = useState(false);
+  const [newSectionChecklist, setNewSectionChecklist] = useState<string[]>([]);
+  const [newChecklistItem, setNewChecklistItem] = useState('');
 
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'GAMEMASTER';
+
+  // Rich text editor formatting functions
+  const formatText = (command: string, value?: string) => {
+    document.execCommand(command, false, value);
+    editorRef.current?.focus();
+  };
+
+  const EDITOR_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#3b82f6', '#8b5cf6', '#ec4899', '#ffffff', '#9ca3af'];
 
   useEffect(() => {
     loadSections();
@@ -354,12 +377,14 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
   const handleStartEdit = (section: SectionWithMeta) => {
     setEditingSection(section.section_key);
     setEditContent(section.content);
+    setEditTitle(section.title);
   };
 
   const handleSaveEdit = async (section: SectionWithMeta) => {
     setIsSaving(true);
     const updatedSection = {
       ...section,
+      title: editTitle,
       content: editContent
     };
 
@@ -367,7 +392,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     if (result.success) {
       setSections(prev => prev.map(s =>
         s.section_key === section.section_key
-          ? { ...s, content: editContent, id: result.id || s.id }
+          ? { ...s, title: editTitle, content: editContent, id: result.id || s.id }
           : s
       ));
       setEditingSection(null);
@@ -378,6 +403,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
   const handleCancelEdit = () => {
     setEditingSection(null);
     setEditContent('');
+    setEditTitle('');
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, sectionKey: string) => {
@@ -500,11 +526,18 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
       }
     }
 
+    // Combine content with checklist
+    let fullContent = newSectionContent;
+    if (newSectionChecklist.length > 0) {
+      const checklistJson = JSON.stringify(newSectionChecklist);
+      fullContent = fullContent + '\n<!--CHECKLIST:' + checklistJson + '-->';
+    }
+
     const newSection: GuideSection = {
       activity: 'teamconstruct',
       section_key: sectionKey,
       title: newSectionTitle.toUpperCase(),
-      content: newSectionContent,
+      content: fullContent,
       image_url: imageUrl,
       order_index: maxOrder + 1,
       category: newSectionCategory
@@ -522,9 +555,44 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
         isDefault: false
       };
       setSections(prev => [...prev, newSectionWithMeta].sort((a, b) => (a.order_index || 0) - (b.order_index || 0)));
+      // Reset modal state
       setShowNewSectionModal(false);
+      setNewSectionTitle('');
+      setNewSectionContent('');
+      setNewSectionIcon('file');
+      setNewSectionImage(null);
+      setNewSectionImagePreview(null);
+      setNewSectionChecklist([]);
+      setNewChecklistItem('');
     }
     setIsSaving(false);
+  };
+
+  // Checklist helper functions
+  const addChecklistItem = () => {
+    if (newChecklistItem.trim()) {
+      setNewSectionChecklist(prev => [...prev, newChecklistItem.trim()]);
+      setNewChecklistItem('');
+    }
+  };
+
+  const removeChecklistItem = (index: number) => {
+    setNewSectionChecklist(prev => prev.filter((_, i) => i !== index));
+  };
+
+  // Parse checklist from content
+  const parseChecklist = (content: string): { text: string; checklist: string[] } => {
+    const match = content.match(/<!--CHECKLIST:(.+?)-->/);
+    if (match) {
+      try {
+        const checklist = JSON.parse(match[1]);
+        const text = content.replace(/\n?<!--CHECKLIST:.+?-->/, '');
+        return { text, checklist };
+      } catch {
+        return { text: content, checklist: [] };
+      }
+    }
+    return { text: content, checklist: [] };
   };
 
   if (isLoading) {
@@ -652,11 +720,29 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
               <div className="tablet:w-2/3">
                 {isEditing ? (
                   <div className="space-y-3">
-                    <textarea
-                      value={editContent}
-                      onChange={(e) => setEditContent(e.target.value)}
-                      className="w-full h-64 bg-battle-black/50 border border-white/20 rounded-lg p-4 text-white text-sm leading-relaxed resize-none focus:outline-none focus:border-battle-orange"
-                    />
+                    {/* Title Input */}
+                    <div>
+                      <label className="block text-xs text-gray-400 uppercase tracking-wider mb-1">
+                        Overskrift
+                      </label>
+                      <input
+                        type="text"
+                        value={editTitle}
+                        onChange={(e) => setEditTitle(e.target.value)}
+                        className="w-full bg-battle-black/50 border border-white/20 rounded-lg px-4 py-2 text-white font-bold uppercase tracking-wider focus:outline-none focus:border-battle-orange"
+                      />
+                    </div>
+                    {/* Content Textarea */}
+                    <div>
+                      <label className="block text-xs text-gray-400 uppercase tracking-wider mb-1">
+                        Indhold
+                      </label>
+                      <textarea
+                        value={editContent}
+                        onChange={(e) => setEditContent(e.target.value)}
+                        className="w-full h-64 bg-battle-black/50 border border-white/20 rounded-lg p-4 text-white text-sm leading-relaxed resize-none focus:outline-none focus:border-battle-orange"
+                      />
+                    </div>
                     <div className="flex gap-2">
                       <button
                         onClick={() => handleSaveEdit(section)}
@@ -677,9 +763,35 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                   </div>
                 ) : (
                   <div className="relative">
-                    <div className="text-sm tablet:text-base text-gray-300 whitespace-pre-line leading-relaxed">
-                      {section.content}
-                    </div>
+                    {(() => {
+                      const { text, checklist } = parseChecklist(section.content);
+                      return (
+                        <>
+                          <div className="text-sm tablet:text-base text-gray-300 whitespace-pre-line leading-relaxed">
+                            {text}
+                          </div>
+                          {checklist.length > 0 && (
+                            <div className="mt-4 bg-battle-black/30 border border-white/10 rounded-lg p-3 space-y-2">
+                              <div className="text-xs text-gray-500 uppercase tracking-wider mb-2">Tjekliste</div>
+                              {checklist.map((item, idx) => (
+                                <label key={idx} className="flex items-center gap-3 cursor-pointer group">
+                                  <input
+                                    type="checkbox"
+                                    className="sr-only peer"
+                                  />
+                                  <div className="w-5 h-5 rounded border border-white/30 flex items-center justify-center peer-checked:bg-green-500 peer-checked:border-green-500 transition-colors">
+                                    <CheckSquare className="w-3 h-3 text-white opacity-0 peer-checked:opacity-100" />
+                                  </div>
+                                  <span className="text-sm text-gray-300 peer-checked:line-through peer-checked:text-gray-500 transition-all">
+                                    {item}
+                                  </span>
+                                </label>
+                              ))}
+                            </div>
+                          )}
+                        </>
+                      );
+                    })()}
 
                     {/* Action buttons */}
                     <div className="mt-4 flex flex-wrap gap-2">
@@ -843,9 +955,54 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                   value={newSectionContent}
                   onChange={(e) => setNewSectionContent(e.target.value)}
                   placeholder="Skriv indholdet her..."
-                  rows={6}
+                  rows={4}
                   className="w-full bg-battle-black/50 border border-white/20 rounded-lg px-4 py-3 text-white resize-none focus:outline-none focus:border-battle-orange"
                 />
+              </div>
+
+              {/* Checklist */}
+              <div>
+                <label className="block text-xs text-gray-400 uppercase tracking-wider mb-2">
+                  Tjekliste (valgfrit)
+                </label>
+                <div className="space-y-2">
+                  {/* Add item input */}
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={newChecklistItem}
+                      onChange={(e) => setNewChecklistItem(e.target.value)}
+                      onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addChecklistItem())}
+                      placeholder="Tilføj punkt..."
+                      className="flex-1 bg-battle-black/50 border border-white/20 rounded-lg px-3 py-2 text-white text-sm focus:outline-none focus:border-battle-orange"
+                    />
+                    <button
+                      type="button"
+                      onClick={addChecklistItem}
+                      className="px-3 py-2 bg-green-500/20 border border-green-500/30 rounded-lg text-green-400 hover:bg-green-500/30 transition-colors"
+                    >
+                      <Plus className="w-4 h-4" />
+                    </button>
+                  </div>
+                  {/* Checklist items */}
+                  {newSectionChecklist.length > 0 && (
+                    <div className="bg-battle-black/30 border border-white/10 rounded-lg p-2 space-y-1">
+                      {newSectionChecklist.map((item, index) => (
+                        <div key={index} className="flex items-center gap-2 group">
+                          <Square className="w-4 h-4 text-gray-500 flex-shrink-0" />
+                          <span className="flex-1 text-sm text-gray-300">{item}</span>
+                          <button
+                            type="button"
+                            onClick={() => removeChecklistItem(index)}
+                            className="p-1 text-red-400/50 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                          >
+                            <X className="w-3 h-3" />
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Image Upload */}
