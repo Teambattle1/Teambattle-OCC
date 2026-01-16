@@ -1372,6 +1372,438 @@ VIGTIGT: Hvis noget af gearet/anlægget IKKE kan bruges til næste opgave - RING
 };
 
 // TeamConstruct-specific default sections
+const getTeamChallengeSections = (): SectionWithMeta[] => {
+  return [
+    // FØR OPGAVEN
+    {
+      activity: 'teamchallenge',
+      section_key: 'forventninger_before',
+      title: 'FORVENTNINGER TIL DIG',
+      content: `Hvad forventes der af dig FØR opgaven starter?
+
+• Vær forberedt og kend de 3 Battle Zoner
+• Tjek alle tablets og bokse inden afgang
+• Load spillet i LOQUIZ på WIFI inden afgang
+• Ankom i god tid til opsætning`,
+      order_index: 0,
+      icon: Target,
+      iconKey: 'target',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'maalsaetning',
+      title: 'MÅLSÆTNING & TEAMS',
+      content: `TeamChallenge er vores mest populære aktivitet!
+
+FORMÅL: Deltagerne skal gennem samarbejde med løsning af meget forskelligartede opgaver se hinandens styrker og have en underholdende og relationsskabende oplevelse.
+
+TEAMOPDELING: 3-5 deltagere pr. team (4 er optimalt)
+
+DE 3 BATTLE ZONER:
+• BE@T-THE-BOX: Fysiske opgaver i 32 sorte bokse
+• BONUSZONE: 18 opgaver på tablet - kan løses HELE tiden
+• BE@T-THE-M@P: Ca. 50 GPS opgaver udendørs`,
+      order_index: 1,
+      icon: Target,
+      iconKey: 'target',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'tidsplan',
+      title: 'TIDSPLAN',
+      content: `VARIGHED: 75-150 min
+
+• 5 min: Intro - brug gerne videointro
+• 5 min: Opdeling af hold, fordeling ved borde
+• 5 min: Til at sende "Beat-the-Map" ud
+• 60-120 min: Til battle (afhængigt af Beat-The-Map)
+• 10 min: Til at få alle teams retur
+• 5 min: Til kåring af vinder`,
+      order_index: 2,
+      icon: Clock,
+      iconKey: 'clock',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'pakkeliste',
+      title: 'PAKKELISTE VED AFGANG',
+      content: `1. Pak TeamChallenge sæt med sorte bokse (samme farve skilt)
+2. Kuffert med tablets - tjek antal i app
+   • Tjek strøm på ALLE tablets
+   • Tjek Sim Kort forbindelse med 4G
+3. Load spillet i LOQUIZ på WIFI INDEN afgang
+4. JBL musikafspiller - par med telefon
+5. Den store sorte instruktørkasse med:
+   • Laminerede A4 numre (1-50)
+   • Orange duge til runde borde
+   • Orange filtmåtter
+   • Oplader til ballonpumpen
+6. Høje caféborde - et til hvert team
+7. 1-2 sorte 120 cm borde til boxene`,
+      order_index: 3,
+      icon: ClipboardList,
+      iconKey: 'clipboard',
+      color: 'green',
+      link: '#teamchallenge_packing_afgang',
+      linkText: 'PAKKELISTE AFGANG',
+      isInternal: true,
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'teknisk_forberedelse',
+      title: 'TEKNISK FORBEREDELSE',
+      content: `SE VIDEO: https://l.ead.me/teamaction
+
+TABLETS:
+• Placer en tablet på hvert højbord
+• Åbn LOQUIZ i bunden af skærmen (blåt ikon)
+• Find login til spillet i TeamBattle app'en
+• Username & kodeord er det SAMME
+• Vær opmærksom på STORE/små bogstaver
+• Login på alle tablets med kode eller QR
+• Skærmlås tablet`,
+      order_index: 4,
+      icon: Settings,
+      iconKey: 'settings',
+      color: 'green',
+      link: 'https://l.ead.me/teamaction',
+      linkText: 'SE TABLET GUIDE VIDEO',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'opstilling',
+      title: 'OPSTILLING AF SPILOMRÅDE',
+      content: `OPSÆTNING:
+• Opstil borde og kufferter så der er klart
+• Opsæt orange duge på højborde
+• Alle sorte kasser stilles OPREJST på et bord
+• Placer bordet i MIDTEN mellem alle teams
+• Ligeligt fordelt: et højbord til hvert hold
+• Placer en tablet på hvert bord (logget ind + skærmlåst)`,
+      order_index: 5,
+      icon: MapPin,
+      iconKey: 'mappin',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    // UNDER OPGAVEN
+    {
+      activity: 'teamchallenge',
+      section_key: 'forventninger_during',
+      title: 'FORVENTNINGER TIL DIG',
+      content: `Hvad forventes der af dig UNDER opgaven?
+
+• Bevæg dig HELE tiden rundt mellem bordene
+• "Afhjælp tvivl og hyggesnakke"
+• Hjælp med instruktør-opgaver (gule strips)
+• Sørg for god stemning og energi`,
+      order_index: 6,
+      icon: Target,
+      iconKey: 'target',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'musik',
+      title: 'MUSIK TIL OPGAVEN',
+      content: `Connect musikafspiller med bluetooth.
+
+QR kode findes i alle tablet kassers låg.
+
+REGLER:
+• Musik SKAL spille når gæsterne kommer (godt lydtæppe)
+• SLUK under velkomst
+• Start lidt lavere igen de første 10-15 min
+• TÆND igen hvis stemningen daler
+• TÆND ALTID når I har kåret vinder
+
+Er I flere instruktører: én har ansvar for musik!`,
+      order_index: 7,
+      icon: Music,
+      iconKey: 'music',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'velkomst',
+      title: 'VELKOMST',
+      content: `BYD VELKOMMEN og fortæl:
+• Navn(e) på instruktører
+• Kort intro til TeamBattle
+
+FORKLAR AKTIVITETEN:
+• Som team skal I løse flest opgaver korrekt inden for tiden
+• Tiden er vigtig både på ENKELTE opgaver og HELE aktiviteten
+• Opgaverne spænder bredt fra korte spørgsmål til komplekse opgaver
+• INTET er fysisk krævende
+• Rigtigt svar = POINT, forkert svar = MINUS point
+• Der kåres en TeamChallenge vinder
+
+FORKLAR DE 3 ZONER (2 eller 3 afhængigt af Beat-The-Map):
+1. BE@T-THE-BOX: Fysiske opgaver i sorte bokse
+2. BONUSZONE: Opgaver på tablet - kan løses HELE aktiviteten
+3. BE@T-THE-M@P: Opgaver på kort (ikke altid med)`,
+      order_index: 8,
+      icon: Users,
+      iconKey: 'users',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'opstart',
+      title: 'OPSTART AF AKTIVITETEN',
+      content: `HVIS MANGE DELTAGERE (deles i 2 grupper):
+• Fortæl at instruktører kommer rundt til hvert bord
+• Start hvert team op NÅR de har skrevet teamnavn
+
+TEAMNAVNE:
+• Teamet læser introen først
+• Derefter indtastes TEAMNAVN der SKAL indeholde TEAMNUMMER
+• Eks: "De 4 Musketerer"
+• Bed dem markere når de er klar til instruks
+
+EFTER 3-5 MINUTTER:
+• Afklar om teams har FORSTÅET tabletten
+• Hjælp med "instruktørhjælp" opgaver:
+  - Pointgivning efter fysisk aktivitet
+  - Hjælp til billede/video ved Bonus opgaver
+  - Facilitér instruktørdrevne opgaver (GUL strips)`,
+      order_index: 9,
+      icon: Play,
+      iconKey: 'play',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'beat_the_box',
+      title: 'BEAT THE BOX - ZONEN',
+      content: `VIDEO: https://l.ead.me/teamchallenge
+
+FORKLAR TIL KUNDEN:
+1. Hent EN box ad gangen til jeres eget bord FØR I åbner den
+2. Åbn boxen
+3. Scan QR kode med tilsvarende flag (sprog)
+   • "CODE IS NOT IN THE GAME" = forkert sprog, vend kortet
+   • QR scanner findes nederste højre hjørne + menuen i venstre top
+4. Nogle opgaver har TIDSGRÆNSE - send svar 10-15 sek inden
+5. Returnér kuffert til bordet når opgaven er løst
+6. Anbefal at SKIFTE mellem BONUSZONE og bokse
+
+HUSK:
+• BLÅ QR scanneknap i nederste højre hjørne
+• Ca. 30 bokse på bordet - hent én ad gangen
+• Rødt ur under billedet = tid på opgaven
+• Forkerte svar giver MINUSPOINT
+• Vi hjælper gerne med at tage billeder`,
+      order_index: 10,
+      icon: Package,
+      iconKey: 'package',
+      color: 'yellow',
+      link: 'https://l.ead.me/teamchallenge',
+      linkText: 'SE VIDEO GENNEMGANG',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'bonus_zone',
+      title: 'BONUS - ZONEN',
+      content: `VIDEO 31: https://l.ead.me/teamchallenge
+
+Under HELE spillet er der en BLÅ knap "BonusZone" nederst.
+
+BONUSZONEN:
+• 6x3 ikoner i 6 temaer
+• Tryk på ikon = åbner BONUS opgave
+• Foto/video opgaver: Instruktør hjælper med billede
+• Video bruger 3 sek fra tryk til optagelse
+
+VIGTIGT - GØR DEM OPMÆRSOM GENTAGNE GANGE:
+• Bonusopgaver kan løses HELE spillet
+• Grønt OK (V) = korrekt
+• Rødt kryds (X) = forkert
+• 3 rigtige i en linje = 300 BONUS point`,
+      order_index: 11,
+      icon: Trophy,
+      iconKey: 'trophy',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'beat_the_map',
+      title: 'BEAT THE MAP - ZONEN',
+      content: `Beat-The-Map er udendørs GPS jagt efter BLÅ ikoner.
+
+FORKLAR TIL HOLDET:
+• 3 sværhedsgrader i 3 farver = forskellig point
+• Opgaver dukker AUTOMATISK op når I bevæger jer hen
+• Nogle opgaver har TID - rødt ur under billedet
+• Forkerte svar giver MINUSPOINT
+• Er opgaven åben SKAL den løses - ellers minuspoint
+• Zoom med fingrene (demonstrér)
+• Centrér position: blå knap i højre top
+• Google is cheating!
+
+TIMING:
+• Beat-The-Map ≈ halvdelen af tiden
+• Send dem ud FØR du briefer Beat-The-Box
+• Når infoskærm dukker op = kom retur til startzonen
+• BONUSZONEN er også synlig her`,
+      order_index: 12,
+      icon: Navigation,
+      iconKey: 'mappin',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'kaaring',
+      title: 'KÅRING AF VINDERTEAM',
+      content: `PÅ STORSKÆRM:
+• Aftal med kunden FØR opgaven hvordan du får adgang
+• Vælg FULD SKÆRM i browseren FØR du kobler resultpage til
+• SKJUL TOP 3 til du skal kåre dem
+
+UDEN STORSKÆRM - Showman!
+1. Bed team nr. 3 komme frem UDEN at fortælle placering
+2. Fortæl deres point
+3. Lad folk klappe - og fortæl så de er nr. 3
+4. Gentag for nr. 2 og nr. 1
+5. Aflever ballontrofæer fra BOX 20 til vinderteamet
+6. Fortæl at kontaktperson har rankingliste og billeder
+
+TAK AF:
+• Nævn TeamBattle
+• "Vi glæder os til at TEAMBATTLE med jer igen"
+• TÆND MUSIK!`,
+      order_index: 13,
+      icon: Trophy,
+      iconKey: 'trophy',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    // EFTER OPGAVEN
+    {
+      activity: 'teamchallenge',
+      section_key: 'forventninger_after',
+      title: 'FORVENTNINGER TIL DIG',
+      content: `Hvad forventes der af dig EFTER opgaven?
+
+• Ryd grundigt op
+• Tjek alle bokse er komplette
+• Tjek alle tablets virker
+• Rapporter fejl/mangler i evalueringen`,
+      order_index: 14,
+      icon: Target,
+      iconKey: 'target',
+      color: 'red',
+      category: 'after',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'link_til_kunden',
+      title: 'LINK TIL KUNDEN',
+      content: `Vi sender link til kunden med:
+• Resultpage - rankingliste
+• Medialink - download billeder og videoer
+• Answers - svar fra alle teams (hvis egne opgaver)
+
+Mailen kommer MENS de er i gang med opgaven.
+
+Hvis ikke: Send linket fra vores app under NOTER på opgaven.`,
+      order_index: 15,
+      icon: FileText,
+      iconKey: 'file',
+      color: 'red',
+      category: 'after',
+      isDefault: true
+    },
+    {
+      activity: 'teamchallenge',
+      section_key: 'tjekliste',
+      title: 'TJEKLISTE HJEMKOMST',
+      content: `TJEK ALLE BOKSE:
+• Er der NR. på alle kufferter?
+• Er der QR koder i alle kufferter?
+• Er der skum i alle kufferter?
+
+SPECIELLE TJEK:
+• Box 2: Etch a Sketch virker + markeringsprikker
+• Box 3: 4 Rubic der virker
+• Box 4: Klokker sidder på pinden
+• Box 9: Alle 80 brikker til Jorden Rundt
+• Box 16: Låsen på kontrolkuffert er låst
+• Box 19: Pump fodbolde (pumpe i box 25)
+• Box 20: FARVEDE balloner + batteri + sort dut
+• Box 22: Hint-billede i tabletkuffert
+• Box 25: Minimum 7 genstande at skyde med
+• Box 26: 4 små figurer i hver kasse
+• Box 27: Batterier virker
+• Box 28: FRISKE krydderier - fyldte`,
+      order_index: 16,
+      icon: CheckCircle2,
+      iconKey: 'check',
+      color: 'red',
+      link: '#teamchallenge_packing_hjemkomst',
+      linkText: 'TJEKLISTE HJEMKOMST',
+      isInternal: true,
+      category: 'after',
+      isDefault: true
+    },
+    // DE 10 BUD
+    {
+      activity: 'teamchallenge',
+      section_key: 'de_10_bud',
+      title: 'DE 10 BUD',
+      content: `TEAMCHALLENGE - DE 10 VIGTIGSTE PUNKTER:
+
+1. Load spillet i LOQUIZ på WIFI INDEN afgang
+2. Tjek strøm og 4G på ALLE tablets
+3. Opsæt bokse OPREJST og indbydende i midten
+4. MUSIK skal spille når gæsterne kommer
+5. Forklar de 3 ZONER tydeligt
+6. Bevæg dig HELE TIDEN rundt og hjælp
+7. Mind dem om BONUSZONEN gentagne gange
+8. Send Beat-The-Map ud FØR du briefer Beat-The-Box
+9. Kår vinderen som en SHOWMAN
+10. TJEK alle bokse er komplette efter opgaven`,
+      order_index: 20,
+      icon: ClipboardList,
+      iconKey: 'clipboard',
+      color: 'blue',
+      category: 'summary',
+      isDefault: true
+    }
+  ];
+};
+
 const getTeamConstructSections = (): SectionWithMeta[] => {
   return [
     // FØR OPGAVEN
@@ -1758,6 +2190,8 @@ const getDefaultSections = (activity: string): SectionWithMeta[] => {
       return getTeamLazerSections();
     case 'teamconstruct':
       return getTeamConstructSections();
+    case 'teamchallenge':
+      return getTeamChallengeSections();
     default:
       return getGenericSections(activity);
   }
