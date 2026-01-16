@@ -28,6 +28,7 @@ import {
   Wrench,
   Map,
   ListChecks,
+  Radio,
   Terminal,
   Database,
   Camera,
@@ -270,6 +271,14 @@ export const TEAMLAZER_LINKS: HubLink[] = [
     description: 'Troubleshooting Guides',
     color: 'orange',
     badge: 'new'
+  },
+  {
+    id: 'tl8',
+    title: 'FREKVENSER',
+    url: '#teamlazer_frekvenser',
+    icon: Radio,
+    description: 'Frekvens Guide',
+    color: 'purple'
   }
 ];
 

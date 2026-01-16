@@ -95,7 +95,7 @@ import {
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide';
+type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_fejlsogning' | 'teamsegway_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'teamlazer_frekvenser' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor' | 'teamlazer_guide' | 'teamrobin_guide' | 'teamsegway_guide' | 'teamconnect_guide' | 'teamaction_guide' | 'teamchallenge_guide';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -308,6 +308,7 @@ const App: React.FC = () => {
     else if (link.url === '#teamsegway_packing') changeView('teamsegway_packing');
     else if (link.url === '#teamlazer_scorecard') changeView('teamlazer_scorecard');
     else if (link.url === '#teamlazer_fejlsogning') changeView('teamlazer_fejlsogning');
+    else if (link.url === '#teamlazer_frekvenser') changeView('teamlazer_frekvenser');
     else if (link.url === '#fejlsogning_teamlazer') changeView('fejlsogning_teamlazer');
     else if (link.url === '#fejlsogning_teamrobin') changeView('fejlsogning_teamrobin');
     else if (link.url === '#fejlsogning_teamsegway') changeView('fejlsogning_teamsegway');
@@ -380,6 +381,8 @@ const App: React.FC = () => {
     } else if (currentView === 'teamlazer_justering') {
       changeView('teamlazer_fejlsogning');
     } else if (currentView === 'teamlazer_fejlsogning') {
+      changeView('teamlazer');
+    } else if (currentView === 'teamlazer_frekvenser') {
       changeView('teamlazer');
     } else if (currentView === 'teamrobin_video') {
       changeView('teamrobin');
@@ -716,6 +719,12 @@ const App: React.FC = () => {
       viewTitle = 'FEJLSØGNING';
       viewSubtitle = 'TeamLazer Troubleshooting';
       ViewIcon = Wrench;
+      break;
+    case 'teamlazer_frekvenser':
+      currentLinks = [];
+      viewTitle = 'FREKVENSER';
+      viewSubtitle = 'TeamLazer Frekvens Guide';
+      ViewIcon = Zap;
       break;
     case 'teamrobin_fejlsogning':
       currentLinks = [];
@@ -1250,6 +1259,27 @@ const App: React.FC = () => {
               playlistId="PLq4wXYwkH9QbWM9SurCo-EWPJlCO03-vk"
               videoIndex={TEAMLAZER_FEJLSOGNING_VIDEO_INDEX}
             />
+          ) : currentView === 'teamlazer_frekvenser' ? (
+            <div className="w-full max-w-6xl mx-auto px-4 py-6">
+              <div className="bg-battle-grey/50 rounded-2xl border border-white/10 p-6">
+                <h2 className="text-xl font-bold text-white uppercase tracking-wider mb-4 text-center">
+                  TeamLazer Frekvenser
+                </h2>
+                <p className="text-gray-400 text-center mb-6">
+                  Frekvensindstillinger til TeamLazer geværer - Set 1, Set 2 og Set 3
+                </p>
+                <div className="bg-white rounded-xl p-4 overflow-auto">
+                  <img
+                    src="https://kyvnqtmknirhpylhvxsv.supabase.co/storage/v1/object/public/guide-images/teamlazer/frekvenser.jpg"
+                    alt="TeamLazer Frekvenser"
+                    className="w-full h-auto max-w-4xl mx-auto"
+                  />
+                </div>
+                <p className="text-gray-500 text-sm text-center mt-4">
+                  Brug denne oversigt til at indstille geværer til de korrekte frekvenser
+                </p>
+              </div>
+            </div>
           ) : currentView === 'teamrobin_fejlsogning' ? (
             <VideoPlayer
               title="TeamRobin Fejlsøgning"
