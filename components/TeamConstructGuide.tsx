@@ -474,16 +474,21 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
     });
   };
 
-  // Delete custom section
+  // Delete section (any section, including default)
   const handleDeleteSection = async (section: SectionWithMeta) => {
-    if (section.isDefault) return;
     if (!confirm(`Er du sikker på at du vil slette "${section.title}"?`)) return;
 
+    // If section has an id in database, delete from database
     if (section.id) {
       const result = await deleteGuideSection(section.id);
       if (result.success) {
         setSections(prev => prev.filter(s => s.section_key !== section.section_key));
+      } else {
+        alert('Kunne ikke slette: ' + (result.error || 'Ukendt fejl'));
       }
+    } else {
+      // Section only exists locally (default section never saved), just remove from state
+      setSections(prev => prev.filter(s => s.section_key !== section.section_key));
     }
   };
 
@@ -668,15 +673,6 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
               </h3>
             </div>
             <div className="flex items-center gap-2">
-              {isAdmin && !section.isDefault && (
-                <button
-                  onClick={(e) => { e.stopPropagation(); handleDeleteSection(section); }}
-                  className="p-1.5 hover:bg-red-500/20 rounded-lg transition-colors"
-                  title="Slet sektion"
-                >
-                  <Trash2 className="w-4 h-4 text-red-400" />
-                </button>
-              )}
               {isExpanded ? (
                 <ChevronUp className={`w-5 h-5 ${colorClasses.text}`} />
               ) : (
@@ -829,13 +825,22 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
                         )
                       )}
                       {isAdmin && (
-                        <button
-                          onClick={() => handleStartEdit(section)}
-                          className="inline-flex items-center gap-2 px-4 py-2 bg-battle-orange/20 border border-battle-orange/30 rounded-lg text-battle-orange text-xs uppercase tracking-wider hover:bg-battle-orange/30 transition-colors"
-                        >
-                          <Edit3 className="w-4 h-4" />
-                          REDIGER
-                        </button>
+                        <>
+                          <button
+                            onClick={() => handleStartEdit(section)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-battle-orange/20 border border-battle-orange/30 rounded-lg text-battle-orange text-xs uppercase tracking-wider hover:bg-battle-orange/30 transition-colors"
+                          >
+                            <Edit3 className="w-4 h-4" />
+                            REDIGER
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSection(section)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-xs uppercase tracking-wider hover:bg-red-500/30 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            SLET
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>

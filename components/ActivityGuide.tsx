@@ -515,11 +515,18 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
   };
 
   const handleDeleteSection = async (section: SectionWithMeta) => {
-    if (!section.id || section.isDefault) return;
     if (!confirm('Er du sikker på at du vil slette denne sektion?')) return;
 
-    const result = await deleteGuideSection(section.id);
-    if (result.success) {
+    // If section has an id in database, delete from database
+    if (section.id) {
+      const result = await deleteGuideSection(section.id);
+      if (result.success) {
+        setSections(prev => prev.filter(s => s.section_key !== section.section_key));
+      } else {
+        alert('Kunne ikke slette: ' + (result.error || 'Ukendt fejl'));
+      }
+    } else {
+      // Section only exists locally (default section never saved), just remove from state
       setSections(prev => prev.filter(s => s.section_key !== section.section_key));
     }
   };
@@ -863,7 +870,7 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                         )
                       )}
 
-                      {/* Admin edit button */}
+                      {/* Admin edit and delete buttons */}
                       {isAdmin && (
                         <>
                           <button
@@ -873,15 +880,13 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                             <Edit3 className="w-4 h-4" />
                             REDIGER
                           </button>
-                          {!section.isDefault && section.id && (
-                            <button
-                              onClick={() => handleDeleteSection(section)}
-                              className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-xs uppercase tracking-wider hover:bg-red-500/30 transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                              SLET
-                            </button>
-                          )}
+                          <button
+                            onClick={() => handleDeleteSection(section)}
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-red-500/20 border border-red-500/30 rounded-lg text-red-400 text-xs uppercase tracking-wider hover:bg-red-500/30 transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            SLET
+                          </button>
                         </>
                       )}
                     </div>
