@@ -67,7 +67,7 @@ REGLER:
     order_index: 1,
     icon: Music,
     color: 'green',
-    category: 'before' as CategoryKey
+    category: 'during' as CategoryKey
   },
   {
     section_key: 'tidsplan',
