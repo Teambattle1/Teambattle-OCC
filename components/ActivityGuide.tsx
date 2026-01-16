@@ -186,15 +186,16 @@ interface ActivityGuideProps {
 // Default empty sections for new activities
 const getDefaultSections = (activity: string): SectionWithMeta[] => {
   return [
+    // FØR OPGAVEN
     {
       activity,
-      section_key: 'velkommen',
-      title: 'VELKOMMEN',
-      content: 'Tilføj information om velkomst og introduktion her.',
+      section_key: 'forventninger_before',
+      title: 'FORVENTNINGER TIL DIG',
+      content: 'Hvad forventes der af dig før opgaven starter?',
       order_index: 0,
-      icon: Users,
-      iconKey: 'users',
-      color: 'blue',
+      icon: Target,
+      iconKey: 'target',
+      color: 'green',
       category: 'before',
       isDefault: true
     },
@@ -210,16 +211,42 @@ const getDefaultSections = (activity: string): SectionWithMeta[] => {
       category: 'before',
       isDefault: true
     },
+    // UNDER OPGAVEN
+    {
+      activity,
+      section_key: 'forventninger_during',
+      title: 'FORVENTNINGER TIL DIG',
+      content: 'Hvad forventes der af dig under opgaven?',
+      order_index: 2,
+      icon: Target,
+      iconKey: 'target',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
     {
       activity,
       section_key: 'afvikling',
       title: 'AFVIKLING',
       content: 'Tilføj information om afvikling af aktiviteten her.',
-      order_index: 2,
+      order_index: 3,
       icon: Play,
       iconKey: 'play',
       color: 'yellow',
       category: 'during',
+      isDefault: true
+    },
+    // EFTER OPGAVEN
+    {
+      activity,
+      section_key: 'forventninger_after',
+      title: 'FORVENTNINGER TIL DIG',
+      content: 'Hvad forventes der af dig efter opgaven?',
+      order_index: 4,
+      icon: Target,
+      iconKey: 'target',
+      color: 'red',
+      category: 'after',
       isDefault: true
     },
     {
@@ -227,7 +254,7 @@ const getDefaultSections = (activity: string): SectionWithMeta[] => {
       section_key: 'oprydning',
       title: 'OPRYDNING',
       content: 'Tilføj information om oprydning her.',
-      order_index: 3,
+      order_index: 5,
       icon: CheckCircle2,
       iconKey: 'check',
       color: 'red',
@@ -934,7 +961,7 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
         </div>
 
         {/* Sections */}
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 tablet:grid-cols-2 tablet:landscape:grid-cols-3 desktop:grid-cols-3 gap-3">
           {categorySections.map((section, index) => renderSection(section, category.color, index, categorySections.length))}
         </div>
       </div>

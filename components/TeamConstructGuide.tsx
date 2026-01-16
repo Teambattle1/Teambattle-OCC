@@ -72,6 +72,23 @@ const getIconByKey = (key: string): React.ElementType => {
 
 // Default sections from the TeamConstruct instructor manual
 const DEFAULT_SECTIONS = [
+  // FØR OPGAVEN
+  {
+    section_key: 'forventninger_before',
+    title: 'FORVENTNINGER TIL DIG',
+    content: `Hvad forventes der af dig FØR opgaven starter?
+
+• Vær forberedt og kend din opgave
+• Tjek alt gear inden afgang
+• Ankom i god tid
+• Kontakt kunden ved ankomst`,
+    order_index: 0,
+    icon: Target,
+    iconKey: 'target',
+    color: 'green',
+    category: 'before' as CategoryKey,
+    isDefault: true
+  },
   {
     section_key: 'maalsaetning',
     title: 'MÅLSÆTNING & TEAMS',
@@ -80,11 +97,28 @@ const DEFAULT_SECTIONS = [
 TEAMOPDELING: 3-4 deltagere pr. team
 
 Resultatet bliver, trods samme udgangspunkt – meget forskelligt.`,
-    order_index: 0,
+    order_index: 1,
     icon: Target,
     iconKey: 'target',
     color: 'red',
     category: 'before' as CategoryKey,
+    isDefault: true
+  },
+  // UNDER OPGAVEN
+  {
+    section_key: 'forventninger_during',
+    title: 'FORVENTNINGER TIL DIG',
+    content: `Hvad forventes der af dig UNDER opgaven?
+
+• Vær synlig og tilgængelig
+• Hold øje med sikkerhed
+• Sørg for god stemning
+• Overhold tidsplanen`,
+    order_index: 5,
+    icon: Target,
+    iconKey: 'target',
+    color: 'yellow',
+    category: 'during' as CategoryKey,
     isDefault: true
   },
   {
@@ -99,7 +133,7 @@ REGLER:
 • Sluk under velkomst og fællesinstruktioner
 • Tænd når holdene bygger
 • Tænd altid ved oprydning`,
-    order_index: 1,
+    order_index: 6,
     icon: Music,
     iconKey: 'music',
     color: 'green',
@@ -185,7 +219,7 @@ OPSÆTNING:
 • Der kommer lidt overraskelser undervejs
 
 Sørg for at ALLE kan høre dig tydeligt.`,
-    order_index: 5,
+    order_index: 7,
     icon: Users,
     iconKey: 'users',
     color: 'orange',
@@ -205,7 +239,7 @@ SIKKERHED:
 • Skærehandsker SKAL bruges ved savning
 • Hold øje med korrekt brug af værktøj
 • Grib ind ved farlig adfærd`,
-    order_index: 6,
+    order_index: 8,
     icon: Settings,
     iconKey: 'settings',
     color: 'red',
@@ -225,11 +259,28 @@ SIKKERHED:
 4. Annoncér vinderen højtideligt
 
 Sørg for god stemning og anerkendelse til ALLE hold.`,
-    order_index: 7,
+    order_index: 9,
     icon: Trophy,
     iconKey: 'trophy',
     color: 'yellow',
     category: 'during' as CategoryKey,
+    isDefault: true
+  },
+  // EFTER OPGAVEN
+  {
+    section_key: 'forventninger_after',
+    title: 'FORVENTNINGER TIL DIG',
+    content: `Hvad forventes der af dig EFTER opgaven?
+
+• Ryd grundigt op
+• Tjek alt gear virker
+• Rapporter fejl/mangler
+• Evaluer opgaven`,
+    order_index: 10,
+    icon: Target,
+    iconKey: 'target',
+    color: 'red',
+    category: 'after' as CategoryKey,
     isDefault: true
   },
   {
@@ -244,7 +295,7 @@ EFTER HVER OPGAVE:
 • Ring STRAKS hvis gear ikke virker
 
 Tænd musik under oprydning!`,
-    order_index: 8,
+    order_index: 11,
     icon: Home,
     iconKey: 'home',
     color: 'green',
@@ -880,7 +931,7 @@ const TeamConstructGuide: React.FC<TeamConstructGuideProps> = ({ onNavigate }) =
             </button>
           )}
         </div>
-        <div className={`grid grid-cols-1 ${categoryKey === 'after' ? '' : 'tablet:grid-cols-2 desktop:grid-cols-3'} gap-3`}>
+        <div className="grid grid-cols-1 tablet:grid-cols-2 tablet:landscape:grid-cols-3 desktop:grid-cols-3 gap-3">
           {categorySections.map((s, idx) => renderSection(s, colorName, idx, categorySections.length))}
         </div>
       </div>
