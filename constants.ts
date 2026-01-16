@@ -33,6 +33,7 @@ import {
   Camera,
   Play,
   Download,
+  Car,
   LucideProps
 } from 'lucide-react';
 import { HubLink } from './types';
@@ -674,6 +675,97 @@ export const TEAMACTION_LINKS: HubLink[] = [
   }
 ];
 
+// TeamRace Submenu Links
+export const TEAMRACE_LINKS: HubLink[] = [
+  {
+    id: 'trace1',
+    title: 'SCORECARD',
+    url: '#teamrace_scorecard',
+    icon: ListChecks,
+    description: 'Point Tracking',
+    color: 'red'
+  },
+  {
+    id: 'trace2',
+    title: 'GUIDE',
+    url: '#teamrace_guide',
+    icon: Map,
+    description: 'Instructions',
+    color: 'blue'
+  },
+  {
+    id: 'trace3',
+    title: 'PAKKELISTER',
+    url: '#teamrace_packing',
+    icon: Package,
+    description: 'Packing Lists',
+    color: 'green',
+    badge: 'new'
+  },
+  {
+    id: 'trace4',
+    title: 'FEJLSØGNING',
+    url: '#fejlsogning_teamrace',
+    icon: Wrench,
+    description: 'Rapporter fejl',
+    color: 'yellow'
+  },
+  {
+    id: 'trace5',
+    title: 'VIDEO',
+    url: '#teamrace_video',
+    icon: Play,
+    description: 'Video Guides',
+    color: 'red',
+    badge: 'new'
+  },
+  {
+    id: 'trace6',
+    title: 'RC CARS',
+    url: '#teamrace_rccars',
+    icon: Gamepad2,
+    description: 'Remote Control',
+    color: 'purple'
+  },
+  {
+    id: 'trace7',
+    title: 'INSTRUCTIONS',
+    url: '#teamrace_instructions',
+    icon: Map,
+    description: 'Vejledninger',
+    color: 'lightblue'
+  }
+];
+
+// TeamRace Packing Submenu Links
+export const TEAMRACE_PACKING_LINKS: HubLink[] = [
+  {
+    id: 'trp1',
+    title: 'FØR OPGAVEN',
+    url: '#teamrace_packing_afgang',
+    icon: Package,
+    description: 'Afgang',
+    color: 'green'
+  },
+  {
+    id: 'trp2',
+    title: 'EFTER OPGAVEN',
+    url: '#teamrace_packing_hjemkomst',
+    icon: ListChecks,
+    description: 'Hjemkomst',
+    color: 'blue'
+  },
+  {
+    id: 'trp3',
+    title: 'TASKE',
+    url: '#teamrace_packing_taske',
+    icon: Package,
+    description: 'Sæbekasse Pakkeliste',
+    color: 'orange',
+    badge: 'new'
+  }
+];
+
 // Office Submenu Links
 export const OFFICE_LINKS: HubLink[] = [
   // CrewControlCenter section
@@ -864,6 +956,7 @@ export const ACTIVITY_LINKS: HubLink[] = [
   // Group 4
   { id: 'a10', title: 'TEAMACTION', url: '#teamaction', icon: Swords, description: 'High Intensity', color: 'lightblue' },
   { id: 'a11', title: 'TEAMCONSTRUCT', url: '#teamconstruct', icon: Hammer, description: 'Building', color: 'yellow' },
+  { id: 'a12', title: 'TEAMRACE', url: '#teamrace', icon: Car, description: 'Racing', color: 'orange' },
 ];
 
 // Economy Submenu Links
@@ -886,6 +979,7 @@ export const ECONOMY_LINKS: HubLink[] = [
 
 // TeamLazer Video Index - matches YouTube playlist order
 export const TEAMLAZER_VIDEO_INDEX = [
+  { title: 'Justering af gevær', index: -1, videoId: 'RREzWzfckOc' },
   { title: 'Den STORE kasse', index: 0 },
   { title: 'Alt det andet gear', index: 1 },
   { title: 'Ring til 114!', index: 2 },
@@ -928,4 +1022,11 @@ export const TEAMCONTROL_VIDEO_INDEX = [
   { title: 'Placering af RC biler i rigtige boxe', index: 1, videoId: 'pFInMgP4oRo' },
   { title: 'Parring af Droner (Hvide)', index: 2, videoId: 'pVoigvLu08I' },
   { title: 'Flybrix - parring af drone', index: 3, videoId: 'oWYOgD2MN7g' },
+];
+
+export const TEAMRACE_VIDEO_INDEX = [
+  { title: 'Video 1 - Kommer snart', index: 0 },
+  { title: 'Video 2 - Kommer snart', index: 1 },
+  { title: 'Video 3 - Kommer snart', index: 2 },
+  { title: 'Video 4 - Kommer snart', index: 3 },
 ];

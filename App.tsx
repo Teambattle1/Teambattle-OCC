@@ -24,8 +24,11 @@ import {
   TEAMLAZER_VIDEO_INDEX,
   TEAMCONSTRUCT_VIDEO_INDEX,
   TEAMCONTROL_VIDEO_INDEX,
+  TEAMRACE_VIDEO_INDEX,
   FLYBRIX_LINKS,
-  TEAMCONTROL_PACKING_LINKS
+  TEAMCONTROL_PACKING_LINKS,
+  TEAMRACE_LINKS,
+  TEAMRACE_PACKING_LINKS
 } from './constants';
 import HubButton from './components/HubButton';
 import Clock, { DateDisplay } from './components/Clock';
@@ -53,6 +56,10 @@ import FejlsogningReport from './components/FejlsogningReport';
 import AdminReports from './components/AdminReports';
 import PackingListEditor from './components/PackingListEditor';
 import DynamicPackingList from './components/DynamicPackingList';
+import PDFViewer from './components/PDFViewer';
+import TeamRaceGuide from './components/TeamRaceGuide';
+import TeamRaceInstructions from './components/TeamRaceInstructions';
+import TeamRaceScorecard from './components/TeamRaceScorecard';
 import { useAuth } from './contexts/AuthContext';
 import {
   ShieldCheck,
@@ -79,11 +86,12 @@ import {
   Package,
   ListChecks,
   HelpCircle,
-  Map
+  Map,
+  Car
 } from 'lucide-react';
 import { HubLink } from './types';
 
-type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'admin_reports' | 'admin_packing_editor';
+type ViewState = 'main' | 'activities' | 'economy' | 'task_control' | 'tools' | 'code' | 'office' | 'team_challenge' | 'loquiz' | 'teamaction' | 'teamlazer' | 'teamrobin' | 'teamconnect' | 'teambox' | 'teamsegway' | 'teamcontrol' | 'teamconstruct' | 'teamrace' | 'distance_tool' | 'teamrobin_packing' | 'teamrobin_packing_before' | 'teamrobin_packing_after' | 'teamlazer_justering' | 'teamlazer_fejlsogning' | 'teamrobin_video' | 'teamchallenge_video' | 'teamaction_video' | 'teamsegway_video' | 'teamconstruct_video' | 'teamconstruct_guide' | 'teamconstruct_scorecard' | 'teamconstruct_packing' | 'teamconstruct_packing_afgang' | 'teamconstruct_packing_hjemkomst' | 'teamcontrol_video' | 'teamcontrol_guide' | 'teamcontrol_flybrix' | 'teamcontrol_flybrix_manual' | 'teamcontrol_packing' | 'teamcontrol_packing_afgang' | 'teamcontrol_packing_hjemkomst' | 'teamcontrol_musik' | 'teambox_video' | 'teambox_checklist' | 'teambox_guide' | 'teambox_packing' | 'teambox_packing_afgang' | 'teambox_packing_hjemkomst' | 'teambox_downloads' | 'teamlazer_video' | 'teamlazer_packing' | 'teamsegway_packing' | 'teamlazer_scorecard' | 'fejlsogning_teamlazer' | 'fejlsogning_teamrobin' | 'fejlsogning_teamsegway' | 'fejlsogning_teamcontrol' | 'fejlsogning_teamconstruct' | 'fejlsogning_teamconnect' | 'fejlsogning_teambox' | 'fejlsogning_teamaction' | 'fejlsogning_teamchallenge' | 'fejlsogning_loquiz' | 'fejlsogning_teamrace' | 'teamrace_video' | 'teamrace_packing' | 'teamrace_packing_afgang' | 'teamrace_packing_hjemkomst' | 'teamrace_packing_taske' | 'teamrace_scorecard' | 'teamrace_guide' | 'teamrace_rccars' | 'teamrace_instructions' | 'admin_reports' | 'admin_packing_editor';
 
 const App: React.FC = () => {
   const { isAuthenticated, isLoading, profile, signOut, logPageVisit } = useAuth();
@@ -260,6 +268,7 @@ const App: React.FC = () => {
     else if (link.title === 'TEAMSEGWAY') changeView('teamsegway');
     else if (link.title === 'TEAMCONTROL') changeView('teamcontrol');
     else if (link.title === 'TEAMCONSTRUCT') changeView('teamconstruct');
+    else if (link.title === 'TEAMRACE') changeView('teamrace');
     else if (link.title === 'DISTANCE') changeView('distance_tool');
     else if (link.url === '#teamrobin_packing') changeView('teamrobin_packing');
     else if (link.url === '#teamrobin_packing_before') changeView('teamrobin_packing_before');
@@ -305,6 +314,16 @@ const App: React.FC = () => {
     else if (link.url === '#fejlsogning_teamaction') changeView('fejlsogning_teamaction');
     else if (link.url === '#fejlsogning_teamchallenge') changeView('fejlsogning_teamchallenge');
     else if (link.url === '#fejlsogning_loquiz') changeView('fejlsogning_loquiz');
+    else if (link.url === '#teamrace_scorecard') changeView('teamrace_scorecard');
+    else if (link.url === '#teamrace_guide') changeView('teamrace_guide');
+    else if (link.url === '#teamrace_packing') changeView('teamrace_packing');
+    else if (link.url === '#teamrace_packing_afgang') changeView('teamrace_packing_afgang');
+    else if (link.url === '#teamrace_packing_hjemkomst') changeView('teamrace_packing_hjemkomst');
+    else if (link.url === '#teamrace_packing_taske') changeView('teamrace_packing_taske');
+    else if (link.url === '#teamrace_video') changeView('teamrace_video');
+    else if (link.url === '#fejlsogning_teamrace') changeView('fejlsogning_teamrace');
+    else if (link.url === '#teamrace_rccars') changeView('teamrace_rccars');
+    else if (link.url === '#teamrace_instructions') changeView('teamrace_instructions');
     else if (link.url === '#code') changeView('code');
     else if (link.url === '#admin_reports') changeView('admin_reports');
     else if (link.url === '#admin_packing_editor') changeView('admin_packing_editor');
@@ -336,6 +355,12 @@ const App: React.FC = () => {
       changeView('activities');
     } else if (currentView === 'teamconstruct') {
       changeView('activities');
+    } else if (currentView === 'teamrace') {
+      changeView('activities');
+    } else if (currentView === 'teamrace_scorecard' || currentView === 'teamrace_guide' || currentView === 'teamrace_packing' || currentView === 'teamrace_video' || currentView === 'fejlsogning_teamrace' || currentView === 'teamrace_rccars' || currentView === 'teamrace_instructions') {
+      changeView('teamrace');
+    } else if (currentView === 'teamrace_packing_afgang' || currentView === 'teamrace_packing_hjemkomst' || currentView === 'teamrace_packing_taske') {
+      changeView('teamrace_packing');
     } else if (currentView === 'distance_tool') {
       changeView('tools');
     } else if (currentView === 'code') {
@@ -573,6 +598,72 @@ const App: React.FC = () => {
       viewTitle = 'TEAMCONSTRUCT';
       viewSubtitle = '';
       ViewIcon = Hammer;
+      break;
+    case 'teamrace':
+      currentLinks = TEAMRACE_LINKS;
+      viewTitle = 'TEAMRACE';
+      viewSubtitle = '';
+      ViewIcon = Car;
+      break;
+    case 'teamrace_scorecard':
+      currentLinks = [];
+      viewTitle = 'SCORECARD';
+      viewSubtitle = 'TeamRace';
+      ViewIcon = ListChecks;
+      break;
+    case 'teamrace_guide':
+      currentLinks = [];
+      viewTitle = 'GUIDE';
+      viewSubtitle = 'TeamRace';
+      ViewIcon = Map;
+      break;
+    case 'teamrace_packing':
+      currentLinks = TEAMRACE_PACKING_LINKS;
+      viewTitle = 'PAKKELISTER';
+      viewSubtitle = 'TeamRace';
+      ViewIcon = Package;
+      break;
+    case 'teamrace_packing_afgang':
+      currentLinks = [];
+      viewTitle = 'FØR OPGAVEN';
+      viewSubtitle = 'Afgang Pakkeliste';
+      ViewIcon = Package;
+      break;
+    case 'teamrace_packing_hjemkomst':
+      currentLinks = [];
+      viewTitle = 'EFTER OPGAVEN';
+      viewSubtitle = 'Hjemkomst Checklist';
+      ViewIcon = ListChecks;
+      break;
+    case 'teamrace_packing_taske':
+      currentLinks = [];
+      viewTitle = 'TASKE';
+      viewSubtitle = 'Sæbekasse Pakkeliste';
+      ViewIcon = Package;
+      break;
+    case 'teamrace_video':
+      currentLinks = [];
+      viewTitle = 'VIDEO';
+      viewSubtitle = 'TeamRace';
+      ViewIcon = Car;
+      break;
+    case 'fejlsogning_teamrace':
+      currentLinks = [];
+      viewTitle = 'FEJLSØGNING';
+      viewSubtitle = 'TeamRace';
+      ViewIcon = Wrench;
+      break;
+    case 'teamrace_rccars':
+      currentLinks = [];
+      viewTitle = 'RC CARS';
+      viewSubtitle = 'Remote Control';
+      ViewIcon = Gamepad2;
+      break;
+    case 'teamrace_instructions':
+      currentLinks = [];
+      viewTitle = 'INSTRUCTIONS';
+      viewSubtitle = 'Samlevejledning';
+      ViewIcon = Map;
       break;
     case 'distance_tool':
       currentLinks = []; // No links grid for this view
@@ -1115,6 +1206,32 @@ const App: React.FC = () => {
             <FejlsogningReport activity="teamchallenge" />
           ) : currentView === 'fejlsogning_loquiz' ? (
             <FejlsogningReport activity="loquiz" />
+          ) : currentView === 'fejlsogning_teamrace' ? (
+            <FejlsogningReport activity="teamrace" />
+          ) : currentView === 'teamrace_video' ? (
+            <VideoPlayer
+              title="TeamRace Video Guides"
+              playlistId="PLq4wXYwkH9QZxzGDBGeMBMxWmyKKH2xKl"
+              videoIndex={TEAMRACE_VIDEO_INDEX}
+            />
+          ) : currentView === 'teamrace_guide' ? (
+            <TeamRaceGuide onNavigate={(view) => changeView(view as ViewState)} />
+          ) : currentView === 'teamrace_rccars' ? (
+            <PDFViewer
+              pdfUrl="https://shop.hoeco.at/explosionsdatein/pdf/76054-5_LaTraxTeton.pdf"
+              title="LaTrax Teton Manual"
+              totalPages={3}
+            />
+          ) : currentView === 'teamrace_packing_afgang' ? (
+            <DynamicPackingList activity="teamrace" listType="afgang" />
+          ) : currentView === 'teamrace_packing_hjemkomst' ? (
+            <DynamicPackingList activity="teamrace" listType="hjemkomst" />
+          ) : currentView === 'teamrace_packing_taske' ? (
+            <DynamicPackingList activity="teamrace" listType="taske" title="TASKE - Sæbekasse Pakkeliste" />
+          ) : currentView === 'teamrace_instructions' ? (
+            <TeamRaceInstructions totalSlides={10} />
+          ) : currentView === 'teamrace_scorecard' ? (
+            <TeamRaceScorecard />
           ) : currentView === 'admin_reports' ? (
             <AdminReports />
           ) : currentView === 'admin_packing_editor' ? (

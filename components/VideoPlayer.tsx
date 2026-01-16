@@ -23,6 +23,10 @@ const VideoPlayer: React.FC<VideoPlayerProps> = ({ title, videoId, playlistId, v
   // Build the embed URL based on whether it's a video or playlist
   // If we have a specific videoId from the index, use that with the playlist
   const getEmbedUrl = (index: number = 0, specificVideoId?: string) => {
+    if (specificVideoId && index < 0) {
+      // Standalone video not in playlist (negative index indicates standalone)
+      return `https://www.youtube.com/embed/${specificVideoId}?rel=0&modestbranding=1`;
+    }
     if (specificVideoId && playlistId) {
       // Use specific video ID with playlist context
       return `https://www.youtube.com/embed/${specificVideoId}?list=${playlistId}&rel=0&modestbranding=1`;

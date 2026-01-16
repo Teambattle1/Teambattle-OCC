@@ -192,6 +192,56 @@ const DEFAULT_LISTS: Record<string, Record<string, PackingItem[]>> = {
       { id: 'sa3', text: 'Tjek for skader' },
       { id: 'sa4', text: 'Rapport om eventuelle uheld' },
     ]
+  },
+  teamrace: {
+    afgang: [
+      { id: 'tra1', text: 'Sorte tasker med brædder til sæbekassebiler' },
+      { id: 'tra2', text: 'Kasser med hjelme' },
+      { id: 'tra3', text: 'En gearkasse med:', isDivider: true },
+      { id: 'tra4', text: 'Pointskemaer', indent: true },
+      { id: 'tra5', text: 'Kuglepen', indent: true },
+      { id: 'tra6', text: 'Kegler', indent: true },
+      { id: 'tra7', text: 'Regnslag', indent: true },
+      { id: 'tra8', text: '1 stk. højt cafébord til point' },
+      { id: 'tra9', text: '2 stk. sorte borde til at stille udstyr på' },
+      { id: 'tra10', text: 'En gul kasse med værktøj' },
+      { id: 'tra11', text: 'En gul kasse med skruemaskiner + opladte batterier' },
+      { id: 'tra12', text: 'En gul kasse med tape til at pynte sæbekassebilen' },
+      { id: 'tra13', text: '(I tilfælde af regn - 1 stk. telt + Jernklodser)', subtext: 'Valgfrit ved risiko for regn' },
+    ],
+    hjemkomst: [
+      { id: 'trh0', text: 'Gearet skal virke og være klar til næste bruger!', isDivider: true },
+      { id: 'trh1', text: 'Alle brædder og udstyr der er gået i stykker skal udskiftes' },
+      { id: 'trh2', text: 'Har du oplevet fejl/mangler skal det skrives i evalueringen' },
+      { id: 'trh3', text: 'Virker noget af gearet ikke, RING STRAKS', subtext: 'Så kommende opgave ikke er umulig' },
+      { id: 'trh4', text: 'Tjek at alle tasker er pakket korrekt' },
+      { id: 'trh5', text: 'Batterier til skruemaskiner skal oplades' },
+    ],
+    taske: [
+      { id: 'trt0', text: 'Pakkes i 1 taske pr. hold', isDivider: true },
+      { id: 'trt1', text: 'Bræt A', subtext: '1 stk.' },
+      { id: 'trt2', text: 'Bræt B', subtext: '2 stk.' },
+      { id: 'trt3', text: 'Bræt C', subtext: '3 stk.' },
+      { id: 'trt4', text: 'Bræt D', subtext: '1 stk.' },
+      { id: 'trt5', text: 'Bræt E', subtext: '2 stk.' },
+      { id: 'trt6', text: 'Bræt F', subtext: '1 stk.' },
+      { id: 'trt7', text: 'Bræt G', subtext: '2 stk.' },
+      { id: 'trt8', text: 'Bræt H', subtext: '2 stk.' },
+      { id: 'trt9', text: 'Bræt I', subtext: '2 stk.' },
+      { id: 'trt10', text: 'Dæk', subtext: '4 stk.' },
+      { id: 'trt11', text: 'Aksler', subtext: '2 stk.' },
+      { id: 'trt12', text: 'Reb', subtext: '1 stk.' },
+      { id: 'trt13', text: 'Manual', subtext: '1 stk.' },
+      { id: 'trt14', text: 'Underlag', subtext: '1 stk.' },
+      { id: 'trt15', text: 'Handsker', subtext: '1 par' },
+      { id: 'trt16', text: 'Briller', subtext: '1 stk.' },
+      { id: 'trt17', text: 'Horn', subtext: '1 stk.' },
+      { id: 'trt18', text: 'PAKKES SEPARAT:', isDivider: true },
+      { id: 'trt19', text: 'Skruer, bolte, tape', subtext: 'I separat kasse' },
+      { id: 'trt20', text: 'Boremaskiner', subtext: 'I separat kasse' },
+      { id: 'trt21', text: 'Hjelme', subtext: 'I separat kasse' },
+      { id: 'trt22', text: 'HUSK: Tjek om der er træ der skal udskiftes!', isDivider: true },
+    ]
   }
 };
 
@@ -205,6 +255,7 @@ const ACTIVITY_NAMES: Record<string, string> = {
   teamconnect: 'TeamConnect',
   teamaction: 'TeamAction',
   teamchallenge: 'TeamChallenge',
+  teamrace: 'TeamRace',
 };
 
 interface DynamicPackingListProps {

@@ -530,3 +530,121 @@ export const uploadGuideImage = async (
     return { success: false, error: 'Failed to upload image' };
   }
 };
+
+// ============ TeamRace Scorecard Types ============
+export interface TeamRaceSession {
+  id?: string;
+  session_name: string;
+  tournament_data: unknown;
+  created_at?: string;
+  updated_at?: string;
+  created_by?: string;
+}
+
+// Save TeamRace Session
+export const saveTeamRaceSession = async (
+  sessionName: string,
+  tournamentData: unknown,
+  sessionId?: string
+): Promise<{ success: boolean; id?: string; error?: string }> => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (sessionId) {
+      // Update existing session
+      const { error } = await supabase
+        .from('teamrace_sessions')
+        .update({
+          session_name: sessionName,
+          tournament_data: tournamentData,
+          updated_at: new Date().toISOString()
+        })
+        .eq('id', sessionId);
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+      return { success: true, id: sessionId };
+    } else {
+      // Create new session
+      const { data, error } = await supabase
+        .from('teamrace_sessions')
+        .insert({
+          session_name: sessionName,
+          tournament_data: tournamentData,
+          created_by: user?.id,
+          created_at: new Date().toISOString(),
+          updated_at: new Date().toISOString()
+        })
+        .select('id')
+        .single();
+
+      if (error) {
+        return { success: false, error: error.message };
+      }
+      return { success: true, id: data?.id };
+    }
+  } catch (err) {
+    console.error('Failed to save TeamRace session:', err);
+    return { success: false, error: 'Failed to save session' };
+  }
+};
+
+// Load TeamRace Session
+export const loadTeamRaceSession = async (
+  sessionId: string
+): Promise<{ success: boolean; data?: TeamRaceSession; error?: string }> => {
+  try {
+    const { data, error } = await supabase
+      .from('teamrace_sessions')
+      .select('*')
+      .eq('id', sessionId)
+      .single();
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true, data: data as TeamRaceSession };
+  } catch (err) {
+    console.error('Failed to load TeamRace session:', err);
+    return { success: false, error: 'Failed to load session' };
+  }
+};
+
+// Get all TeamRace Sessions
+export const getAllTeamRaceSessions = async (): Promise<{ success: boolean; data?: TeamRaceSession[]; error?: string }> => {
+  try {
+    const { data, error } = await supabase
+      .from('teamrace_sessions')
+      .select('id, session_name, created_at, updated_at, created_by')
+      .order('updated_at', { ascending: false });
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true, data: data as TeamRaceSession[] };
+  } catch (err) {
+    console.error('Failed to get TeamRace sessions:', err);
+    return { success: false, error: 'Failed to get sessions' };
+  }
+};
+
+// Delete TeamRace Session
+export const deleteTeamRaceSession = async (
+  sessionId: string
+): Promise<{ success: boolean; error?: string }> => {
+  try {
+    const { error } = await supabase
+      .from('teamrace_sessions')
+      .delete()
+      .eq('id', sessionId);
+
+    if (error) {
+      return { success: false, error: error.message };
+    }
+    return { success: true };
+  } catch (err) {
+    console.error('Failed to delete TeamRace session:', err);
+    return { success: false, error: 'Failed to delete session' };
+  }
+};
