@@ -48,6 +48,7 @@ import TeamSegwayPackingList from './components/TeamSegwayPackingList';
 import LazerPointScoreboard from './components/LazerPointScoreboard';
 import IdeasModal from './components/IdeasModal';
 import TeamConstructGuide from './components/TeamConstructGuide';
+import TeamBoxVideoGrid from './components/TeamBoxVideoGrid';
 import TeamBoxGuide from './components/TeamBoxGuide';
 import TeamBoxDownloads from './components/TeamBoxDownloads';
 import TeamConstructScorecard from './components/TeamConstructScorecard';
@@ -1239,10 +1240,7 @@ const App: React.FC = () => {
               </div>
             </div>
           ) : currentView === 'teambox_video' ? (
-            <VideoPlayer
-              title="TeamBox Video Guides"
-              playlistId="PLq4wXYwkH9QYNeIb2OD85T-zLjIkp6MIc"
-            />
+            <TeamBoxVideoGrid onBack={() => changeView('teambox')} />
           ) : currentView === 'teambox_checklist' ? (
             <DynamicPackingList activity="teambox" listType="nulstil" title="NULSTIL BOX" enableTabs={true} trackCompletion={true} />
           ) : currentView === 'teambox_guide' ? (

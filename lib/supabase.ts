@@ -461,27 +461,45 @@ export const saveGuideSection = async (
   section: GuideSection
 ): Promise<{ success: boolean; id?: string; error?: string }> => {
   try {
-    if (section.id) {
+    // First, try to find existing section by activity + section_key if no id provided
+    let sectionId = section.id;
+
+    if (!sectionId) {
+      const { data: existing } = await supabase
+        .from('guide_sections')
+        .select('id')
+        .eq('activity', section.activity)
+        .eq('section_key', section.section_key)
+        .single();
+
+      if (existing) {
+        sectionId = existing.id;
+      }
+    }
+
+    if (sectionId) {
       // Update existing section
+      const updateData = {
+        title: section.title,
+        content: section.content,
+        image_url: section.image_url ?? null,
+        video_url: section.video_url ?? null,
+        icon_key: section.icon_key ?? null,
+        linked_packing_list: section.linked_packing_list ?? null,
+        order_index: section.order_index,
+        category: section.category,
+        updated_at: new Date().toISOString()
+      };
+      console.log('Updating section with id:', sectionId, 'data:', updateData);
       const { error } = await supabase
         .from('guide_sections')
-        .update({
-          title: section.title,
-          content: section.content,
-          image_url: section.image_url,
-          video_url: section.video_url,
-          icon_key: section.icon_key,
-          linked_packing_list: section.linked_packing_list,
-          order_index: section.order_index,
-          category: section.category,
-          updated_at: new Date().toISOString()
-        })
-        .eq('id', section.id);
+        .update(updateData)
+        .eq('id', sectionId);
 
       if (error) {
         return { success: false, error: error.message };
       }
-      return { success: true, id: section.id };
+      return { success: true, id: sectionId };
     } else {
       // Create new section
       const { data, error } = await supabase
@@ -491,10 +509,10 @@ export const saveGuideSection = async (
           section_key: section.section_key,
           title: section.title,
           content: section.content,
-          image_url: section.image_url,
-          video_url: section.video_url,
-          icon_key: section.icon_key,
-          linked_packing_list: section.linked_packing_list,
+          image_url: section.image_url ?? null,
+          video_url: section.video_url ?? null,
+          icon_key: section.icon_key ?? null,
+          linked_packing_list: section.linked_packing_list ?? null,
           order_index: section.order_index,
           category: section.category,
           created_at: new Date().toISOString(),

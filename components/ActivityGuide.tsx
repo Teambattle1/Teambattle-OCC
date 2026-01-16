@@ -15,7 +15,6 @@ import {
   X,
   Edit3,
   Save,
-  ExternalLink,
   PackageCheck,
   Play,
   CheckCircle2,
@@ -28,6 +27,7 @@ import {
   Navigation,
   Gamepad2,
   Package,
+  Phone,
   Swords,
   Car,
   Utensils,
@@ -37,6 +37,7 @@ import {
   RefreshCw,
   Youtube,
   ImagePlus,
+  Image,
   Bold,
   Italic,
   Underline,
@@ -75,7 +76,11 @@ const ICON_OPTIONS = [
   { key: 'settings', icon: Settings, label: 'Indstillinger' },
   { key: 'trophy', icon: Trophy, label: 'Trofæ' },
   { key: 'home', icon: Home, label: 'Hjem' },
-  { key: 'file', icon: FileText, label: 'Dokument' }
+  { key: 'file', icon: FileText, label: 'Dokument' },
+  { key: 'phone', icon: Phone, label: 'Telefon' },
+  { key: 'package', icon: Package, label: 'Pakke' },
+  { key: 'play', icon: Play, label: 'Afspil' },
+  { key: 'check', icon: CheckCircle2, label: 'Check' }
 ];
 
 const getIconByKey = (key: string): React.ElementType => {
@@ -257,6 +262,107 @@ const FORMAT_COLORS = [
   { name: 'Lilla', value: '#a855f7' },
 ];
 
+// Parse a single text segment for inline formatting (non-recursive for safety)
+const parseInlineFormatting = (text: string, keyPrefix: string = ''): React.ReactNode => {
+  if (!text) return null;
+
+  // Build result by processing patterns in order of priority
+  let result: React.ReactNode[] = [text];
+  let keyCounter = 0;
+
+  // Helper to process a pattern on all string segments in result
+  const processPattern = (
+    regex: RegExp,
+    wrapper: (content: string, key: string) => React.ReactNode
+  ) => {
+    const newResult: React.ReactNode[] = [];
+    for (const segment of result) {
+      if (typeof segment !== 'string') {
+        newResult.push(segment);
+        continue;
+      }
+
+      regex.lastIndex = 0;
+      if (!regex.test(segment)) {
+        newResult.push(segment);
+        continue;
+      }
+
+      regex.lastIndex = 0;
+      let lastIndex = 0;
+      let match;
+
+      while ((match = regex.exec(segment)) !== null) {
+        if (match.index > lastIndex) {
+          newResult.push(segment.slice(lastIndex, match.index));
+        }
+        newResult.push(wrapper(match[1], `${keyPrefix}${keyCounter++}`));
+        lastIndex = regex.lastIndex;
+      }
+      if (lastIndex < segment.length) {
+        newResult.push(segment.slice(lastIndex));
+      }
+    }
+    result = newResult;
+  };
+
+  // Process color: [#hexcode]text[/color] (needs special handling for 2 capture groups)
+  {
+    const colorRegex = /\[(#[a-fA-F0-9]{6})\]([^\[]*)\[\/color\]/g;
+    const newResult: React.ReactNode[] = [];
+    for (const segment of result) {
+      if (typeof segment !== 'string') {
+        newResult.push(segment);
+        continue;
+      }
+
+      colorRegex.lastIndex = 0;
+      if (!colorRegex.test(segment)) {
+        newResult.push(segment);
+        continue;
+      }
+
+      colorRegex.lastIndex = 0;
+      let lastIndex = 0;
+      let match;
+
+      while ((match = colorRegex.exec(segment)) !== null) {
+        if (match.index > lastIndex) {
+          newResult.push(segment.slice(lastIndex, match.index));
+        }
+        newResult.push(
+          <span key={`${keyPrefix}c${keyCounter++}`} style={{ color: match[1] }}>{match[2]}</span>
+        );
+        lastIndex = colorRegex.lastIndex;
+      }
+      if (lastIndex < segment.length) {
+        newResult.push(segment.slice(lastIndex));
+      }
+    }
+    result = newResult;
+  }
+
+  // Process bold: **text**
+  processPattern(
+    /\*\*([^*]+)\*\*/g,
+    (content, key) => <strong key={key} className="font-bold">{content}</strong>
+  );
+
+  // Process underline: __text__
+  processPattern(
+    /__([^_]+)__/g,
+    (content, key) => <u key={key} className="underline">{content}</u>
+  );
+
+  // Process italic: *text*
+  processPattern(
+    /\*([^*]+)\*/g,
+    (content, key) => <em key={key} className="italic">{content}</em>
+  );
+
+  return <>{result}</>;
+};
+
 // Parse formatted text to JSX
 const parseFormattedText = (text: string): React.ReactNode => {
   if (!text) return null;
@@ -264,65 +370,12 @@ const parseFormattedText = (text: string): React.ReactNode => {
   // Split by lines first
   const lines = text.split('\n');
 
-  return lines.map((line, lineIndex) => {
-    // Parse inline formatting
-    let parsed: React.ReactNode = line;
-
-    // Bold: **text**
-    if (typeof parsed === 'string' && parsed.includes('**')) {
-      const parts = parsed.split(/\*\*([^*]+)\*\*/g);
-      parsed = parts.map((part, i) =>
-        i % 2 === 1 ? <strong key={i} className="font-bold">{part}</strong> : part
-      );
-    }
-
-    // Italic: *text* (but not **)
-    if (typeof parsed === 'string' && /(?<!\*)\*(?!\*)([^*]+)(?<!\*)\*(?!\*)/.test(parsed)) {
-      const parts = parsed.split(/(?<!\*)\*(?!\*)([^*]+)(?<!\*)\*(?!\*)/g);
-      parsed = parts.map((part, i) =>
-        i % 2 === 1 ? <em key={i} className="italic">{part}</em> : part
-      );
-    }
-
-    // Underline: __text__
-    if (typeof parsed === 'string' && parsed.includes('__')) {
-      const parts = parsed.split(/__([^_]+)__/g);
-      parsed = parts.map((part, i) =>
-        i % 2 === 1 ? <u key={i} className="underline">{part}</u> : part
-      );
-    }
-
-    // Color: [#hexcode]text[/color]
-    if (typeof parsed === 'string' && parsed.includes('[#')) {
-      const colorRegex = /\[(#[a-fA-F0-9]{6})\]([^\[]+)\[\/color\]/g;
-      const parts: React.ReactNode[] = [];
-      let lastIndex = 0;
-      let match;
-
-      while ((match = colorRegex.exec(parsed)) !== null) {
-        if (match.index > lastIndex) {
-          parts.push(parsed.slice(lastIndex, match.index));
-        }
-        parts.push(
-          <span key={match.index} style={{ color: match[1] }}>{match[2]}</span>
-        );
-        lastIndex = colorRegex.lastIndex;
-      }
-      if (lastIndex < parsed.length) {
-        parts.push(parsed.slice(lastIndex));
-      }
-      if (parts.length > 0) {
-        parsed = parts;
-      }
-    }
-
-    return (
-      <React.Fragment key={lineIndex}>
-        {parsed}
-        {lineIndex < lines.length - 1 && <br />}
-      </React.Fragment>
-    );
-  });
+  return lines.map((line, lineIndex) => (
+    <React.Fragment key={lineIndex}>
+      {parseInlineFormatting(line, `l${lineIndex}`)}
+      {lineIndex < lines.length - 1 && <br />}
+    </React.Fragment>
+  ));
 };
 
 // Formatting Toolbar Component
@@ -487,12 +540,18 @@ const VideoUrlInput: React.FC<VideoUrlInputProps> = ({ section, onSave }) => {
   );
 };
 
+// Packing item data with optional image
+interface PackingItemData {
+  text: string;
+  imageUrl?: string;
+}
+
 // Linked Packing List Checklist Component
 interface LinkedPackingListChecklistProps {
   linkedKey: string;
   sectionKey: string;
-  fetchItems: (linkedKey: string) => Promise<string[]>;
-  cachedItems?: string[];
+  fetchItems: (linkedKey: string) => Promise<PackingItemData[]>;
+  cachedItems?: PackingItemData[];
   colorClasses: { bg: string; border: string; text: string; icon: string };
 }
 
@@ -503,9 +562,11 @@ const LinkedPackingListChecklist: React.FC<LinkedPackingListChecklistProps> = ({
   cachedItems,
   colorClasses
 }) => {
-  const [items, setItems] = useState<string[]>(cachedItems || []);
+  const [items, setItems] = useState<PackingItemData[]>(cachedItems || []);
   const [checkedItems, setCheckedItems] = useState<Record<string, boolean>>({});
   const [isLoading, setIsLoading] = useState(!cachedItems);
+  const [hoveredImage, setHoveredImage] = useState<string | null>(null);
+  const [selectedImage, setSelectedImage] = useState<string | null>(null);
 
   // Load checked state from localStorage
   useEffect(() => {
@@ -568,39 +629,94 @@ const LinkedPackingListChecklist: React.FC<LinkedPackingListChecklistProps> = ({
                     `Pakkeliste: ${listType}`;
 
   return (
-    <div className="mt-4 bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <ClipboardList className="w-5 h-5 text-purple-400" />
-          <span className="text-sm font-medium text-purple-300 uppercase tracking-wider">{listTitle}</span>
+    <>
+      <div className="mt-4 bg-purple-500/10 border border-purple-500/20 rounded-xl p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <ClipboardList className="w-5 h-5 text-purple-400" />
+            <span className="text-sm font-medium text-purple-300 uppercase tracking-wider">{listTitle}</span>
+          </div>
+          <span className={`text-xs px-2 py-1 rounded-full ${
+            checkedCount === totalCount ? 'bg-green-500/20 text-green-400' : 'bg-purple-500/20 text-purple-400'
+          }`}>
+            {checkedCount}/{totalCount}
+          </span>
         </div>
-        <span className={`text-xs px-2 py-1 rounded-full ${
-          checkedCount === totalCount ? 'bg-green-500/20 text-green-400' : 'bg-purple-500/20 text-purple-400'
-        }`}>
-          {checkedCount}/{totalCount}
-        </span>
-      </div>
-      <div className="space-y-2">
-        {items.map((item, idx) => (
-          <label key={idx} className="flex items-center gap-3 cursor-pointer group p-2 rounded-lg hover:bg-white/5 transition-colors">
-            <input
-              type="checkbox"
-              checked={checkedItems[item] || false}
-              onChange={() => handleToggle(item)}
-              className="sr-only peer"
-            />
-            <div className="w-5 h-5 rounded border-2 border-purple-400/50 flex items-center justify-center peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-colors flex-shrink-0">
-              {checkedItems[item] && <CheckSquare className="w-3 h-3 text-white" />}
+        <div className="space-y-2">
+          {items.map((item, idx) => (
+            <div key={idx} className="flex items-center gap-3 p-2 rounded-lg hover:bg-white/5 transition-colors group">
+              <label className="flex items-center gap-3 cursor-pointer flex-1">
+                <input
+                  type="checkbox"
+                  checked={checkedItems[item.text] || false}
+                  onChange={() => handleToggle(item.text)}
+                  className="sr-only peer"
+                />
+                <div className="w-5 h-5 rounded border-2 border-purple-400/50 flex items-center justify-center peer-checked:bg-purple-500 peer-checked:border-purple-500 transition-colors flex-shrink-0">
+                  {checkedItems[item.text] && <CheckSquare className="w-3 h-3 text-white" />}
+                </div>
+                <span className={`text-sm transition-all ${
+                  checkedItems[item.text] ? 'text-gray-500 line-through' : 'text-gray-300'
+                }`}>
+                  {item.text}
+                </span>
+              </label>
+              {/* Image indicator with hover preview */}
+              {item.imageUrl && (
+                <div className="relative">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedImage(item.imageUrl || null);
+                    }}
+                    onMouseEnter={() => setHoveredImage(item.imageUrl || null)}
+                    onMouseLeave={() => setHoveredImage(null)}
+                    className="p-1.5 rounded-lg bg-purple-500/20 hover:bg-purple-500/30 transition-colors"
+                    title="Vis billede"
+                  >
+                    <Image className="w-4 h-4 text-purple-400" />
+                  </button>
+                  {/* Hover preview tooltip */}
+                  {hoveredImage === item.imageUrl && (
+                    <div className="absolute right-0 bottom-full mb-2 z-50 pointer-events-none">
+                      <div className="bg-battle-grey border border-purple-500/30 rounded-lg p-1 shadow-xl">
+                        <img
+                          src={item.imageUrl}
+                          alt="Preview"
+                          className="w-32 h-32 object-cover rounded"
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-            <span className={`text-sm transition-all ${
-              checkedItems[item] ? 'text-gray-500 line-through' : 'text-gray-300'
-            }`}>
-              {item}
-            </span>
-          </label>
-        ))}
+          ))}
+        </div>
       </div>
-    </div>
+
+      {/* Full-size image modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setSelectedImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh]">
+            <img
+              src={selectedImage}
+              alt="Pakkeliste billede"
+              className="max-w-full max-h-[90vh] object-contain rounded-lg"
+            />
+            <button
+              onClick={() => setSelectedImage(null)}
+              className="absolute top-2 right-2 p-2 bg-black/50 hover:bg-black/70 rounded-full transition-colors"
+            >
+              <X className="w-6 h-6 text-white" />
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
 
@@ -617,12 +733,14 @@ const getTeamLazerSections = (): SectionWithMeta[] => {
       activity: 'teamlazer',
       section_key: 'forventninger_before',
       title: 'FORVENTNINGER TIL DIG',
-      content: `• Møde op i god tid (min. 15 min før)
-• Være veludhvilet og mentalt klar
+      content: `Dit mål: At blive en selvsikker og kompetent TeamLazer-instruktør, der kan levere en professionel og sjov oplevelse for alle deltagere.
+
+• Vær forberedt og kend din opgave
+• Tjek alt gear inden afgang
+• Ankom minimum 45 min før eventstart (LEAD)
 • Have læst denne guide grundigt
 • Være klædt til vejret (udendørs aktivitet)
-• Have din telefon opladet til musik/koordinering
-• Være klar til at give 100% energi`,
+• Have din telefon opladet til musik`,
       order_index: 0,
       icon: Target,
       iconKey: 'target',
@@ -633,18 +751,25 @@ const getTeamLazerSections = (): SectionWithMeta[] => {
     {
       activity: 'teamlazer',
       section_key: 'introduktion',
-      title: 'INTRODUKTION TIL TEAMLAZER',
-      content: `TeamLazer er en actionfyldt laser tag-oplevelse hvor deltagerne kæmper i hold med professionelle lasergeværer på en specialdesignet bane.
+      title: 'INTRODUKTION TIL LAZER LERDUESKYDNING',
+      content: `Lazer Lerdueskydning er en moderne og sikker variant af den traditionelle lerdueskydning. Der skydes med rigtige rifler, men i stedet for krudt anvender vi ufarlige laserstråler, der rammer genanvendelige lerduer udstyret med reflektorer.
 
-KONCEPTET:
-• 4 intensive runder à ca. 5-7 minutter
-• Hold mod hold kamp (typisk 2-4 hold)
-• Forskellige spilmodi mulige
-• Point optjenes ved at ramme modstandere
-• Fokus på samarbejde, strategi og sjov
+FORDELE:
+• Ingen rekyl (tilbageslag på skulder)
+• Ingen høje brag eller farlige elementer
+• Alle kan deltage uanset erfaring og evner
 
-MÅLGRUPPE:
-Primært firmateambuilding, polterabender, fødselsdage og sociale events. Deltagere i alle aldre kan være med.`,
+SÅDAN FOREGÅR DET:
+• 3-5 deltagere pr. team (helst max 4 personer)
+• Alle skyder samtidig efter samme due
+• Livescore vises på stort display foran skydezonen
+• Typisk 4 forskellige runder per arrangement
+
+HVORFOR TEAMLAZER?
+• Inklusivt: Alle kan deltage uanset fysik eller erfaring
+• Fleksibelt: Kan afholdes næsten hvor som helst med plads
+• Engagerende: Konkurrenceelementet holder spændingen høj
+• Fungerer også i mørke med tacticallys!`,
       order_index: 1,
       icon: Target,
       iconKey: 'target',
@@ -656,19 +781,31 @@ Primært firmateambuilding, polterabender, fødselsdage og sociale events. Delta
       activity: 'teamlazer',
       section_key: 'pakning_gear',
       title: 'PAKNING & GEAR',
-      content: `TJEKLISTE TIL PAKNING:
-• Lasergeværer (tjek antal vs. deltagerantal)
-• Veste/seler til geværer
-• Ladestationer/powerbanks
-• Bluetooth højttaler til musik
-• Kegler/markeringer til bane
-• Førstehjælpskasse
-• Vand til deltagere
-• Backup batterier
-• Tablet/telefon til scoring
+      content: `FØLGENDE SKAL MED I BILEN:
 
-VIGTIGT:
-Tjek altid at alle geværer er fuldt opladet inden afgang. Test hvert gevær kort for at sikre de virker.`,
+☐ 1 stk. kaster (launcher) til duer
+☐ Pløkker til kaster
+☐ Knæpude
+☐ Fjeder til duekaster (tjek i duekassen!)
+☐ Tårn til duer inkl. alle 3 vingemøtrikker
+☐ Display - start og test med gul TEST knap
+☐ 1 højt bord til pointboard og controller
+☐ 5 geværer + 24 GENOPLADELIGE batterier
+   NB: Batterier må IKKE sidde i geværerne under kørsel!
+☐ 5 skydemåtter (nummermåtter 1-5)
+☐ Den STORE boks med GEAR
+☐ Den lille boks med DUER
+☐ 1 JBL musikafspiller - par med telefon/tablet
+
+OVERVEJ OGSÅ:
+☐ Telt ved dårligt vejr (+ jernklodser)
+☐ Afspærringspinde/bånd
+☐ Koblingssæt til 2 setup
+☐ Beachflag
+☐ Natduer og lygter (hvis natskydning)
+
+VIGTIGT: Tjek at ALLE geværer virker FØR afgang!
+Tænd dem og se rødt LED lys.`,
       order_index: 2,
       icon: ClipboardList,
       iconKey: 'clipboard',
@@ -678,23 +815,64 @@ Tjek altid at alle geværer er fuldt opladet inden afgang. Test hvert gevær kor
     },
     {
       activity: 'teamlazer',
+      section_key: 'gear_bokse',
+      title: 'INDHOLD I BOKSE',
+      content: `DEN STORE BOX - INDHOLD:
+• 2 højtalere til display
+• 3 blå kabelruller inkl.:
+  - 1 controller (trådløse versioner findes)
+  - 1 kabel til kaster (trådløse versioner findes)
+  - 1 kabel til 12V (bilstik)
+• 1 ekstra lader til anlæg
+• Scoreboard inkl. POINTSKEMAER i blåt clipboard
+• Kuglepenne
+
+DEN LILLE BOX MED DUER:
+• 80-100 duer (3-farvet plastikduer)
+  Et fyldt rør har 60 duer - der skal være til fyldt rør + ekstra
+• Fjeder til duekaster (HVIS ikke allerede på kasteren!)
+
+MEGET VIGTIGT: Tjek altid at fjederen er med!
+
+Mangler der duer eller andet, så giv besked under "Fejl & Mangler" i TeamBattle appen.`,
+      order_index: 3,
+      icon: Package,
+      iconKey: 'package',
+      color: 'green',
+      category: 'before',
+      isDefault: true
+    },
+    {
+      activity: 'teamlazer',
       section_key: 'ankomst_opsaetning',
       title: 'ANKOMST & OPSÆTNING',
-      content: `VED ANKOMST:
-1. Find kontaktperson hos kunden
-2. Aftal præcis lokation for bane og baseområde
-3. Tjek for sikkerhedsfarer (huller, genstande, trafik)
-4. Sæt baseområde op først (geværer, vand, musikanlæg)
+      content: `ANKOMST & OPSÆTNING:
 
-BANEOPSÆTNING:
-• Markér baneområdet tydeligt med kegler
-• Sørg for mindst 20x30 meter åbent område
-• Skab naturlige dækninger hvis muligt
-• Hold sikkerhedszone omkring banen
+1. TIDLIG ANKOMST
+   Min. 45 minutter før eventstart for LEAD
 
-TIDSRAMME:
-Ankom minimum 30-45 min før start for at have tid til fuld opsætning og test.`,
-      order_index: 3,
+2. NOTIFICER RECEPTIONEN
+   Giv besked så snart du er ankommet
+
+3. RING 114
+   Der skal næsten altid ringes til politiet - se særskilt afsnit
+
+4. TERRÆN-INSPEKTION
+   • Identificer potentielle farer (ujævnt terræn, forhindringer)
+   • Gennemtænk placering af deltagere og udstyr
+   • Tjek for offentlig adgang
+
+5. OPSÆTNING AF BANEN
+   Se særskilt afsnit om banesetup
+
+6. HÅNDTERING AF GEVÆRER
+   Se særskilt afsnit
+
+7. SÆT MUSIK PÅ
+   Musikken skal spille når gæsterne ankommer!
+
+MODTAGELSE: Når banen er sat op, geværerne håndteret og musikken spiller - byd deltagerne velkommen med et smil!`,
+      order_index: 4,
       icon: MapPin,
       iconKey: 'mappin',
       color: 'green',
@@ -705,21 +883,27 @@ Ankom minimum 30-45 min før start for at have tid til fuld opsætning og test.`
       activity: 'teamlazer',
       section_key: 'ring_114',
       title: 'RING 114 - VIGTIGT!',
-      content: `RING ALTID 114 FØR AKTIVITETEN STARTER!
+      content: `Der skal ved ankomst ringes til Politiet på 114, hvis vi står på offentlig grund eller nær noget som kan OPFATTES som offentligt, selvom det er privat.
 
-Fortæl dem:
-• Hvem du er (Crew Battle)
-• Hvor I er (præcis adresse)
-• Hvad I laver (laser tag aktivitet med legetøjsvåben)
-• Hvornår aktiviteten slutter
+GENERELT: Det er bedst bare altid at ringe!
+
+HVAD SKAL DU OPLYSE?
+• Dit CPR-nummer (de kan se hvis du har ringet før)
+• Adressen hvor I står
+• At I laver et kort teambuilding arrangement
+• At aktiviteten hedder Lazer Lerdueskydning
+• At det er ganske ufarligt, men kan ligne rigtige geværer
+• At der kun skydes med lys - IKKE krudt & kugler
+• At I er væk indenfor 2 timer
+• At det ikke ødelægger noget eller sviner
 
 HVORFOR?
-Naboer eller forbipasserende kan ringe til politiet hvis de ser aktiviteten og ikke ved hvad det er. Ved at ringe 114 på forhånd undgår I unødvendig politiudrykning.
+Naboer eller forbipasserende kan ringe til politiet hvis de ser aktiviteten. Ved at ringe 114 på forhånd undgår I unødvendig politiudrykning.
 
 Ved akut nødsituation ring altid 112.`,
-      order_index: 4,
-      icon: FileText,
-      iconKey: 'file',
+      order_index: 5,
+      icon: Phone,
+      iconKey: 'phone',
       color: 'green',
       category: 'before',
       isDefault: true
@@ -728,24 +912,33 @@ Ved akut nødsituation ring altid 112.`,
       activity: 'teamlazer',
       section_key: 'banesetup',
       title: 'BANESETUP',
-      content: `DEN PERFEKTE BANE:
-• Minimum 20x30 meter
-• Fladt eller let kuperet terræn
-• Naturlige dækninger (træer, buske, bakker)
-• Klare afgrænsninger med kegler
+      content: `PLACERING AF UDSTYR:
 
-BANEELEMENTER:
-• Startpositioner for hvert hold
-• Neutral zone i midten
-• Sikkerheds-buffer zone omkring banen
-• Respawn-punkter markeret tydeligt
+• PLASTIKMÅTTER (1-5): Placeres med 50-60 cm mellemrum
 
-SIKKERHED:
-• Ingen farlige forhindringer
-• God sigtbarhed for instruktør
-• Let adgang til førstehjælp
-• Vand tilgængeligt for deltagere`,
-      order_index: 5,
+• SCOREBOARD TAVLEN: 5-7 meter lige foran måtterne
+
+• GEVÆRERNE: Placeres ovenpå kasserne skråt foran
+
+• KASTEREN: Ca. 20 meter til venstre for scoreboardet
+  Placeres så duerne flyver hen over skydezonen
+
+SIKKERHED VED KASTEREN:
+• Sørg for ingen udefrakommende går foran den
+• Den skyder med stor kraft!
+• Vær påpasselig med egne fingre ved samling/adskillelse
+• SLUK ALTID kasteren og hiv stikket ud hvis du skal "fiske" duer fri
+
+BANE-LAYOUT:
+[KASTER] ----20m---- [SCOREBOARD]
+                          |
+                        5-7m
+                          |
+                    [1][2][3][4][5]
+                     (Skydemåtter)
+
+Duerne flyver i en bue ca. 30-35 meter ud.`,
+      order_index: 6,
       icon: MapPin,
       iconKey: 'mappin',
       color: 'green',
@@ -755,25 +948,29 @@ SIKKERHED:
     {
       activity: 'teamlazer',
       section_key: 'haandtering_gevaerer',
-      title: 'HÅNDTERING AF GEVÆRER',
-      content: `SIKKERHEDSREGLER:
-• Behandl altid geværet som et rigtigt våben
-• Peg ALDRIG på folk der ikke deltager
-• Ingen hovedskud på tæt hold (under 2 meter)
-• Geværet skal altid pege nedad når ikke i brug
+      title: 'HÅNDTERING AF GEVÆRER FØR OPGAVEN',
+      content: `FREMGANGSMÅDE:
 
-TEKNIK:
-• Hold geværet med begge hænder
-• Sigt med det indbyggede sigte
-• Korte, kontrollerede tryk på aftrækkeren
-• Hold geværet tæt ind til kroppen ved løb
+1. ISÆT BATTERIER
+   • 4 GENOPLADELIGE batterier i alle 5 geværer
+   • VIGTIGT: Normale batterier er for lange og ødelægger fjederen!
+   • Batterier må IKKE "slippes" ned - skal roligt glides ned i løbet
+   • Husk: Batterier skal ud og i lader efter hvert arrangement!
 
-VEDLIGEHOLD:
-• Tjek batteri før hver runde
-• Rengør sensorer mellem brug
-• Opbevar tørt og beskyttet
-• Rapporter defekter med det samme`,
-      order_index: 6,
+2. TJEK ALLE GEVÆRER
+   • Tænd for dem og displayet
+   • Se at de lyser rødt på rigtig kanal
+
+3. TEST-SKYD
+   • Skyd et par skud i luften
+   • Se om de lyser rødt i begge skud (= OK)
+   • Hvis nogle markerer grønt = fejl
+
+HVIS ET GEVÆR RAMMER ALT I TESTSKUD:
+Læg det væk FØR kunden kommer, og omgruppér holdene til 4 geværer.
+
+HUSK: En velforberedt instruktør er en selvsikker instruktør!`,
+      order_index: 7,
       icon: Target,
       iconKey: 'target',
       color: 'green',
@@ -786,13 +983,18 @@ VEDLIGEHOLD:
       activity: 'teamlazer',
       section_key: 'forventninger_during',
       title: 'FORVENTNINGER TIL DIG',
-      content: `• Vær synlig og tilgængelig hele tiden
+      content: `DU ER BÅDE VÆRT, DOMMER OG GUIDE!
+
+Det er din energi og tilstedeværelse, der sætter rammen for et sjovt og mindeværdigt event.
+
+• Vær synlig og tilgængelig hele tiden
 • Hold høj energi og entusiasme
 • Vær retfærdig dommer ved uenigheder
 • Hold øje med sikkerhed konstant
 • Sørg for alle har det sjovt
-• Grib ind ved usportslig opførsel
-• Hold tidsplanen`,
+• Hold tidsplanen
+
+Din evne til at engagere deltagerne, skabe god stemning og sikre en tydelig introduktion er nøglen til en vellykket TeamLazer-oplevelse.`,
       order_index: 10,
       icon: Target,
       iconKey: 'target',
@@ -803,24 +1005,29 @@ VEDLIGEHOLD:
     {
       activity: 'teamlazer',
       section_key: 'musik',
-      title: 'MUSIK',
-      content: `MUSIKKENS ROLLE:
-Musik skaber stemning og energi! Kør ALTID musik under aktiviteten.
+      title: 'MUSIK TIL OPGAVEN',
+      content: `Musik bryder tavsheden og skaber stemning - især hvis gæsterne ikke kender hinanden.
 
-ANBEFALINGER:
-• Højt tempo, actionfyldt musik
-• Ingen stødende tekster
-• Genkendeligt for de fleste
-• Epic/film soundtrack virker godt
+MUSIK-PROTOKOL:
 
-LYDNIVEAU:
-• Højt nok til at skabe stemning
-• Lavt nok til at instruktioner kan høres
-• Skru ned ved briefing og instruktion
-• Skru op under selve runderne
+• Det forventes at der spiller musik NÅR GÆSTERNE KOMMER
+  Tilpas højt til at der er et godt "lydtæppe"
 
-SPOTIFY PLAYLISTER:
-Brug Crew Battle's TeamLazer playliste eller tilsvarende action/gaming playlister.`,
+• SLUK under velkomst og briefing
+
+• TÆND igen mens de skyder
+
+• TÆND ALTID når I har kåret vinderen
+  Mens der stadig er gæster ved opgaven
+
+FREMGANGSMÅDE:
+1. Connect JBL musikafspiller med bluetooth
+2. Brug tablet på WIFI eller din egen telefon
+3. Start playlisten: https://l.ead.me/musik1
+
+QR kode findes også i låget til pointblokken.
+
+TIP: Har du Apple Watch kan Spotify justeres derfra.`,
       order_index: 11,
       icon: Music,
       iconKey: 'music',
@@ -831,35 +1038,35 @@ Brug Crew Battle's TeamLazer playliste eller tilsvarende action/gaming playliste
     {
       activity: 'teamlazer',
       section_key: 'tidsplan',
-      title: 'TIDSPLAN',
-      content: `TYPISK FORLØB (90 minutter):
+      title: 'TIDSPLAN: EKSEKVERING',
+      content: `VARIGHED I ALT: 75-90 minutter
 
-00:00 - 00:10 | VELKOMST & INTRO
-• Præsentation af dig selv
-• Kort om Crew Battle
-• Dagens program
+VELKOMST OG HOLD: 5 min
+• Byd velkommen
+• Fortæl navn(e) på instruktør(er)
+• Intro til TeamBattle
+• Opdel i teams (hvis ikke gjort på forhånd)
 
-00:10 - 00:20 | BRIEFING
-• Sikkerhedsregler
-• Hvordan geværerne virker
-• Spilleregler
+GENNEMGANG AF GEAR: 5 min
+• Forklar hvad aktiviteten går ud på
+• Laser lerdueskydning - ufarligt
+• Duerne er af composit og genbruges
+• 4 runder med forskellige regler
+• Vi kårer et samlet vinderteam til sidst
 
-00:20 - 00:30 | TESTRUNDE
-• Alle prøver geværer
-• Øv sigteteknik
-• Bliv fortrolig med udstyret
+TRÆNING AF DELTAGERE: 10-15 min
+• Instruktion i geværer
+• Testrunde
 
-00:30 - 01:10 | DE 4 RUNDER
-• Ca. 7-10 min per runde
-• Kort pause mellem runder
-• Point optælling
+DE 4 RUNDER: 50-60 min
+• LAZERSPORT
+• SPEEDSHOT
+• SKILLSHOT
+• RAPIDFIRE
 
-01:10 - 01:20 | AFSLUTNING
+KÅRING OG AFSKED: 5 min
 • Vinderhold kåres
-• Foto mulighed
-• Tak for i dag
-
-01:20 - 01:30 | BUFFER/OPRYDNING`,
+• Tak for i dag`,
       order_index: 12,
       icon: Clock,
       iconKey: 'clock',
@@ -871,28 +1078,32 @@ Brug Crew Battle's TeamLazer playliste eller tilsvarende action/gaming playliste
       activity: 'teamlazer',
       section_key: 'din_rolle_instruktor',
       title: 'DIN ROLLE SOM INSTRUKTØR',
-      content: `DU ER SHOWETS VÆRT!
-Din energi smitter. Går du 100% ind i det, gør deltagerne det også.
+      content: `NÅR DELTAGERNE ER ANKOMMET:
 
-DINE HOVEDOPGAVER:
-• Skabe tryg og sjov atmosfære
-• Forklare regler klart og tydeligt
-• Holde styr på tid og runder
-• Være retfærdig dommer
-• Sikre alles sikkerhed
-• Holde energien oppe
+1. BYD VELKOMMEN
+   • Fortæl navn(e) på instruktør(er)
+   • Intro til TeamBattle
 
-KOMMUNIKATION:
-• Tal højt og tydeligt
-• Brug kropssprog aktivt
-• Vær entusiastisk uden at overdrive
-• Ros god sportsånd
+2. OPDEL I TEAMS
+   Hvis dette ikke er klaret på forhånd af kunden
 
-KONFLIKTHÅNDTERING:
-• Lyt til begge parter
-• Tag hurtige beslutninger
-• Vær konsekvent
-• Hold det humoristisk hvis muligt`,
+3. FORKLAR AKTIVITETEN
+   • Der skal skydes med gevær efter lerduer
+   • Det virker ved hjælp af laser - ufarligt
+   • Duerne er af composit og genbruges
+   • 4 runder med forskellige regler
+   • Reglerne forklares inden hver runde
+   • Vi kårer et samlet vinderteam baseret på alle 4 runders score
+
+4. INSTRUER I GEVÆRERNE
+
+5. EKSEKVÉR TESTRUNDE
+
+6. EKSEKVÉR DE 4 RUNDER
+
+7. UDDEL POINT
+
+8. AFRUNDING OG "TAK FOR I DAG"`,
       order_index: 13,
       icon: Users,
       iconKey: 'users',
@@ -904,32 +1115,28 @@ KONFLIKTHÅNDTERING:
       activity: 'teamlazer',
       section_key: 'brug_gevaerer',
       title: 'BRUG AF GEVÆRER',
-      content: `DEMONSTRATION FOR DELTAGERE:
+      content: `INSTRUKTION TIL DELTAGERNE:
 
-1. TÆND GEVÆRET
-• Vis hvor tænd/sluk knap sidder
-• Vent på at det er klar (lyd/lys)
+1. FORKLAR FUNKTION
+   • Hvordan gevær, kaster og scoreboard fungerer
+   • Hvordan man holder geværet korrekt
+   • Hvordan man sigter
 
-2. SIGTE
+2. FORTÆL OM TESTRUNDEN
+   • Alle skal testskyde
+   • Alle skyder på samme flyvende due
+   • Der IKKE skal skiftes skytte FØR du siger til
+
+SIGTETEKNIK:
 • Hold geværet stabilt med begge hænder
-• Kig gennem sigtekornet
-• Peg mod modstanders vest-sensorer
+• Kig langs løbet
+• Følg duen med geværet
+• Tryk roligt af
 
-3. SKYD
-• Tryk på aftrækkeren
-• Korte, kontrollerede skud
-• Se efter bekræftelse på hit
-
-4. NÅR DU ER RAMT
-• Vesten vibrerer/blinker
-• Du er "død" i 3-5 sekunder
-• Gå til respawn-punkt
-• Vent til vesten er klar igen
-
-VIGTIGE POINTER:
-• Rammer du en i hovedet tæller det IKKE
-• Geværet har begrænset rækkevidde
-• Gem dig bag dækning når du lader`,
+VIGTIGT:
+• Geværet har 2 skud per due
+• Score vises live på displayet
+• Hvert gevær har et nummer der matcher displayet`,
       order_index: 14,
       icon: Target,
       iconKey: 'target',
@@ -945,20 +1152,23 @@ VIGTIGE POINTER:
 Alle skal være trygge ved udstyret før konkurrencen starter.
 
 SÅDAN GØR DU:
-1. Del geværer ud til alle
-2. Lad dem skyde mod en væg/mål i 2 min
-3. Vis hvordan man tjekker egne point
-4. Par dem sammen for at øve hits
-5. Forklar respawn-mekanik i praksis
 
-VIGTIGT:
-• Sørg for alle har prøvet at skyde
-• Check at alle veste virker
-• Besvar spørgsmål
-• Byg energi og forventning op
+1. Hver deltager skyder ca. 10 duer
 
-TIP:
-"Nu hvor I har prøvet lidt... hvem tror de vinder!?" - Skab rivalisering og engagement!`,
+2. Forklar hvordan point vises på scoreboard
+   Så deltagerne kan følge med i pointgivning
+
+3. Når alle har skudt 8-15 duer hver (alt efter evner):
+   Få ALLE til at hjælpe med at samle duerne ind igen
+
+TIP: Lok dem ved at forklare at LIGE OM LIDT er det en del af konkurrencen at samle duer ind!
+
+4. Fyld kasteren op igen
+
+BYGER ENERGI:
+"Nu hvor I har prøvet lidt... hvem tror I vinder!?"
+
+Skab rivalisering og engagement mellem holdene!`,
       order_index: 15,
       icon: Play,
       iconKey: 'play',
@@ -970,33 +1180,29 @@ TIP:
       activity: 'teamlazer',
       section_key: 'de_4_runder',
       title: 'DE 4 RUNDER',
-      content: `RUNDE 1: KLASSISK TEAM DEATHMATCH
-• Hold mod hold
-• Flest kills vinder
-• 5-7 minutter
+      content: `RUNDE 1: LAZERSPORT
+Antal duer: 10 duer pr. mand
+POINT: 2 point for hit på 1. skud, 1 point for hit på 2. skud
+Max 2 point pr. due (rammer 1. skud gives IKKE point for 2. skud)
 
-RUNDE 2: CAPTURE THE FLAG
-• Hent modstanderens flag
-• Bring det til egen base
-• Beskyt dit eget flag
+RUNDE 2: SPEEDSHOT
+Antal duer: 10 duer pr. mand
+POINT: KUN den deltager som rammer duen FØRST får 2 point
+Resten kan ramme, men får intet!
 
-RUNDE 3: VIP BESKYTTELSE
-• Et hold har en VIP
-• Andre skal "eliminere" VIP'en
-• VIP må ikke skyde
+RUNDE 3: SKILLSHOT
+Antal duer: 5x3 (15) duer pr. mand
+POINT: Op til 3 point pr. due (2 for 1. skud + 1 for 2. skud)
+SKIFT: Efter hver 3. due rykker alle én plads til højre
+(Plads 5 flytter til plads 1)
+NB: Score vises stadig på oprindeligt TEAM nummer!
 
-RUNDE 4: ALLE MOD ALLE
-• Ingen hold - hver mand for sig!
-• Sidste person stående vinder
-• Alternativt: Flest kills
-
-MELLEM RUNDER:
-• Kort vanpause (1-2 min)
-• Hurtig pointopdatering
-• Byg spænding til næste runde
-
-TILPASNING:
-Vælg modi der passer til gruppen. Kender de hinanden godt? Kør mere aggressive modi. Er de fremmede? Start blødt.`,
+RUNDE 4: RAPIDFIRE
+Antal duer: 5x4 eller 5 (20-25) duer pr. mand
+SKIFT: Efter hver 4-5. due rykker alle placering
+POINT: Rækkefølge - TOP 5 der rammer:
+1. = 5 point, 2. = 4 point, 3. = 3 point, 4. = 2 point, 5. = 1 point
+Man kan ramme med begge skud og få 2 placeringer (max 9 point)`,
       order_index: 16,
       icon: Trophy,
       iconKey: 'trophy',
@@ -1006,36 +1212,59 @@ Vælg modi der passer til gruppen. Kender de hinanden godt? Kør mere aggressive
     },
     {
       activity: 'teamlazer',
+      section_key: 'pointgivning',
+      title: 'POINTGIVNING',
+      content: `AFSLUTNING AF RUNDE:
+
+Når alle deltagere på teamet har skudt det angivne antal duer:
+1. Notér pointtal på pointarket
+2. Fordel placeringspoint: 5 – 4 – 3 – 2 – 1
+   (også selvom der kun er fx 4 hold med)
+
+SIDELØBENDE:
+De 1-3 teams der er i midten af point i runden skal samle duer ind!
+
+POINTLIGHED:
+Ved pointlighed får begge teams SAMME antal point og bunden løftes et point op.
+
+EFTER HVER RUNDE:
+• Skriv point ned fra displayet fra alle teams
+• Fordel scoren 5-1 fra højeste score og nedefter
+
+VARIATIONER (hvis tid til overs):
+• Gentag et eller flere spil som "revanche"
+• Alle spil gentages, men kun én udvalgt deltager skyder pr. spil`,
+      order_index: 17,
+      icon: FileText,
+      iconKey: 'file',
+      color: 'yellow',
+      category: 'during',
+      isDefault: true
+    },
+    {
+      activity: 'teamlazer',
       section_key: 'afrunding',
-      title: 'AFRUNDING',
-      content: `NÅR SIDSTE RUNDE ER SLUT:
+      title: 'AFRUNDING OG "TAK FOR I DAG"',
+      content: `MENS DER SAMLES DUER IND FOR RUNDE 4:
 
-1. SAML ALLE
-• Kald alle sammen i en cirkel
-• Sørg for opmærksomhed
+1. Regn de 4 rundescorer sammen
+   Da det er lave numre (1-5) bør det gå stærkt
 
-2. RESULTATER
-• Optæl endelige point
-• Kår vinderholder højlydt!
-• Anerkend gode præstationer
+2. Ved pointlighed:
+   Lav en "flest point på 5 skud" på spil 3
+   Bed dem selv vælge deres skytte
 
-3. FOTO
-• Tilbyd gruppefoto
-• Evt. foto med geværer
-• Del via kunde-kontakt
+3. KÅR VINDERHOLDET!
 
-4. TAK
-• Tak for god kamp
-• Nævn Crew Battle positivt
-• "Vi håber at se jer igen!"
-
-5. FEEDBACK
-• Spørg kort om oplevelsen
-• Noter evt. forbedringsforslag
+AFSLUT MED:
+• "Tak for i dag!"
+• Italesæt hvor godt det gik med at ramme duer
+• At de fik hygget sig og grint sammen
+• At de har set nye sider af hinanden
 
 HUSK:
-Afslutningen er det sidste indtryk. Gør det mindeværdigt!`,
-      order_index: 17,
+Afslutningen er det sidste indtryk - gør det mindeværdigt!`,
+      order_index: 18,
       icon: CheckCircle2,
       iconKey: 'check',
       color: 'yellow',
@@ -1048,12 +1277,15 @@ Afslutningen er det sidste indtryk. Gør det mindeværdigt!`,
       activity: 'teamlazer',
       section_key: 'forventninger_after',
       title: 'FORVENTNINGER TIL DIG',
-      content: `• Pak alt udstyr korrekt ned
-• Efterlad området pænt
+      content: `• Pak alt udstyr sikkert og effektivt ned
+• Efterlad lokationen ren og pæn som du fandt den
 • Tjek at intet er glemt
-• Oplad alt udstyr efter hjemkomst
-• Rapporter eventuelle skader
-• Giv feedback til koordinator`,
+• Ved hjemkomst: Tjek alt gear igennem
+• Sørg for at gear er klar til næste opgave
+
+Du og dine kollegaer har et fælles ansvar for at dette sker hver gang!
+
+Det er god stil og professionelt at efterlade lokationen i perfekt stand.`,
       order_index: 20,
       icon: Target,
       iconKey: 'target',
@@ -1063,86 +1295,72 @@ Afslutningen er det sidste indtryk. Gør det mindeværdigt!`,
     },
     {
       activity: 'teamlazer',
-      section_key: 'nedpakning',
-      title: 'NEDPAKNING',
-      content: `TRIN FOR TRIN:
-
-1. INDSAML UDSTYR
-• Saml alle geværer
-• Saml alle veste
-• Find alle kegler/markeringer
-
-2. TJEK OG SLUK
-• Sluk hvert gevær
-• Tjek for skader
-• Notér eventuelle problemer
-
-3. PAK FORSVARLIGT
-• Geværer i beskyttende tasker
-• Veste foldet pænt
-• Småting i separat pose
-
-4. RENGØR OMRÅDE
-• Fjern alt affald
-• Efterlad som I fandt det
-• Tak evt. kontaktperson
-
-VIGITGT:
-Gå en sidste runde og tjek området. Det er nemt at glemme ting!`,
-      order_index: 21,
-      icon: ClipboardList,
-      iconKey: 'clipboard',
-      color: 'red',
-      category: 'after',
-      isDefault: true
-    },
-    {
-      activity: 'teamlazer',
       section_key: 'tjekliste_hjemkomst',
-      title: 'TJEKLISTE HJEMKOMST',
-      content: `VED ANKOMST TIL LAGER:
+      title: 'TJEKLISTE VED HJEMKOMST',
+      content: `VED HJEMKOMSTEN TIL LAGERET:
 
-☐ Alt udstyr er pakket ud af bil
-☐ Alle geværer sat til opladning
-☐ Alle veste hængt til tørre/lufte
-☐ Kegler og markeringer på plads
-☐ Musikudstyr på plads
-☐ Defekt udstyr markeret og meldt
-☐ Førstehjælpskasse genopfyldt om nødvendigt
-☐ Bil rengjort for udstyr
+☐ TØR GEAR AF
+   Alt gear inkl. ledninger tørres af med viskestykke/klud
+   Er noget for beskidt - GIV BESKED så vi finder en løsning
 
-RAPPORTERING:
-• Send kort besked til koordinator
-• Nævn evt. problemer
-• Giv feedback på lokationen
-• Del gode historier fra dagen
+☐ VÅDT GEAR
+   Alle våde kabler og især stik/controller hænges op
+   Våde duer tømmes ud og lufttørres
+   Våde geværkasser placeres åbne på lageret
+   Geværer skal forblive "knækkede"
 
-TAK FOR DIN INDSATS!
-Du gør en forskel for Crew Battle og vores kunder.`,
-      order_index: 22,
+☐ BATTERIER
+   ALLE batterier ud af geværerne og i lader!
+
+☐ SIKRE LADNING
+   Display og kaster sættes til lader
+   125% SIKR at de lader inden du går!
+   Ved mindste tvivl - RING!
+
+☐ POINTSKEMAER
+   Brugte skemaer smides ud
+   Friske lægges i clipboard
+
+☐ FEJL ELLER MANGLER
+   Skriv under "Fejl & Mangler" i app
+
+VIGTIGT: Hvis noget af gearet/anlægget IKKE kan bruges til næste opgave - RING TIL OS MED DET SAMME!`,
+      order_index: 21,
       icon: Home,
       iconKey: 'home',
       color: 'red',
       category: 'after',
       isDefault: true
     },
-    // DE 10 BUD
+    // TOP 10
     {
       activity: 'teamlazer',
       section_key: 'de_10_bud',
-      title: 'DE 10 BUD',
+      title: 'DE 10 VIGTIGSTE POINTER',
       content: `TEAMLAZER - DE 10 VIGTIGSTE PUNKTER:
 
-1. RING ALTID 114 før aktiviteten starter
-2. Tjek at alle geværer er fuldt opladet
-3. Test hvert gevær inden deltagerne ankommer
-4. Forklar sikkerhedsregler tydeligt
-5. Kør ALTID musik under aktiviteten
-6. Vær en engageret og synlig instruktør
-7. Hold øje med sikkerhed hele tiden
-8. Sørg for fair og sjov konkurrence
-9. Afslut med kåring og gruppefoto
-10. Sæt ALT gear til opladning ved hjemkomst`,
+1. RING ALTID 114 ved ankomst til lokationen
+
+2. Tjek at ALLE 5 geværer virker FØR kunden kommer
+   Tænd og se rødt LED lys
+
+3. Test-skyd alle geværer (rødt = OK, grønt = fejl)
+
+4. Brug kun GENOPLADELIGE batterier
+   Normale batterier ødelægger fjederen!
+
+5. Musik SKAL spille når gæsterne ankommer
+
+6. SLUK musik under velkomst og briefing
+
+7. Vær en engageret vært, dommer og guide
+
+8. Sørg for at deltagerne samler duer ind mellem runder
+
+9. Afslut med klar pointopdatering og vinderkåring
+
+10. Ved hjemkomst: ALLE batterier i lader
+    Sikr 125% at display og kaster lader!`,
       order_index: 30,
       icon: ClipboardList,
       iconKey: 'clipboard',
@@ -1584,7 +1802,7 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
   const [selectedCategory, setSelectedCategory] = useState<CategoryKey | null>(null);
 
   // Linked packing list data cache
-  const [linkedPackingListData, setLinkedPackingListData] = useState<Record<string, string[]>>({});
+  const [linkedPackingListData, setLinkedPackingListData] = useState<Record<string, PackingItemData[]>>({});
 
   const isAdmin = profile?.role === 'ADMIN' || profile?.role === 'GAMEMASTER';
   const activityConfig = ACTIVITY_CONFIG[activity] || { icon: Settings, color: 'blue', title: activity };
@@ -1758,7 +1976,7 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
   };
 
   // Fetch packing list items for linked checklist display
-  const fetchLinkedPackingList = async (linkedKey: string): Promise<string[]> => {
+  const fetchLinkedPackingList = async (linkedKey: string): Promise<PackingItemData[]> => {
     // Check cache first
     if (linkedPackingListData[linkedKey]) {
       return linkedPackingListData[linkedKey];
@@ -1777,7 +1995,12 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
         return [];
       }
 
-      const items = Array.isArray(data.items) ? data.items.map((item: { text: string; name?: string }) => item.text || item.name || '') : [];
+      const items: PackingItemData[] = Array.isArray(data.items)
+        ? data.items.map((item: { text?: string; name?: string; imageUrl?: string }) => ({
+            text: item.text || item.name || '',
+            imageUrl: item.imageUrl
+          }))
+        : [];
 
       // Cache the result
       setLinkedPackingListData(prev => ({ ...prev, [linkedKey]: items }));
@@ -2195,8 +2418,8 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
         {isExpanded && (
           <div className="px-4 tablet:px-5 pb-4 tablet:pb-5 border-t border-white/10">
             <div className="pt-4 flex flex-col tablet:flex-row gap-4">
-              {/* Image Section - only show if image exists or in edit mode */}
-              {(section.image_url || isEditing) && (
+              {/* Image/Video Section - only show if image/video exists or in edit mode */}
+              {(section.image_url || section.video_url || isEditing) && (
               <div className="tablet:w-1/2 space-y-4">
                 <input
                   type="file"
@@ -2206,19 +2429,48 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                   className="hidden"
                 />
                 {section.image_url ? (
-                  <div
-                    className={`relative rounded-lg tablet:rounded-xl overflow-hidden border-2 border-dashed ${colorClasses.border} cursor-pointer group`}
-                    onClick={() => isAdmin && triggerImageUpload(section.section_key)}
-                  >
-                    <img
-                      src={section.image_url}
-                      alt={section.title}
-                      className="w-full h-48 tablet:h-64 object-cover"
-                    />
-                    {isAdmin && (
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <Upload className="w-8 h-8 text-white" />
-                      </div>
+                  <div className="space-y-2">
+                    <div
+                      className={`relative rounded-lg tablet:rounded-xl overflow-hidden border-2 border-dashed ${colorClasses.border} cursor-pointer group`}
+                      onClick={() => isAdmin && triggerImageUpload(section.section_key)}
+                    >
+                      <img
+                        src={section.image_url}
+                        alt={section.title}
+                        className="w-full h-48 tablet:h-64 object-cover"
+                      />
+                      {isAdmin && (
+                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                          <Upload className="w-8 h-8 text-white" />
+                        </div>
+                      )}
+                    </div>
+                    {/* Remove image button - only in edit mode */}
+                    {isEditing && (
+                      <button
+                        onClick={async (e) => {
+                          e.stopPropagation();
+                          if (confirm('Fjern billede fra dette afsnit?')) {
+                            try {
+                              await saveGuideSection({
+                                ...section,
+                                image_url: undefined
+                              });
+                              setSections(prev => prev.map(s =>
+                                s.section_key === section.section_key
+                                  ? { ...s, image_url: undefined }
+                                  : s
+                              ));
+                            } catch (err) {
+                              console.error('Failed to remove image:', err);
+                            }
+                          }
+                        }}
+                        className="w-full flex items-center justify-center gap-2 px-3 py-2 bg-red-500/10 border border-red-500/20 rounded-lg text-red-400 text-xs uppercase tracking-wider hover:bg-red-500/20 transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Fjern billede
+                      </button>
                     )}
                   </div>
                 ) : (
@@ -2280,6 +2532,7 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                                       ? { ...s, video_url: undefined }
                                       : s
                                   ));
+                                  setEditVideoUrl('');
                                 } catch (err) {
                                   console.error('Failed to remove video:', err);
                                 }
@@ -2297,15 +2550,31 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                         section={section}
                         onSave={async (url) => {
                           try {
-                            await saveGuideSection({
-                              ...section,
-                              video_url: url
-                            });
-                            setSections(prev => prev.map(s =>
-                              s.section_key === section.section_key
-                                ? { ...s, video_url: url }
-                                : s
-                            ));
+                            const sectionToSave = {
+                              id: section.id,
+                              activity: section.activity,
+                              section_key: section.section_key,
+                              title: section.title,
+                              content: section.content,
+                              image_url: section.image_url,
+                              video_url: url,
+                              icon_key: section.iconKey,
+                              linked_packing_list: section.linked_packing_list,
+                              order_index: section.order_index,
+                              category: section.category
+                            };
+                            console.log('Saving video to section:', sectionToSave);
+                            const result = await saveGuideSection(sectionToSave);
+                            console.log('Video save result:', result);
+                            if (result.success) {
+                              setSections(prev => prev.map(s =>
+                                s.section_key === section.section_key
+                                  ? { ...s, video_url: url }
+                                  : s
+                              ));
+                            } else {
+                              alert('Kunne ikke gemme video: ' + result.error);
+                            }
                           } catch (err) {
                             console.error('Failed to save video:', err);
                           }
@@ -2349,11 +2618,30 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                   </div>
                 )}
 
+                {/* Embedded YouTube Video - shown under image when not editing */}
+                {!isEditing && section.video_url && getYouTubeVideoId(section.video_url) && (
+                  <div className="mt-4">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Youtube className="w-4 h-4 text-red-500" />
+                      <span className="text-xs text-gray-400 uppercase tracking-wider">Video</span>
+                    </div>
+                    <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-battle-black border border-white/10">
+                      <iframe
+                        src={`https://www.youtube.com/embed/${getYouTubeVideoId(section.video_url)}?rel=0`}
+                        title="YouTube video"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
+                        className="absolute inset-0 w-full h-full"
+                      />
+                    </div>
+                  </div>
+                )}
+
               </div>
               )}
 
-              {/* Content Section - full width if no image */}
-              <div className={section.image_url || isEditing ? "tablet:w-1/2" : "w-full"}>
+              {/* Content Section - full width if no image/video */}
+              <div className={section.image_url || section.video_url || isEditing ? "tablet:w-1/2" : "w-full"}>
                 {isEditing ? (
                   <div className="space-y-3">
                     {/* Title Input */}
@@ -2486,25 +2774,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                       );
                     })()}
 
-                    {/* Embedded YouTube Video */}
-                    {section.video_url && getYouTubeVideoId(section.video_url) && (
-                      <div className="mt-4">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Youtube className="w-4 h-4 text-red-500" />
-                          <span className="text-xs text-gray-400 uppercase tracking-wider">Video</span>
-                        </div>
-                        <div className="relative w-full aspect-video rounded-xl overflow-hidden bg-battle-black border border-white/10">
-                          <iframe
-                            src={`https://www.youtube.com/embed/${getYouTubeVideoId(section.video_url)}?rel=0`}
-                            title="YouTube video"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                            className="absolute inset-0 w-full h-full"
-                          />
-                        </div>
-                      </div>
-                    )}
-
                     {/* Embedded Packing List Checklist */}
                     {section.linked_packing_list && (
                       <div className="mt-4">
@@ -2529,7 +2798,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                             }}
                             className={`inline-flex items-center gap-2 px-4 py-2 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
                           >
-                            <ExternalLink className="w-4 h-4" />
                             {section.linkText || 'ÅBEN'}
                           </button>
                         ) : (
@@ -2539,7 +2807,6 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
                             rel="noopener noreferrer"
                             className={`inline-flex items-center gap-2 px-4 py-2 ${colorClasses.bg} border ${colorClasses.border} rounded-lg ${colorClasses.text} text-xs uppercase tracking-wider hover:bg-white/10 transition-colors`}
                           >
-                            <ExternalLink className="w-4 h-4" />
                             {section.linkText || 'ÅBEN LINK'}
                           </a>
                         )}
