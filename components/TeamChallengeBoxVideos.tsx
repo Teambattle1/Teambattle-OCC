@@ -11,38 +11,38 @@ interface BoxVideo {
 
 // Parse and sort the box videos by box number
 const BOX_VIDEOS: BoxVideo[] = [
-  { boxNumber: 1, title: 'Circus', id: '1qPOQFu4tIY', length: '0:13' },
-  { boxNumber: 2, title: 'Etch a sketch', id: 'zIwSL7rBmQQ', length: '0:40' },
-  { boxNumber: 3, title: 'Rubic', id: '8VtWOJvQ7BM', length: '0:18' },
-  { boxNumber: 4, title: 'Play that funky music', id: 'J68mDdG9SRs', length: '0:37' },
-  { boxNumber: 5, title: 'Logik!', id: 'KpbT8D45L94', length: '0:18' },
-  { boxNumber: 6, title: 'Klodshans', id: '2Sg5MKun1wM', length: '0:36' },
-  { boxNumber: 7, title: 'Målbart', id: 'mZ0j6aboVlA', length: '0:16' },
-  { boxNumber: 8, title: 'ÆG-stra', id: 'hkoGkR4JacQ', length: '0:41' },
-  { boxNumber: 9, title: 'Jorden Rundt', id: 'f6kLgX_ptOI', length: '0:23' },
-  { boxNumber: 10, title: 'Bandcamp', id: 'aEMwF6tHcD8', length: '0:51' },
-  { boxNumber: 11, title: 'Helt Roligt', id: 'PT9LMSr32Jo', length: '0:34' },
-  { boxNumber: 12, title: 'Pinfight', id: '0FdjbpkFn_Y', length: '1:03' },
+  { boxNumber: 1, title: 'CIRCUS', id: '1qPOQFu4tIY', length: '0:13' },
+  { boxNumber: 2, title: 'ETCH A SKETCH', id: 'zIwSL7rBmQQ', length: '0:40' },
+  { boxNumber: 3, title: 'RUBIC', id: '8VtWOJvQ7BM', length: '0:18' },
+  { boxNumber: 4, title: 'PLAY THAT FUNKY MUSIC', id: 'J68mDdG9SRs', length: '0:37' },
+  { boxNumber: 5, title: 'LOGIK!', id: 'KpbT8D45L94', length: '0:18' },
+  { boxNumber: 6, title: 'KLODSHANS', id: '2Sg5MKun1wM', length: '0:36' },
+  { boxNumber: 7, title: 'MÅLBART', id: 'mZ0j6aboVlA', length: '0:16' },
+  { boxNumber: 8, title: 'ÆG-STRA', id: 'hkoGkR4JacQ', length: '0:41' },
+  { boxNumber: 9, title: 'JORDEN RUNDT', id: 'f6kLgX_ptOI', length: '0:23' },
+  { boxNumber: 10, title: 'BANDCAMP', id: 'aEMwF6tHcD8', length: '0:51' },
+  { boxNumber: 11, title: 'HELT ROLIGT', id: 'PT9LMSr32Jo', length: '0:34' },
+  { boxNumber: 12, title: 'PINFIGHT', id: '0FdjbpkFn_Y', length: '1:03' },
   { boxNumber: 13, title: 'TEQUILA!', id: 'Wjd5BD3OnZU', length: '0:21' },
-  { boxNumber: 14, title: 'I Balance', id: '1NUu-azTbjs', length: '0:59' },
-  { boxNumber: 15, title: 'The T Task', id: 'FyaO_lVVRC4', length: '0:24' },
+  { boxNumber: 14, title: 'I BALANCE', id: '1NUu-azTbjs', length: '0:59' },
+  { boxNumber: 15, title: 'THE T TASK', id: 'FyaO_lVVRC4', length: '0:24' },
   { boxNumber: 16, title: '4350', id: 'y2SuwxShXeI', length: '1:02' },
-  { boxNumber: 17, title: 'Små numre', id: '686elFeg1m4', length: '0:32' },
-  { boxNumber: 18, title: 'Præcis!', id: 'yFhhhUMHYaA', length: '0:36' },
+  { boxNumber: 17, title: 'SMÅ NUMRE', id: '686elFeg1m4', length: '0:32' },
+  { boxNumber: 18, title: 'PRÆCIS!', id: 'yFhhhUMHYaA', length: '0:36' },
   { boxNumber: 19, title: 'MÅL!', id: '-phNmL-52ho', length: '0:35' },
-  { boxNumber: 20, title: 'Oppustet', id: 'l4NEZb6jAwQ', length: '0:23' },
-  { boxNumber: 21, title: 'Bonus Runde', id: 'IGrF6MuzLN4', length: '0:45' },
-  { boxNumber: 22, title: 'Box 22', id: 'IkR0cJ4N5Yw', length: '0:21' },
-  { boxNumber: 23, title: 'Knuden', id: '0sppIvVui-w', length: '0:25' },
-  { boxNumber: 24, title: 'Holey Moley!', id: '326MmwpH_N0', length: '0:32' },
-  { boxNumber: 25, title: 'Slingshot', id: 'UNktC_knd7Q', length: '0:37' },
-  { boxNumber: 26, title: 'Snake', id: 'd-YR5w4C-9A', length: '0:23' },
-  { boxNumber: 27, title: 'Simon', id: 'LT0ExdbBnuE', length: '1:04' },
-  { boxNumber: 28, title: 'Spice Girls', id: '30ISFLhciSQ', length: '0:32' },
-  { boxNumber: 29, title: 'Box 29', id: '', length: '' },
-  { boxNumber: 30, title: 'Var der andet?', id: 'HMfvBD06nt8', length: '0:19' },
-  { boxNumber: 31, title: 'Top100', id: 'jkO60ivQsPs', length: '0:32' },
-  { boxNumber: 'BONUS', title: 'Bonuspanel', id: 'IGrF6MuzLN4', length: '0:45', isBonus: true },
+  { boxNumber: 20, title: 'OPPUSTET', id: 'l4NEZb6jAwQ', length: '0:23' },
+  { boxNumber: 21, title: 'RAPPE FINGRE', id: 'vwWCUYdhbQ0', length: '0:38' },
+  { boxNumber: 22, title: 'BROEN', id: '7JF4hROShfE', length: '0:28' },
+  { boxNumber: 23, title: 'KNUDEN', id: '0sppIvVui-w', length: '0:25' },
+  { boxNumber: 24, title: 'HOLEY MOLEY!', id: '326MmwpH_N0', length: '0:32' },
+  { boxNumber: 25, title: 'SLINGSHOT', id: 'UNktC_knd7Q', length: '0:37' },
+  { boxNumber: 26, title: 'SNAKE', id: 'd-YR5w4C-9A', length: '0:23' },
+  { boxNumber: 27, title: 'SIMON', id: 'LT0ExdbBnuE', length: '1:04' },
+  { boxNumber: 28, title: 'SPICE GIRLS', id: '30ISFLhciSQ', length: '0:32' },
+  { boxNumber: 29, title: 'BOX 29', id: '', length: '' },
+  { boxNumber: 30, title: 'VAR DER ANDET?', id: 'HMfvBD06nt8', length: '0:19' },
+  { boxNumber: 31, title: 'TOP100', id: 'jkO60ivQsPs', length: '0:32' },
+  { boxNumber: 'BONUS', title: 'BONUSPANEL', id: 'IGrF6MuzLN4', length: '0:45', isBonus: true },
 ];
 
 const STORAGE_KEY = 'teamchallenge_box_descriptions';
@@ -288,21 +288,29 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
   const renderMetadataTags = (boxNumber: number | string, compact: boolean = false) => {
     const meta = getBoxMetadata(boxNumber);
     const tags = [
-      { key: 'indoor', icon: Home, label: 'Inde', active: meta.indoor },
-      { key: 'outdoor', icon: Sun, label: 'Ude', active: meta.outdoor },
-      { key: 'funbuilding', icon: Users, label: 'Funbuilding', active: meta.funbuilding },
-      { key: 'instructorScore', icon: Award, label: 'Instruktør', active: meta.instructorScore },
+      { key: 'indoor', icon: Home, label: 'Inde', active: meta.indoor, color: 'cyan' },
+      { key: 'outdoor', icon: Sun, label: 'Ude', active: meta.outdoor, color: 'yellow' },
+      { key: 'funbuilding', icon: Users, label: 'Funbuilding', active: meta.funbuilding, color: 'green' },
+      { key: 'instructorScore', icon: Award, label: 'Instruktør', active: meta.instructorScore, color: 'purple' },
     ];
+
+    const colorClasses: Record<string, { active: string; inactive: string }> = {
+      cyan: { active: 'bg-cyan-400/20 text-cyan-400 border-cyan-400/50', inactive: 'bg-gray-700/50 text-gray-500 border-gray-600' },
+      yellow: { active: 'bg-yellow-400/20 text-yellow-400 border-yellow-400/50', inactive: 'bg-gray-700/50 text-gray-500 border-gray-600' },
+      green: { active: 'bg-green-400/20 text-green-400 border-green-400/50', inactive: 'bg-gray-700/50 text-gray-500 border-gray-600' },
+      purple: { active: 'bg-purple-400/20 text-purple-400 border-purple-400/50', inactive: 'bg-gray-700/50 text-gray-500 border-gray-600' },
+    };
 
     if (compact) {
       return (
         <div className="flex gap-1 flex-wrap">
-          {tags.filter(t => t.active).map(tag => {
+          {tags.map(tag => {
             const Icon = tag.icon;
+            const colors = colorClasses[tag.color];
             return (
               <div
                 key={tag.key}
-                className="flex items-center gap-0.5 px-1.5 py-0.5 bg-battle-orange/20 rounded text-battle-orange"
+                className={`flex items-center gap-0.5 px-1.5 py-0.5 rounded border ${tag.active ? colors.active : colors.inactive}`}
                 title={tag.label}
               >
                 <Icon className="w-3 h-3" />
@@ -317,14 +325,11 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
       <div className="flex gap-2 flex-wrap">
         {tags.map(tag => {
           const Icon = tag.icon;
+          const colors = colorClasses[tag.color];
           return (
             <div
               key={tag.key}
-              className={`flex items-center gap-1 px-2 py-1 rounded text-xs ${
-                tag.active
-                  ? 'bg-battle-orange/20 text-battle-orange'
-                  : 'bg-gray-700/50 text-gray-500'
-              }`}
+              className={`flex items-center gap-1 px-2 py-1 rounded border text-xs ${tag.active ? colors.active : colors.inactive}`}
             >
               <Icon className="w-3 h-3" />
               <span>{tag.label}</span>
@@ -412,6 +417,22 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                 <span className="text-[9px] tablet-landscape:text-[10px] text-battle-orange">
                   {video.length}
                 </span>
+              )}
+              {/* Toggle indicator dots */}
+              {video.id && (
+                <div className="flex gap-1 mt-0.5">
+                  {(() => {
+                    const meta = getBoxMetadata(video.boxNumber);
+                    return (
+                      <>
+                        <div className={`w-1.5 h-1.5 rounded-full ${meta.indoor ? 'bg-cyan-400' : 'bg-gray-600'}`} title="Inde" />
+                        <div className={`w-1.5 h-1.5 rounded-full ${meta.outdoor ? 'bg-yellow-400' : 'bg-gray-600'}`} title="Ude" />
+                        <div className={`w-1.5 h-1.5 rounded-full ${meta.funbuilding ? 'bg-green-400' : 'bg-gray-600'}`} title="Funbuilding" />
+                        <div className={`w-1.5 h-1.5 rounded-full ${meta.instructorScore ? 'bg-purple-400' : 'bg-gray-600'}`} title="Instruktør" />
+                      </>
+                    );
+                  })()}
+                </div>
               )}
               {/* Description indicator */}
               {descriptions[String(video.boxNumber)] && (
@@ -717,7 +738,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                   onClick={() => toggleMetadata('indoor')}
                   className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
                     editorMetadata.indoor
-                      ? 'bg-battle-orange/20 border-battle-orange text-white'
+                      ? 'bg-cyan-400/20 border-cyan-400 text-cyan-400'
                       : 'bg-gray-700/50 border-gray-600 text-gray-400'
                   }`}
                 >
@@ -726,7 +747,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                     <span className="text-sm">Egnet til inde</span>
                   </div>
                   {editorMetadata.indoor ? (
-                    <ToggleRight className="w-5 h-5 text-battle-orange" />
+                    <ToggleRight className="w-5 h-5 text-cyan-400" />
                   ) : (
                     <ToggleLeft className="w-5 h-5" />
                   )}
@@ -737,7 +758,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                   onClick={() => toggleMetadata('outdoor')}
                   className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
                     editorMetadata.outdoor
-                      ? 'bg-battle-orange/20 border-battle-orange text-white'
+                      ? 'bg-yellow-400/20 border-yellow-400 text-yellow-400'
                       : 'bg-gray-700/50 border-gray-600 text-gray-400'
                   }`}
                 >
@@ -746,7 +767,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                     <span className="text-sm">Egnet til ude</span>
                   </div>
                   {editorMetadata.outdoor ? (
-                    <ToggleRight className="w-5 h-5 text-battle-orange" />
+                    <ToggleRight className="w-5 h-5 text-yellow-400" />
                   ) : (
                     <ToggleLeft className="w-5 h-5" />
                   )}
@@ -757,7 +778,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                   onClick={() => toggleMetadata('funbuilding')}
                   className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
                     editorMetadata.funbuilding
-                      ? 'bg-battle-orange/20 border-battle-orange text-white'
+                      ? 'bg-green-400/20 border-green-400 text-green-400'
                       : 'bg-gray-700/50 border-gray-600 text-gray-400'
                   }`}
                 >
@@ -766,7 +787,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                     <span className="text-sm">Funbuilding</span>
                   </div>
                   {editorMetadata.funbuilding ? (
-                    <ToggleRight className="w-5 h-5 text-battle-orange" />
+                    <ToggleRight className="w-5 h-5 text-green-400" />
                   ) : (
                     <ToggleLeft className="w-5 h-5" />
                   )}
@@ -777,7 +798,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                   onClick={() => toggleMetadata('instructorScore')}
                   className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
                     editorMetadata.instructorScore
-                      ? 'bg-battle-orange/20 border-battle-orange text-white'
+                      ? 'bg-purple-400/20 border-purple-400 text-purple-400'
                       : 'bg-gray-700/50 border-gray-600 text-gray-400'
                   }`}
                 >
@@ -786,7 +807,7 @@ const TeamChallengeBoxVideos: React.FC<TeamChallengeBoxVideosProps> = ({ onBack 
                     <span className="text-sm">Instruktør score</span>
                   </div>
                   {editorMetadata.instructorScore ? (
-                    <ToggleRight className="w-5 h-5 text-battle-orange" />
+                    <ToggleRight className="w-5 h-5 text-purple-400" />
                   ) : (
                     <ToggleLeft className="w-5 h-5" />
                   )}
