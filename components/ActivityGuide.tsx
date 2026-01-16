@@ -363,20 +363,36 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
 
   const handleSaveEdit = async (section: SectionWithMeta) => {
     setIsSaving(true);
-    const updatedSection = {
-      ...section,
-      title: editTitle,
-      content: editContent
-    };
+    try {
+      const updatedSection: GuideSection = {
+        id: section.id,
+        activity: section.activity || activity,
+        section_key: section.section_key,
+        title: editTitle,
+        content: editContent,
+        image_url: section.image_url,
+        order_index: section.order_index || 0,
+        category: section.category
+      };
 
-    const result = await saveGuideSection(updatedSection);
-    if (result.success) {
-      setSections(prev => prev.map(s =>
-        s.section_key === section.section_key
-          ? { ...s, title: editTitle, content: editContent, id: result.id || s.id }
-          : s
-      ));
-      setEditingSection(null);
+      console.log('Saving section:', updatedSection);
+      const result = await saveGuideSection(updatedSection);
+      console.log('Save result:', result);
+
+      if (result.success) {
+        const now = new Date().toISOString();
+        setSections(prev => prev.map(s =>
+          s.section_key === section.section_key
+            ? { ...s, title: editTitle, content: editContent, id: result.id || s.id, updated_at: now }
+            : s
+        ));
+        setEditingSection(null);
+      } else {
+        alert('Kunne ikke gemme: ' + (result.error || 'Ukendt fejl'));
+      }
+    } catch (err) {
+      console.error('Error saving section:', err);
+      alert('Fejl ved gemning af sektion');
     }
     setIsSaving(false);
   };
@@ -392,21 +408,42 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
     if (!file) return;
 
     setUploadingSectionKey(sectionKey);
-    const result = await uploadGuideImage(file, activity, sectionKey);
+    try {
+      const result = await uploadGuideImage(file, activity, sectionKey);
 
-    if (result.success && result.url) {
-      const section = sections.find(s => s.section_key === sectionKey);
-      if (section) {
-        const updatedSection = { ...section, image_url: result.url };
-        const saveResult = await saveGuideSection(updatedSection);
-        if (saveResult.success) {
-          setSections(prev => prev.map(s =>
-            s.section_key === sectionKey
-              ? { ...s, image_url: result.url, id: saveResult.id || s.id }
-              : s
-          ));
+      if (result.success && result.url) {
+        const section = sections.find(s => s.section_key === sectionKey);
+        if (section) {
+          const updatedSection: GuideSection = {
+            id: section.id,
+            activity: section.activity || activity,
+            section_key: section.section_key,
+            title: section.title,
+            content: section.content,
+            image_url: result.url,
+            order_index: section.order_index || 0,
+            category: section.category
+          };
+          console.log('Saving image for section:', updatedSection);
+          const saveResult = await saveGuideSection(updatedSection);
+          console.log('Image save result:', saveResult);
+          if (saveResult.success) {
+            const now = new Date().toISOString();
+            setSections(prev => prev.map(s =>
+              s.section_key === sectionKey
+                ? { ...s, image_url: result.url, id: saveResult.id || s.id, updated_at: now }
+                : s
+            ));
+          } else {
+            alert('Kunne ikke gemme billede: ' + (saveResult.error || 'Ukendt fejl'));
+          }
         }
+      } else {
+        alert('Kunne ikke uploade billede: ' + (result.error || 'Ukendt fejl'));
       }
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      alert('Fejl ved upload af billede');
     }
     setUploadingSectionKey(null);
     if (fileInputRef.current) fileInputRef.current.value = '';
@@ -431,21 +468,50 @@ const ActivityGuide: React.FC<ActivityGuideProps> = ({ activity, onNavigate }) =
     if (swapIndex < 0 || swapIndex >= sameCategorySections.length) return;
 
     const swapSection = sameCategorySections[swapIndex];
-    const tempOrder = currentSection.order_index;
-    currentSection.order_index = swapSection.order_index;
-    swapSection.order_index = tempOrder;
+    const newCurrentOrder = swapSection.order_index;
+    const newSwapOrder = currentSection.order_index;
 
-    await saveGuideSection(currentSection);
-    await saveGuideSection(swapSection);
+    try {
+      // Save both sections with swapped order
+      const currentToSave: GuideSection = {
+        id: currentSection.id,
+        activity: currentSection.activity || activity,
+        section_key: currentSection.section_key,
+        title: currentSection.title,
+        content: currentSection.content,
+        image_url: currentSection.image_url,
+        order_index: newCurrentOrder,
+        category: currentSection.category
+      };
+      const swapToSave: GuideSection = {
+        id: swapSection.id,
+        activity: swapSection.activity || activity,
+        section_key: swapSection.section_key,
+        title: swapSection.title,
+        content: swapSection.content,
+        image_url: swapSection.image_url,
+        order_index: newSwapOrder,
+        category: swapSection.category
+      };
 
-    setSections(prev => {
-      const updated = prev.map(s => {
-        if (s.section_key === currentSection.section_key) return { ...s, order_index: currentSection.order_index };
-        if (s.section_key === swapSection.section_key) return { ...s, order_index: swapSection.order_index };
-        return s;
-      });
-      return updated.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
-    });
+      console.log('Moving sections:', { currentToSave, swapToSave });
+      const result1 = await saveGuideSection(currentToSave);
+      const result2 = await saveGuideSection(swapToSave);
+      console.log('Move results:', { result1, result2 });
+
+      if (result1.success && result2.success) {
+        setSections(prev => {
+          const updated = prev.map(s => {
+            if (s.section_key === currentSection.section_key) return { ...s, order_index: newCurrentOrder, id: result1.id || s.id };
+            if (s.section_key === swapSection.section_key) return { ...s, order_index: newSwapOrder, id: result2.id || s.id };
+            return s;
+          });
+          return updated.sort((a, b) => (a.order_index || 0) - (b.order_index || 0));
+        });
+      }
+    } catch (err) {
+      console.error('Error moving section:', err);
+    }
   };
 
   const handleDeleteSection = async (section: SectionWithMeta) => {
