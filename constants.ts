@@ -147,6 +147,15 @@ export const CODE_LINKS: HubLink[] = [
 // TeamChallenge Submenu Links
 export const TEAM_CHALLENGE_LINKS: HubLink[] = [
   {
+    id: 'tc0',
+    title: 'GUIDE',
+    url: '#teamchallenge_guide',
+    icon: Map,
+    description: 'Instructions',
+    color: 'blue',
+    badge: 'new'
+  },
+  {
     id: 'tc1',
     title: 'LOQUIZ',
     url: '#loquiz',
@@ -221,10 +230,11 @@ export const TEAMLAZER_LINKS: HubLink[] = [
   {
     id: 'tl2',
     title: 'GUIDE',
-    url: '#',
+    url: '#teamlazer_guide',
     icon: Map,
     description: 'Instructions',
-    color: 'blue'
+    color: 'blue',
+    badge: 'new'
   },
   {
     id: 'tl6',
@@ -288,10 +298,11 @@ export const TEAMSEGWAY_LINKS: HubLink[] = [
   {
     id: 'ts2',
     title: 'GUIDE',
-    url: '#',
+    url: '#teamsegway_guide',
     icon: Map,
     description: 'Instructions',
-    color: 'blue'
+    color: 'blue',
+    badge: 'new'
   },
   {
     id: 'ts3',
@@ -548,10 +559,11 @@ export const TEAMCONNECT_LINKS: HubLink[] = [
   {
     id: 'tc1',
     title: 'GUIDE',
-    url: '#',
+    url: '#teamconnect_guide',
     icon: Map,
     description: 'Instructions',
-    color: 'blue'
+    color: 'blue',
+    badge: 'new'
   },
   {
     id: 'tc2',
@@ -584,10 +596,11 @@ export const TEAMROBIN_LINKS: HubLink[] = [
   {
     id: 'tr2',
     title: 'GUIDE',
-    url: '#',
+    url: '#teamrobin_guide',
     icon: Map,
     description: 'Instructions',
-    color: 'blue'
+    color: 'blue',
+    badge: 'new'
   },
   {
     id: 'tr3',
@@ -667,6 +680,15 @@ export const TEAMCONSTRUCT_PACKING_LINKS: HubLink[] = [
 
 // TeamAction Submenu Links
 export const TEAMACTION_LINKS: HubLink[] = [
+  {
+    id: 'ta0',
+    title: 'GUIDE',
+    url: '#teamaction_guide',
+    icon: Map,
+    description: 'Instructions',
+    color: 'blue',
+    badge: 'new'
+  },
   {
     id: 'ta1',
     title: 'LOQUIZ',

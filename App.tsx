@@ -427,6 +427,18 @@ const App: React.FC = () => {
       changeView('teambox');
     } else if (currentView === 'teamlazer_video') {
       changeView('teamlazer');
+    } else if (currentView === 'teamlazer_guide') {
+      changeView('teamlazer');
+    } else if (currentView === 'teamrobin_guide') {
+      changeView('teamrobin');
+    } else if (currentView === 'teamsegway_guide') {
+      changeView('teamsegway');
+    } else if (currentView === 'teamconnect_guide') {
+      changeView('teamconnect');
+    } else if (currentView === 'teamaction_guide') {
+      changeView('teamaction');
+    } else if (currentView === 'teamchallenge_guide') {
+      changeView('team_challenge');
     } else if (currentView === 'teamlazer_packing') {
       changeView('teamlazer');
     } else if (currentView === 'teamsegway_packing') {
@@ -921,6 +933,42 @@ const App: React.FC = () => {
       viewSubtitle = 'Loquiz';
       ViewIcon = Wrench;
       break;
+    case 'teamlazer_guide':
+      currentLinks = [];
+      viewTitle = 'CREW GUIDE';
+      viewSubtitle = 'TeamLazer';
+      ViewIcon = Map;
+      break;
+    case 'teamrobin_guide':
+      currentLinks = [];
+      viewTitle = 'CREW GUIDE';
+      viewSubtitle = 'TeamRobin';
+      ViewIcon = Map;
+      break;
+    case 'teamsegway_guide':
+      currentLinks = [];
+      viewTitle = 'CREW GUIDE';
+      viewSubtitle = 'TeamSegway';
+      ViewIcon = Map;
+      break;
+    case 'teamconnect_guide':
+      currentLinks = [];
+      viewTitle = 'CREW GUIDE';
+      viewSubtitle = 'TeamConnect';
+      ViewIcon = Map;
+      break;
+    case 'teamaction_guide':
+      currentLinks = [];
+      viewTitle = 'CREW GUIDE';
+      viewSubtitle = 'TeamAction';
+      ViewIcon = Map;
+      break;
+    case 'teamchallenge_guide':
+      currentLinks = [];
+      viewTitle = 'CREW GUIDE';
+      viewSubtitle = 'TeamChallenge';
+      ViewIcon = Map;
+      break;
     case 'main':
     default:
       // Use the state for main view to reflect drag and drop order, filtered by role
@@ -1264,6 +1312,18 @@ const App: React.FC = () => {
             <TeamRaceInstructions totalSlides={10} />
           ) : currentView === 'teamrace_scorecard' ? (
             <TeamRaceScorecard />
+          ) : currentView === 'teamlazer_guide' ? (
+            <ActivityGuide activity="teamlazer" onNavigate={(view) => changeView(view as ViewState)} />
+          ) : currentView === 'teamrobin_guide' ? (
+            <ActivityGuide activity="teamrobin" onNavigate={(view) => changeView(view as ViewState)} />
+          ) : currentView === 'teamsegway_guide' ? (
+            <ActivityGuide activity="teamsegway" onNavigate={(view) => changeView(view as ViewState)} />
+          ) : currentView === 'teamconnect_guide' ? (
+            <ActivityGuide activity="teamconnect" onNavigate={(view) => changeView(view as ViewState)} />
+          ) : currentView === 'teamaction_guide' ? (
+            <ActivityGuide activity="teamaction" onNavigate={(view) => changeView(view as ViewState)} />
+          ) : currentView === 'teamchallenge_guide' ? (
+            <ActivityGuide activity="teamchallenge" onNavigate={(view) => changeView(view as ViewState)} />
           ) : currentView === 'admin_reports' ? (
             <AdminReports />
           ) : currentView === 'admin_packing_editor' ? (
