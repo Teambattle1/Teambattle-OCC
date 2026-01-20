@@ -301,9 +301,6 @@ Tænd musik under oprydning!`,
     icon: Home,
     iconKey: 'home',
     color: 'green',
-    link: '#teamconstruct_packing_hjemkomst',
-    linkText: 'TJEKLISTE HJEMKOMST',
-    isInternal: true,
     category: 'after' as CategoryKey,
     isDefault: true
   }

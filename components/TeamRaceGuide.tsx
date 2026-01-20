@@ -248,10 +248,7 @@ Gearet skal virke og være klar til den næste der skal bruge det.
 3. Virker noget af gearet ikke, så kommende opgave ikke er mulig, SKAL DER RINGES så snart det er muligt, så vi kan få det fixet.`,
     order_index: 9,
     icon: Home,
-    color: 'green',
-    link: '#teamrace_packing_hjemkomst',
-    linkText: 'TJEKLISTE HJEMKOMST',
-    isInternal: true
+    color: 'green'
   }
 ];
 

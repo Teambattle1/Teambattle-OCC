@@ -192,10 +192,7 @@ EFTER HVER OPGAVE:
 Se nulstillingsskema: https://l.ead.me/teambox-nulstil`,
     order_index: 8,
     icon: Home,
-    color: 'green',
-    link: '#teambox_packing_hjemkomst',
-    linkText: 'TJEKLISTE HJEMKOMST',
-    isInternal: true
+    color: 'green'
   }
 ];
 
