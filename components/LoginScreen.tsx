@@ -54,7 +54,7 @@ const LoginScreen: React.FC = () => {
             <span className="text-battle-orange">BATTLE</span>
           </h1>
           <p className="text-battle-white/50 text-sm tracking-[0.2em] uppercase mt-2">
-            Operational Command Center
+            Crew Command Center
           </p>
         </div>
 

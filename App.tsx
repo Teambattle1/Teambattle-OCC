@@ -1063,7 +1063,7 @@ const App: React.FC = () => {
       // Use the state for main view to reflect drag and drop order, filtered by role, with dynamic badges
       currentLinks = enhanceHubLinksWithBadges(filterLinksByRole(hubLinks));
       viewTitle = 'TEAMBATTLE';
-      viewSubtitle = 'Operational Command Center';
+      viewSubtitle = 'Crew Command Center';
       ViewIcon = ShieldCheck;
       break;
   }
